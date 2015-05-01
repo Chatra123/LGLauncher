@@ -124,9 +124,9 @@ namespace LGLauncher
       if (1 <= PathList.No && 0 < editList.Count)
       {
         int main_endframe = editList[editList.Count - 1];
-        bool CM_is_tipend = (main_endframe != endFrame);   //mainの終端　！＝　avsの終端
-        if (CM_is_tipend) editList.Add(endFrame);          //  終端がＣＭの途中、スキップ用にendFrame追加
-        else editList.RemoveAt(editList.Count - 1);        //  終端が本編の途中、最後のフレーム削除
+        bool CM_is_tipend = (main_endframe != endFrame);   //mainの終端！＝avsの終端
+        if (CM_is_tipend) editList.Add(endFrame);          //  終端がＣＭの途中　→　スキップ用にendFrame追加
+        else editList.RemoveAt(editList.Count - 1);        //  終端が本編の途中　→　最後のフレーム削除
       }
 
       //
