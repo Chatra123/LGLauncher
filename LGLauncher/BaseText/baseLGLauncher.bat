@@ -31,7 +31,7 @@ set min_=%TIME:~3,2%
 set sec_=%TIME:~6,2%
 set msec=%TIME:~9,2%
 set end=%hour%	%min_%	%sec_%	%msec%0
-echo #PartNo#		%begin%		%end%>>"_#TsShortName#_ˆ—ŠÔ.sys.txt"
+echo #PartNo#	%begin%		%end%>>"_#TsShortName#_ˆ—ŠÔ.sys.txt"
 
 
 endlocal
