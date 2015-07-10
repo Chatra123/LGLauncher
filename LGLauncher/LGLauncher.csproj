@@ -41,26 +41,29 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LGL1_PreSession\AvsWithLwi.cs" />
-    <Compile Include="Text\ExceptionInfo.cs" />
+    <Compile Include="Exception\LGLException.cs" />
+    <Compile Include="MainProcess\_1_PreProcess\AvsWithLwi.cs" />
+    <Compile Include="MainProcess\_1_PreProcess\AvsCommon.cs" />
+    <Compile Include="Text\XmlRW.cs" />
+    <Compile Include="Exception\ExceptionInfo.cs" />
     <Compile Include="Text\FileRW.cs" />
     <Compile Include="Text\Log.cs" />
     <Compile Include="Text\Setting.cs" />
-    <Compile Include="LGL1_PreSession\AvsWithD2v.cs" />
-    <Compile Include="LGL1_PreSession\TimeShiftSrt.cs" />
-    <Compile Include="LGL1_PreSession\LGLauncherBat.cs" />
-    <Compile Include="LGL2_PostSession\EditFrame_main.cs" />
-    <Compile Include="LGL2_PostSession\EditFrame_sub.cs" />
+    <Compile Include="MainProcess\_1_PreProcess\AvsWithD2v.cs" />
+    <Compile Include="MainProcess\_1_PreProcess\TimeShiftSrt.cs" />
+    <Compile Include="MainProcess\_1_PreProcess\LGLauncherBat.cs" />
+    <Compile Include="MainProcess\_2_PostProcess\EditFrame_main.cs" />
+    <Compile Include="MainProcess\_2_PostProcess\EditFrame_sub.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <EmbeddedResource Include="BaseText\baseLGLauncher.bat" />
-    <EmbeddedResource Include="BaseText\baseTrimAvs.avs" />
+    <EmbeddedResource Include="ResourceText\BaseLGLauncher.bat" />
+    <EmbeddedResource Include="ResourceText\BaseTrimAvs.avs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="BaseText\baseGetInfo.avs" />
+    <EmbeddedResource Include="ResourceText\BaseGetInfo.avs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

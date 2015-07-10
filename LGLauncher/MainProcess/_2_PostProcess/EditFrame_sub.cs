@@ -9,19 +9,27 @@ namespace LGLauncher
   static partial class EditFrame
   {
 
-    //======================================
-    //TvtPlayチャプター形式に変換
-    //======================================
+
     #region ConvertToTvtPlayChap
+    /// <summary>
+    /// TvtPlayチャプター形式に変換
+    /// </summary>
+    /// <param name="frameList">元になるフレームリスト</param>
+    /// <returns>
+    ///   チャプター形式の文字列
+    ///   変換失敗　→　null
+    /// </returns>
     public static string ConvertToTvtPlayChap(List<int> frameList)
     {
       //フレーム数を100msec単位の時間に変換
       //    300[frame]  ->  300 / 29.97 * 10  ->  100[100msec]
       var timeList = frameList.Select((frame) => { return (int)((1.0 * frame / 29.970) * 10.0); }).ToList();
+
       //intへの変換で丸められる。同じ値が続いていたら＋１
       for (int i = 1; i < timeList.Count; i++)
-      {      // front            back
-        if (timeList[i - 1] == timeList[i]) timeList[i]++;
+      {
+        if (timeList[i - 1] == timeList[i])
+          timeList[i]++;
       }
 
 
@@ -32,18 +40,23 @@ namespace LGLauncher
         int time = timeList[i];    //100ms単位
         // 開始直後のＣＭスキップ用
         // 　最初のメインが２秒より後にあるなら追加、  1.6倍速だと14dix-でスキップしなので 20dix-挿入
-        if (i == 0 && 20 < time) { chapText.Add("20dix-"); }
+        if (i == 0 && 20 < time)
+          chapText.Add("20dix-");
 
         // スキップチャプター
-        if (i % 2 == 0) { chapText.Add("" + time + "dox-"); }        //even  cm out
-        else { chapText.Add("" + time + "dix-"); }                   //odd    cm in    
+        if (i % 2 == 0)
+          chapText.Add("" + time + "dox-");                //even  cm out
+        else
+          chapText.Add("" + time + "dix-");                //odd   cm in    
       }
       chapText.Add("0eox-c");          //閉じる
 
 
       //１行にする
       string oneliner = "";
-      foreach (var text in chapText) oneliner += text;
+      foreach (var text in chapText)
+        oneliner += text;
+
       return oneliner;
     }
     /*
@@ -93,18 +106,22 @@ namespace LGLauncher
 
 
 
-    //======================================
-    //短いMain CM をつぶす
-    //======================================
     #region FlatOut
-    //
-    //FlatOut_Main
+    /// <summary>
+    /// 短いＭａｉｎをつぶす
+    /// </summary>
+    /// <param name="frameList">元になるフレームリスト</param>
+    /// <param name="miniMain_sec">指定秒数以下のＭａｉｎをつぶす</param>
+    /// <returns>
+    ///   変換後のフレームリスト
+    ///   変換失敗　→　null
+    /// </returns>
     public static List<int> FlatOut_Main(List<int> frameList, double miniMain_sec)
     {
       //エラーチェック
-      if (frameList == null) { return null; }
-      if (frameList.Count == 0) { return null; }
-      if (frameList.Count % 2 == 1) { return null; }
+      if (frameList == null) return null;
+      if (frameList.Count == 0) return null;
+      if (frameList.Count % 2 == 1) return null;
 
 
       var newList = new List<int>();
@@ -123,15 +140,23 @@ namespace LGLauncher
     }
 
 
-    //
-    //FlatOut_CM
-    //  開始直後のCMはつぶさない。
+
+    /// <summary>
+    /// 短いＣＭをつぶす
+    /// </summary>
+    /// <param name="frameList">元になるフレームリスト</param>
+    /// <param name="miniMain_sec">指定秒数以下のＣＭをつぶす</param>
+    /// <returns>
+    ///   変換後のフレームリスト
+    ///   変換失敗　→　null
+    /// </returns>
+    /// <remarks>開始直後のCMはつぶさない。</remarks>
     public static List<int> FlatOut_CM__(List<int> frameList, double miniCM_sec)
     {
       //エラーチェック
-      if (frameList == null) { return null; }
-      if (frameList.Count == 0) { return null; }
-      if (frameList.Count % 2 == 1) { return null; }
+      if (frameList == null) return null;
+      if (frameList.Count == 0) return null;
+      if (frameList.Count % 2 == 1) return null;
 
 
       var newList = new List<int>();

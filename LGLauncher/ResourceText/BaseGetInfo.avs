@@ -13,7 +13,7 @@ SetWorkingDir("#AvsWorkDir#")
 
 
 
-filename = "#InfoName#"
+filename   = "#InfoName#"
 frameCount = String(FrameCount()) 
 frameRate  = String(FrameRate()) 
 totalTime  = String(float(FrameCount()) / FrameRate()) 

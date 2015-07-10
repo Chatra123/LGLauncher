@@ -16,6 +16,7 @@ namespace LGLFrameChecker
   class Program
   {
 
+
     static void Main(string[] args)
     {
       Console.WriteLine("LGLFrameChecker");
@@ -33,6 +34,9 @@ namespace LGLFrameChecker
 
 
 
+
+
+
     static string CheckFrame()
     {
       //カレントパス
@@ -42,6 +46,9 @@ namespace LGLFrameChecker
       string LWorkDir = AppDir;
       //LWorkDir = @"";
       Directory.SetCurrentDirectory(LWorkDir);
+
+
+
 
 
       //d2v lwi  iPluginチェック
@@ -71,6 +78,9 @@ namespace LGLFrameChecker
 
 
 
+
+
+
       //frameset_all取得
       var frameset_all = FrameSet.Create(LWorkDir, -1, iPluginType);
       if (frameset_all.HaveValidData == false) return frameset_all.ErrMessage;
@@ -97,9 +107,16 @@ namespace LGLFrameChecker
       }
 
       //後ろからまわしてnullなら削除
-      while (0 < FrameSetList.Count && FrameSetList[FrameSetList.Count - 1] == null)
+      while (0 < FrameSetList.Count
+        && FrameSetList[FrameSetList.Count - 1] == null)
+      {
         FrameSetList.RemoveAt(FrameSetList.Count - 1);
+      }
+
       if (FrameSetList.Count() == 0) return "Error:  Not found  *.p*.frame.txt";
+
+
+
 
 
 
@@ -117,6 +134,7 @@ namespace LGLFrameChecker
         if (fs_one == null) { text.AppendLine(); continue; }
         text.AppendLine(fs_one.GetResult());
       }
+
 
       //total
       int Match_Main = FrameSetList.Select(fs => { if (fs != null) return fs.Match_Main; else return 0; }).Sum();
@@ -140,10 +158,16 @@ namespace LGLFrameChecker
 
 
 
-    //======================================
-    //Compare
-    //======================================
+
+
     #region Compare
+    /// <summary>
+    /// 全体フレームと個別フレームを比較
+    /// </summary>
+    /// <param name="FrameAll_Bool">全体フレームリストのブールリスト</param>
+    /// <param name="frameOne_bool">個別フレームリストのブールリスト</param>
+    /// <param name="frameOne_beginEnd">個別フレームリストの開始、終了フレーム数</param>
+    /// <returns></returns>
     static int[] Compare(bool[] FrameAll_Bool, bool[] frameOne_bool, int[] frameOne_beginEnd)
     {
       int fbegin = frameOne_beginEnd[0];
@@ -153,21 +177,34 @@ namespace LGLFrameChecker
 
       for (int f = fbegin; f <= fend; f++)
       {
-        bool f_all, f_one;				     //FrameAll_Bool, frameOne_boolのmain, cm
+        //  main → true,  cm → falseに変換
+        bool f_all, f_one;
 
         //FrameAll_Bool内に対象フレームの値があるか？
-        if (f < FrameAll_Bool.Count()) f_all = FrameAll_Bool[f];
-        else { f_all = false; }		     // as cm
+        if (f < FrameAll_Bool.Count())
+          f_all = FrameAll_Bool[f];
+        else
+          f_all = false;		                     // as cm
 
-        //インデックスの変換		FrameAll_Bool[567]  --＞  frameOne_bool[67] 
-        int idx_at_frameOne = f - fbegin;	//FrameAllのフレーム数 ( 0 to 1000 )を frameOne内( 0 to 100)のインデックス番号に変換
-        if (idx_at_frameOne < frameOne_bool.Count()) f_one = frameOne_bool[idx_at_frameOne];
-        else { f_one = false; }		     // as cm
+
+        //インデックスの変換
+        //FrameAllのフレーム数 ( 0 to 1000 )を frameOne内( 0 to 100)のインデックス番号に変換
+        //  fbegin = 500, fend = 600
+        //  FrameAll_Bool[567]  →  frameOne_bool[67] 
+        int idx_at_frameOne = f - fbegin;
+        if (idx_at_frameOne < frameOne_bool.Count())
+          f_one = frameOne_bool[idx_at_frameOne];
+        else
+          f_one = false; 		                     // as cm
+
 
         //match?
-        if (f_all == true && f_one == true) Match_main++;
-        else if (f_all == false && f_one == false) Match___cm++;
-        else Match__not++;
+        if (f_all == true && f_one == true)
+          Match_main++;
+        else if (f_all == false && f_one == false)
+          Match___cm++;
+        else
+          Match__not++;
       }
 
       return new int[] { Match_main, Match___cm, Match__not };
@@ -179,9 +216,13 @@ namespace LGLFrameChecker
 
 
 
-  //
-  //FrameListデータ格納用
+
+
+
   #region FrameSet
+  /// <summary>
+  /// FrameListデータ格納用
+  /// </summary>
   class FrameSet
   {
     int No;
@@ -218,7 +259,15 @@ namespace LGLFrameChecker
     }
 
 
+
     #region FrameSet作成
+    /// <summary>
+    /// FrameSet作成
+    /// </summary>
+    /// <param name="dir"></param>
+    /// <param name="no"></param>
+    /// <param name="ipluginType"></param>
+    /// <returns></returns>
     public static FrameSet Create(string dir, int no, string ipluginType)
     {
       //ファイル名作成
@@ -228,44 +277,49 @@ namespace LGLFrameChecker
       string framelistName = "*." + partID + ".frame.txt";
       string avsName = "*." + partID + "." + ipluginType + "_*__*.avs";
 
-      var dataset = new FrameSet();
-      dataset.No = no;
+      var frameset = new FrameSet();
+      frameset.No = no;
 
       //file取得
       var files = Directory.GetFiles(dir, framelistName);
       if (files.Count() != 1)
       {
-        dataset.ErrMessage = "Error:  not found  " + framelistName;
-        return dataset;
+        frameset.ErrMessage = "Error:  not found  " + framelistName;
+        return frameset;
       }
 
       //FrameList取得
-      dataset.List = GetFrameList(files[0]);
-      if (dataset.List == null)
+      frameset.List = GetFrameList(files[0]);
+      if (frameset.List == null)
       {
-        dataset.ErrMessage = "Error:  frameList file  " + files[0];
-        return dataset;
+        frameset.ErrMessage = "Error:  frameList file  " + files[0];
+        return frameset;
       }
 
       //beginEnd取得
-      dataset.beginEnd = GetFrame_byName(dir, avsName);
-      if (dataset.beginEnd == null)
+      frameset.beginEnd = GetTrimFrame_fromName(dir, avsName);
+      if (frameset.beginEnd == null)
       {
-        dataset.ErrMessage = "Error:  fail to get beginEnd frame from avsName  " + avsName;
-        return dataset;
+        frameset.ErrMessage = "Error:  fail to get beginEnd frame from avsName  " + avsName;
+        return frameset;
       }
 
       //FrameList_bool作成
-      dataset.boolList = ConvertToBoolArray(dataset.List, dataset.beginEnd);
+      frameset.boolList = ConvertToBoolArray(frameset.List, frameset.beginEnd);
 
-      return dataset;
+      return frameset;
     }
 
 
+
+
     #region Utility
-    //======================================
-    ///bool[] に変換
-    //======================================
+    /// <summary>
+    /// List<int>のフレームリストをbool[] に変換
+    /// </summary>
+    /// <param name="framelist">変換元のフレームリスト</param>
+    /// <param name="beginEnd">開始、終了フレーム数</param>
+    /// <returns></returns>
     static bool[] ConvertToBoolArray(List<int> framelist, int[] beginEnd)
     {
       int TotalFrame = beginEnd[1] - beginEnd[0] + 1;
@@ -285,10 +339,15 @@ namespace LGLFrameChecker
       return boolArray;
     }
 
-    //======================================
-    //ファイル名からフレーム数取得
-    //======================================
-    public static int[] GetFrame_byName(string directory, string nameKey)
+
+
+    /// <summary>
+    /// ファイル名からフレーム数取得
+    /// </summary>
+    /// <param name="directory"></param>
+    /// <param name="nameKey"></param>
+    /// <returns></returns>
+    public static int[] GetTrimFrame_fromName(string directory, string nameKey)
     {
       //ファイル検索
       var files = Directory.GetFiles(directory, nameKey);
@@ -305,10 +364,12 @@ namespace LGLFrameChecker
 
       //検索成功
       if (match.Success)
-      {//数値に変換
+      {
+        //数値に変換
         int ibegin, iend;
         string sbegin = match.Groups["begin"].Value;
         string send = match.Groups["end"].Value;
+
         if (int.TryParse(sbegin, out ibegin) == false) return null;  //パース失敗
         if (int.TryParse(send, out iend) == false) return null;
         return new int[] { ibegin, iend };
@@ -319,9 +380,12 @@ namespace LGLFrameChecker
     }
 
 
-    //======================================
-    //*.frame.txtを取得する
-    //======================================
+
+    /// <summary>
+    /// *.frame.txtを取得する
+    /// </summary>
+    /// <param name="framePath"></param>
+    /// <returns></returns>
     public static List<int> GetFrameList(string framePath)
     {
       //convert List<string>  to  List<int>
@@ -351,7 +415,7 @@ namespace LGLFrameChecker
       var frameList = ConvertToIntList(frameText);
       //エラーチェック
       if (frameList == null) return null;
-      if (frameList.Count % 2 == 1) return null;											         //奇数ならエラー
+      if (frameList.Count % 2 == 1) return null;
       return frameList;
     }
     #endregion

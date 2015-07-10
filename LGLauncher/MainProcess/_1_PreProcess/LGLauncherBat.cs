@@ -13,11 +13,17 @@ namespace LGLauncher
 
   static class LGLauncherBat
   {
+    /// <summary>
+    /// LogoGuillo起動用バッチ作成
+    /// </summary>
+    /// <param name="avsPath">LogoGuilloに渡すavsファイルパス</param>
+    /// <param name="srtPath">LogoGuilloに渡すsrtファイルパス</param>
+    /// <returns></returns>
     static public string Make(string avsPath, string srtPath)
     {
-      //ファイルチェック
+      //引数チェック
       if (File.Exists(avsPath) == false)
-      { Log.WriteLine("LGLauncherBat  File.Exists(avsPath) == false"); return ""; }  //avsがなければ終了
+        throw new LGLException();           //avsがなければ終了
 
 
       //srtをavsと同じ名前にリネーム
@@ -25,6 +31,7 @@ namespace LGLauncher
       {
         string avsWithoutExt = Path.GetFileNameWithoutExtension(avsPath);
         string newSrtPath = Path.Combine(PathList.LWorkDir, avsWithoutExt + ".srt");
+
         try
         {
           if (File.Exists(newSrtPath)) File.Delete(newSrtPath);
@@ -35,32 +42,32 @@ namespace LGLauncher
 
 
       //
-      //baseLGLauncher.bat読込み
+      //BaseLGLauncher.bat読込み
       //　ファイルがあればファイルから読込み
       //  　　　　　なければ内部リソースから読込み
       var batText = new List<string>();
-      string batPath = Path.Combine(PathList.AppDir, "baseLGLauncher.bat");
-      if (File.Exists(batPath))
-      {
-        batText = FileR.ReadAllLines(batPath);                                 //ファイル
-        if (batText == null) { Log.WriteLine("baseLGLauncher.bat read error"); return ""; }
-      }
-      else
-        batText = FileR.ReadFromResource("baseLGLauncher.bat");                //リソース
+      //string batPath = Path.Combine(PathList.AppDir, "BaseLGLauncher.bat");
+
+      //if (File.Exists(batPath))
+      //{
+      //  batText = FileR.ReadAllLines(batPath);
+      //  if (batText == null) throw new LGLException();
+      //}
+      //else
+      batText = FileR.ReadFromResource("LGLauncher.ResourceText.BaseLGLauncher.bat");
 
 
 
       //ロゴデータ取得
-      if (string.IsNullOrWhiteSpace(PathList.Channel)) { Log.WriteLine("string.IsNullOrWhiteSpace(PathList.Channel)"); return ""; }
       var logoAndParam = GetLogoAndParam(PathList.Channel, PathList.Program, PathList.TsPath);
-      if (logoAndParam == null) { Log.WriteLine("logoAndParam == null"); return ""; }
-      if (logoAndParam.Count < 2) { Log.WriteLine("logoAndParam.Count < 2"); return ""; }
+      if (logoAndParam == null) throw new LGLException("logoAndParam is null");
+      if (logoAndParam.Count < 2) throw new LGLException("logoAndParam is not detect");
 
       string logoPath = logoAndParam[0];
       string paramPath = logoAndParam[1];
-      if (File.Exists(logoPath) == false) { Log.WriteLine("not found *.lgd : " + logoPath); return ""; }
-      if (File.Exists(paramPath) == false) { Log.WriteLine("not found *.autoTune.param : " + paramPath); return ""; }
-      if (File.Exists(PathList.LogoGuillo) == false) { Log.WriteLine("not found LogoGuillo"); return ""; }
+      if (File.Exists(logoPath) == false) throw new LGLException("logoPath is not exist");
+      if (File.Exists(paramPath) == false) throw new LGLException("paramPath is not exist");
+      if (File.Exists(PathList.LogoGuillo) == false) throw new LGLException("LogoGuillo is not exist");
 
 
 
@@ -68,15 +75,15 @@ namespace LGLauncher
       string LOGOG_PATH = @"..\..\LSystem\LogoGuillo.exe";
       //#AVS2X_PATH#
       string AVS2X_PATH = @"..\..\LSystem\avs2pipemod.exe";
-      //"#AVSPLG_PATH#"
+      //#AVSPLG_PATH#
       string AVSPLG_PATH = @"..\..\LWork\USE_AVS";
-      //"#VIDEO_PATH#"
-      string VIDEO_PATH = avsPath;     //相対バスだとLOGOGが進まなかった。フルパスで指定
-      //"#LOGO_PATH#"
+      //#VIDEO_PATH#
+      string VIDEO_PATH = avsPath;     //相対バスだとLOGOGの作業フォルダから検索される。フルパスで指定
+      //#LOGO_PATH#
       string LOGO_PATH = logoPath;
-      //"#PRM_PATH#"
+      //#PRM_PATH#
       string PRM_PATH = paramPath;
-      //"#OUTPUT_PATH#"
+      //#OUTPUT_PATH#
       string OUTPUT_PATH = PathList.WorkName + ".frame.txt";
 
 
@@ -107,8 +114,7 @@ namespace LGLauncher
       outBatPath = PathList.WorkPath + ".bat";
 
       //ファイル書込み
-      FileW.WriteAllLines(outBatPath, batText);
-
+      File.WriteAllLines(outBatPath, batText, TextEnc.Shift_JIS);
 
 
       return outBatPath;
@@ -116,21 +122,22 @@ namespace LGLauncher
 
 
 
-    //======================================
-    //ロゴデータ取得
-    //======================================
     #region GetLogoAndParam
+    /// <summary>
+    /// ロゴデータのパス取得
+    /// </summary>
+    /// <param name="channel">LogoSelectorに渡すチャンネル名</param>
+    /// <param name="program">LogoSelectorに渡すプログラム名</param>
+    /// <param name="tsPath">LogoSelectorに渡すTSパス</param>
+    /// <returns>ロゴ、パラメーターパス</returns>
     static List<string> GetLogoAndParam(string channel, string program, string tsPath)
     {
       //ファイルチェック
       if (File.Exists(PathList.LogoSelector) == false)
-      {
-        Log.WriteLine("not found LogoSelector");
-        return null;
-      }
+        throw new LGLException("LogoSelector is not exist");
 
 
-      //パス、コマンド引数
+      //パス、引数
       string exepath = "", arg = "";
       var ext = Path.GetExtension(PathList.LogoSelector).ToLower();
 
@@ -150,14 +157,19 @@ namespace LGLauncher
         exepath = "ext does not correspond";
 
 
+
       //実行
+      Log.WriteLine();
       Log.WriteLine("LogoSelector:");
       Log.WriteLine(exepath);
-      Log.WriteLine("arg   :");
+      Log.WriteLine("arg    :");
       Log.WriteLine(arg);
+
       string result = Get_stdout(exepath, arg);
-      Log.WriteLine("return:");
+
+      Log.WriteLine("return :");
       Log.WriteLine(result);
+
       var split = result.Split(new string[] { Environment.NewLine }, StringSplitOptions.None).ToList();
 
       return split;
@@ -166,24 +178,38 @@ namespace LGLauncher
 
 
 
-    //======================================
-    //プロセス実行  標準出力を読み取る
-    //======================================
+
     #region Get_stdout
+    /// <summary>
+    /// プロセス実行  標準出力を読み取る
+    /// </summary>
+    /// <param name="exepath">実行ファイルパス</param>
+    /// <param name="arg">実行ファイルに渡す引数</param>
+    /// <returns>取得した標準出力</returns>
     static string Get_stdout(string exepath, string arg)
     {
       var prc = new Process();
       prc.StartInfo.FileName = exepath;
       prc.StartInfo.Arguments = arg;
+
       //シェルコマンドを無効に、入出力をリダイレクトするなら必ずfalseに設定
       prc.StartInfo.UseShellExecute = false;
       prc.StartInfo.RedirectStandardOutput = true;         //入出力のリダイレクト
-      prc.Start();
-      //標準出力を読み取る、プロセス終了まで待機
-      string result = prc.StandardOutput.ReadToEnd();
-      prc.WaitForExit();
-      prc.Close();
-      return result;
+
+      try
+      {
+        prc.Start();
+        //標準出力を読み取る、プロセス終了まで待機
+        string result = prc.StandardOutput.ReadToEnd();
+        prc.WaitForExit();
+        prc.Close();
+        return result;
+      }
+      catch (Exception exc)
+      {
+        //例外をそのまま返してログに書き込んでもらう。
+        return exc.ToString();
+      }
     }
     #endregion
 

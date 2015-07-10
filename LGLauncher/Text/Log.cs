@@ -19,26 +19,39 @@ namespace LGLauncher
     public static bool Enable = true;
     static StreamWriter writer = null;
 
-    //
-    //  ライター作成
+
+    /// <summary>
+    /// ライター作成
+    /// </summary>
+    /// <returns></returns>
     static StreamWriter CreateWriter()
     {
-      //アプリ
-      var AppPath = Assembly.GetExecutingAssembly().Location;
-      var AppDir = Path.GetDirectoryName(AppPath);
-      var AppName = Path.GetFileNameWithoutExtension(AppPath);
+
+      string LogDir = new Func<string>(() =>
+      {
+        var AppPath = Assembly.GetExecutingAssembly().Location;
+        var AppDir = Path.GetDirectoryName(AppPath);
+        var AppName = Path.GetFileNameWithoutExtension(AppPath);
+
+        //ファルダ名作成
+        //  LogDir優先順位　（高）  LWorkDir、LTopWorkDir、AppDir  （低）
+        string dir = null;
+        dir = (string.IsNullOrEmpty(dir) == false) ? dir : PathList.LWorkDir;
+        dir = (string.IsNullOrEmpty(dir) == false) ? dir : PathList.LTopWorkDir;
+        dir = (string.IsNullOrEmpty(dir) == false) ? dir : AppDir;
+        return dir;
+
+        //dirの使用状況の想定
+        //　LWorkDir    　　通常
+        //　LTopWorkDir     d2vが作成されていないときはLWorkDir作成前に
+        //　　　　　　　　　例外がスローされる。
+        //　AppDir          LTopWorkDir作成前に発生した例外用
+      })();
+
+      string LogName = string.IsNullOrEmpty(PathList.TsShortName)
+                                 ? "LGLauncher" : PathList.TsShortName;
 
 
-      //ファルダ名作成   LogDir優先順位　（高）WorkDir、TopWorkDir、AppDir　（低）
-      string LogDir = null;
-      LogDir = (string.IsNullOrEmpty(LogDir) == false) ? LogDir : PathList.LWorkDir;     //LWorkDir
-      LogDir = (string.IsNullOrEmpty(LogDir) == false) ? LogDir : PathList.LTopWorkDir;  //LTopWorkDir
-      LogDir = (string.IsNullOrEmpty(LogDir) == false) ? LogDir : AppDir;                //AppDir
-      bool IsAppLog = (LogDir != PathList.LWorkDir);
-
-
-      //ファイル名作成
-      string LogName = string.IsNullOrEmpty(PathList.TsShortName) ? AppName : PathList.TsShortName;
 
       //ライター作成
       //　*.sys.1.log ～ *.sys.16.logを割り当てる。
@@ -48,12 +61,8 @@ namespace LGLauncher
         {
           var path = Path.Combine(LogDir, "_" + LogName + ".sys." + i + ".log");
           var logfile = new FileInfo(path);
-          bool append = true;                              //追記
-          if (IsAppLog)                                    //IsAppLog ＆ ２ＫＢ以上なら上書き
-            if (logfile.Exists && 2 * 1024 <= logfile.Length)
-              append = false;                              //上書き
 
-          writer = new StreamWriter(path, append, new UTF8Encoding(true));
+          writer = new StreamWriter(path, true, new UTF8Encoding(true));       //追記
           break;
         }
         catch { }  //オープン失敗。別プロセスがファイル使用中
@@ -72,17 +81,44 @@ namespace LGLauncher
       return writer;
     }
 
-    //閉じる
+
+    /// <summary>
+    /// 閉じる
+    /// </summary>
     public static void Close() { if (writer != null) { writer.Close(); } }
 
 
-    //書込み
+
+    /// <summary>
+    /// テキストを書込む
+    /// </summary>
+    /// <param name="line">書込むテキスト</param>
     public static void WriteLine(string line = "")
     {
       if (Enable == false) return;
       if (writer == null) { writer = CreateWriter(); }
       if (writer != null) { writer.WriteLine(line); writer.Flush(); }
     }
+
+
+
+    /// <summary>
+    /// 例外情報を書込む
+    /// </summary>
+    /// <param name="e"></param>
+    public static void WriteException(Exception e)
+    {
+      var msglist = e.ToString().Split(new string[] { "場所" }, StringSplitOptions.RemoveEmptyEntries);
+
+      var sb = new StringBuilder();
+      sb.AppendLine("  /▽  Error  ▽/  ");
+      foreach (var line in msglist)
+        sb.AppendLine("    →場所  " + line);
+
+      WriteLine(sb.ToString());
+    }
+
+
 
 
   }

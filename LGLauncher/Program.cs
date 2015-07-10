@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Threading;
 using Microsoft.Win32;
 
+
 #region region_title
 #endregion
 
@@ -18,261 +19,218 @@ namespace LGLauncher
   {
     static void Main(string[] args)
     {
-      /*テスト用引数*/
+      ///*テスト用引数*/
       //var testArgs = new List<string>() { "-no", "1", "-last" , "-ts",
       //                                    @".\cap8s.ts",
       //                                    "-ch", "CBC", "-program", "program" };
       //args = testArgs.ToArray();
 
-
       //例外を捕捉する
       AppDomain.CurrentDomain.UnhandledException += ExceptionInfo.OnUnhandledException;
 
 
-      //
+
       //初期化
-      ParseCommandLine(args);                              //引数解析
-      PathList.InitializeDir();
-
-      Setting.LoadFile();                                  //設定読込
-      if (Setting.file.bEnable <= 0) return;
-
-      bool makepath = PathList.Make();                     //パス作成
-      if (makepath == false) { Log.WriteLine("  →PathList.Make()  fail"); return; }
-
-      bool lockfile = LockTheFile();                       //ファイルの移動禁止
-      if (lockfile == false) { Log.WriteLine("  →LockTheFile()  fail"); return; }
-
-      DeleteWorkItem_Beforehand();                         //分割処理の初回ならファイル削除
-
-      //ログ
-      if (PathList.No == -1 || PathList.No == 1) Log.WriteLine(PathList.TsPath);
-      Log.WriteLine("  No=【    " + PathList.No + "    】");
-
-
-
-
-      //
-      //メイン処理
-      //
-      new Action(() =>
+      var cmdline = new CommandLine(args);                 //引数解析
+      try
       {
-        //avs作成
-        string avsPath = "";
-        if (PathList.D2vMode)
-        {
-          //d2vからavs作成
-          var d2vAvsPath = AvsWithD2v.Make();
-          if (File.Exists(d2vAvsPath) == false) { Log.WriteLine("  →AvsWithD2v.Make()  fail"); return; }    //avs作成失敗
-          avsPath = d2vAvsPath;
-        }
-        else
-        {
-          //lwiからavs作成
-          var lwiAvsPath = AvsWithLwi.Make();
-          if (File.Exists(lwiAvsPath) == false) { Log.WriteLine("  →AvsWithLwi.Make()  fail"); return; }    //avs作成失敗
-          avsPath = lwiAvsPath;
-        }
+        var setting = Setting.LoadFile();
+        if (setting.bEnable <= 0) return;
 
-        //タイムシフトsrt作成
-        string srtPath = TimeShiftSrt.Make();              //作成できなくても継続
+        PathList.Make(cmdline, setting);                   //パス作成
 
+        Log.WriteLine("  No=【    " + PathList.No + "    】");
+        if (PathList.No == -1 || PathList.No == 1)
+          Log.WriteLine(PathList.TsPath);
 
-        //LogoGuillo起動バッチ作成
-        var batPath = LGLauncherBat.Make(avsPath, srtPath);
-        if (File.Exists(batPath) == false) { Log.WriteLine("  →LGLauncherBat.Make()  fail"); return; }      //bat作成失敗
+        LockTheFile();
+
+        DeleteWorkItem_Beforehand();
+
+      }
+      catch (LGLException e)                               //LGLExceptionのみ捕捉、その他はOnUnhandledExceptionで捕捉する。
+      {
+        Log.WriteLine();
+        Log.WriteLine(cmdline.ToString());
+        Log.WriteLine();
+        Log.WriteException(e);
+        Environment.Exit(1);                               //アプリ強制終了
+      }
 
 
 
-        //LogoGuillo同時起動数の制限
-        bool ready = WaitForReady();                       //セマフォ取得
-        if (ready == false) { Log.WriteLine("  →WaitForReady()  fail"); return; }
-
-
-        //LogoGuillo起動
-        bool launch;
-        if (PathList.D2vMode)
-        {
-          launch = LaunchLogoGuillo(batPath);
-        }
-        else
-        {
-          AvsWithLwi.SetLwi();
-          launch = LaunchLogoGuillo(batPath);
-          AvsWithLwi.BackLwi();
-        }
-
-        if (LGLSemaphore != null) LGLSemaphore.Release();  //セマフォ解放
-        if (launch == false) { Log.WriteLine("  →LaunchLogoGuillo()  fail"); return; }
-
-      })();
+      //メイン処理
+      int[] trimFrame = null;
+      try
+      {
+        trimFrame = MainProcess();
+      }
+      catch (LGLException e)
+      {
+        //例外が発生してもアプリは終了させない。EditFrame.Concat()を実行する。
+        Log.WriteLine();
+        Log.WriteException(e);
+      }
 
 
 
-      //
-      //フレーム合成＆チャプターファイル作成
-      bool concat = EditFrame.Concat();
-      if (concat == false) { Log.WriteLine("  →EditFrame()  fail"); return; }
+      //後処理      
+      try
+      {
+        //フレーム合成＆チャプターファイル作成
+        EditFrame.Concat(trimFrame);
+      }
+      catch (LGLException e)
+      {
+        Log.WriteLine();
+        Log.WriteLine(cmdline.ToString());
+        Log.WriteLine();
+        Log.WriteException(e);
+        Environment.Exit(1);                               //アプリ強制終了
+      }
 
 
-      //
+
       //ファイル削除
-      Log.Close();                                         //*.logも削除するので閉じる。
+      Log.Close();
       DeleteWorkItem_Lastly();
 
     }
 
 
 
-    //================================
-    //コマンドライン引数
-    //================================
-    #region ParseCommandLine
-    //引数解析
-    public static void ParseCommandLine(string[] args)
+
+    #region メイン処理
+    static int[] MainProcess()
     {
-      for (int i = 0; i < args.Count(); i++)
+      //avs
+      var avsMaker = PathList.Mode_D2v
+                          ? new AvsWithD2v() as AbstractAvsMaker
+                          : new AvsWithLwi() as AbstractAvsMaker;
+      avsMaker.Make();
+
+      //srt
+      var srtPath = TimeShiftSrt.Make(avsMaker.TrimFrame_m1);
+
+      //bat
+      var batPath = LGLauncherBat.Make(avsMaker.AvsPath, srtPath);
+
+
+
+      try
       {
-        string name, param = "";
-        int parse;
-        name = args[i].ToLower();                          //引数を小文字に変換
-        param = (i + 1 < args.Count()) ? args[i + 1] : "";
+        //同時起動数の制限
+        bool isReady = WaitForReady();                               //セマフォ取得
+        if (isReady == false) return null;
 
-        if (name.IndexOf("-") == 0 || name.IndexOf("/") == 0)
-          name = name.Substring(1, name.Length - 1);      //  - / をはずす
-        else
-          continue;
-
-
-        switch (name)
+        //実行
+        if (PathList.Mode_D2v)
         {
-          //小文字で比較
-          case "no":
-            if (int.TryParse(param, out parse))
-              PathList.No = parse;
-            break;
+          LaunchLogoGuillo(batPath);
+        }
+        else
+        {
+          AvsWithLwi.SetLwi();
+          LaunchLogoGuillo(batPath);
+          AvsWithLwi.BackLwi();
+        }
 
-          case "ts":
-            PathList.TsPath = param;
-            break;
-
-          case "d2v":
-            PathList.D2vPath = param;
-            break;
-
-          case "lwi":
-            PathList.LwiPath = param;
-            break;
-
-          case "srt":
-            PathList.SrtPath = param;
-            break;
-
-          case "subdir":
-            PathList.SubDir = param;
-            break;
-
-          case "ch":
-          case "channel":
-            PathList.Channel = param;
-            break;
-
-          case "program":
-            PathList.Program = param;
-            break;
-
-          case "last":
-            PathList.IsLast = true;
-            break;
-
-          default:
-            break;
-
-        }//switch
-      }//for
-
+        return avsMaker.TrimFrame;
+      }
+      finally
+      {
+        if (LGLSemaphore != null) LGLSemaphore.Release();            //セマフォ解放
+      }
     }
-    //}//class
     #endregion
 
 
 
-    //================================
-    //ファイルの移動を禁止、ファイルシェアのチェック
-    //================================
-    #region LockTheFile
+
+
+
+
+
+    #region ファイルの移動禁止
     static FileStream lock_ts, lock_d2v, lock_lwi, lock_lwifooter, lock_srt;             //プロセス終了でロック解放
-    static bool LockTheFile()
+    /// <summary>
+    /// ファイルを移動禁止にする。
+    /// </summary>
+    /// <returns></returns>
+    static void LockTheFile()
     {
       //ts
       try
       {
         lock_ts = new FileStream(PathList.TsPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
       }
-      catch { Log.WriteLine("ts file open error"); return false; }
-
+      catch { throw new LGLException(); }
 
       //d2v
-      if (PathList.D2vMode == true)
+      if (PathList.Mode_D2v == true)
         try
         {
           lock_d2v = new FileStream(PathList.D2vPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         }
-        catch { Log.WriteLine("d2v file open error"); return false; }
+        catch { throw new LGLException(); }
 
       //lwi
-      if (PathList.D2vMode == false)
+      if (PathList.Mode_D2v == false)
         try
         {
           lock_lwi = new FileStream(PathList.LwiPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         }
-        catch { Log.WriteLine("lwi file open error"); return false; }
+        catch { throw new LGLException(); }
 
       //lwifooter
-      if (PathList.D2vMode == false)
-        if (File.Exists(PathList.LwiFooterPath))           //ファイルが無い場合もある
+      if (PathList.Mode_D2v == false)
+        if (File.Exists(PathList.LwiFooterPath))           //lwifooterファイルは無い場合もある
           try
           {
             lock_lwifooter = new FileStream(PathList.LwiFooterPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
           }
-          catch { Log.WriteLine("lwi footer file open error"); return false; }
+          catch { throw new LGLException(); }
 
 
       //srt
-      if (File.Exists(PathList.SrtPath))                   //ファイルが無い場合もある
+      if (File.Exists(PathList.SrtPath))                   //srtファイルは無い場合もある
         try
         {
           /*　srtファイルはCaption2Ass_PCR_pfによって削除される可能性があるのでファイルサイズを調べてからロックする。*/
-          var fi = new FileInfo(PathList.SrtPath);
-          if (3 < fi.Length)  //gt 3byte bom size
+          var finfo = new FileInfo(PathList.SrtPath);
+          if (3 < finfo.Length)        // -gt 3byte bom size
             lock_srt = new FileStream(PathList.SrtPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         }
-        catch { Log.WriteLine("srt file open error"); return false; }
-
-
-      return true;
-
+        catch { throw new LGLException(); }
     }
-
 
     #endregion
 
 
 
-    //================================
-    //LogoGuillo同時起動数の制限
-    //================================
-    #region WaitForReady
+
+
+    #region LogoGuillo同時起動数の制限
     static Semaphore LGLSemaphore = null;
+
+    /// <summary>
+    /// LogoGuillo同時起動数の制限
+    /// </summary>
     static bool WaitForReady()
     {
       //同時起動数
-      int multiRun = Setting.file.iLogoGuillo_MultipleRun;
-      if (multiRun <= 0) { Log.WriteLine("multiRun <= 0"); return false; }
+      int multiRun = PathList.LogoGuillo_MultipleRun;
+      if (multiRun <= 0) return false;
 
 
-      //セマフォを取得
-      //    LGLauncher同士での衝突回避
+      /// <summary>
+      /// セマフォを取得
+      ///    LGLauncher同士での衝突回避
+      /// </summary>
+      /// <returns>
+      ///   return semaphore;　→　セマフォ取得成功
+      ///   return null; 　　　→　        取得失敗
+      /// </returns>
       var GetSemaphore = new Func<Semaphore>(() =>
       {
         var semaphore = new Semaphore(multiRun, multiRun, "LGL-A8245043-3476");
@@ -285,7 +243,7 @@ namespace LGLauncher
           {
             //プロセスが強制終了されているとセマフォが解放されず取得できない。
             //一定時間でタイムアウトさせる。
-            //全てのLGLauncherが終了するとセマフォがリセットされ取得できるようになる。
+            //全てのLGLauncherが終了するとセマフォがリセットされ再取得できるようになる。
             Log.WriteLine(DateTime.Now.ToString("G"));
             Log.WriteLine("timeout of semaphore release");
             semaphore = null;
@@ -297,19 +255,23 @@ namespace LGLauncher
       });
 
 
-      //プロセス数が規定値未満か？
-      //    LogoGuillo単体、外部ランチャーとの衝突回避
+
+      /// <summary>
+      /// LogoGuilloのプロセス数が規定値未満か？
+      ///   LogoGuillo単体、外部ランチャーとの衝突回避
+      /// </summary>
       var LogoGuilloHasExited = new Func<bool, bool>((extraWait) =>
       {
         int PID = Process.GetCurrentProcess().Id;
         var rand = new Random(PID + DateTime.Now.Millisecond);
 
-        var prclist = Process.GetProcessesByName("LogoGuillo");      //確認  .exeはつけない
+        var prclist = Process.GetProcessesByName("LogoGuillo");      //プロセス数確認  ”.exe”はつけない
         if (prclist.Count() < multiRun)
         {
           Thread.Sleep(rand.Next(5 * 1000, 10 * 1000));
           if (extraWait)
-            Thread.Sleep(rand.Next(0 * 1000, 30 * 1000));            //追加の待機
+            Thread.Sleep(rand.Next(0 * 1000, 30 * 1000));
+
           prclist = Process.GetProcessesByName("LogoGuillo");        //再確認
           if (prclist.Count() < multiRun) return true;
         }
@@ -318,7 +280,9 @@ namespace LGLauncher
       });
 
 
-      //システムがアイドル状態か？
+      /// <summary>
+      /// システムがアイドル状態か？
+      /// </summary>
       var SystemIsIdle = new Func<bool>(() =>
       {
         //SystemIdleMonitor.exeは起動時の負荷が高い
@@ -333,41 +297,59 @@ namespace LGLauncher
         prc.StartInfo.UseShellExecute = false;
         prc.Start();
         prc.WaitForExit(5 * 60 * 1000);
-        return prc.HasExited && prc.ExitCode == 0;
 
+        return prc.HasExited && prc.ExitCode == 0;
       });
+
+
 
 
       //
       //WaitForReady
-      //
-      LGLSemaphore = GetSemaphore();             //セマフォを取得
+      LGLSemaphore = GetSemaphore();                       //セマフォを取得
 
-      while (true) //タイムアウトなし
+      //タイムアウトなし
+      while (true)
       {
-        bool extraWait = (LGLSemaphore == null);
-        //                                          LogoGuilloプロセス数をチェック、終了を待機
-        while (LogoGuilloHasExited(extraWait) == false) { Thread.Sleep(20 * 1000); }
-        //                                          システム負荷が高い、１０分待機
-        if (SystemIsIdle() == false) { Thread.Sleep(10 * 60 * 1000); continue; }
-        //                                          LogoGuilloプロセス数を再チェック
-        if (LogoGuilloHasExited(extraWait) == false) { continue; }
-        break;//                                    システムチェックＯＫ
+        bool extraWait = (LGLSemaphore == null);           //セマフォが取得できない場合は待機時間を長くする。
+
+        while (LogoGuilloHasExited(extraWait) == false)    //LogoGuilloプロセス数をチェック
+          Thread.Sleep(20 * 1000);
+
+
+        if (SystemIsIdle() == false)                       //システム負荷が高い、１０分待機
+        {
+          Thread.Sleep(10 * 60 * 1000);
+          continue;
+        }
+
+        if (LogoGuilloHasExited(extraWait) == false)       //LogoGuilloプロセス数を再チェック
+          continue;
+
+        //システムチェックＯＫ
+        break;
       }
 
       return true;
+
     }
     #endregion
 
 
 
-    //================================
-    //LogoGuillo起動
-    //================================
-    #region LaunchLogoGuillo
-    static bool LaunchLogoGuillo(string batPath)
+
+
+    #region LogoGuillo実行
+    /// <summary>
+    /// LogoGuillo実行
+    /// </summary>
+    /// <param name="batPath">実行するパッチパス</param>
+    /// <returns></returns>
+    static void LaunchLogoGuillo(string batPath)
     {
-      if (File.Exists(batPath) == false) return false;
+      if (File.Exists(batPath) == false)
+        throw new LGLException();
+
 
       var prc = new Process();
       prc.StartInfo.FileName = batPath;
@@ -380,26 +362,23 @@ namespace LGLauncher
       if (prc.ExitCode == 0)
       {
         //正常終了
-        return true;
+        return;
       }
       else if (prc.ExitCode == -9)
       {
         //ロゴ未検出
-        Log.WriteLine("LogoGuillo ExitCode = " + prc.ExitCode + " :  ロゴ未検出");
-        return false;
+        throw new LGLException("★LogoGuillo ExitCode = " + prc.ExitCode + " :  ロゴ未検出");
+
       }
       else if (prc.ExitCode == -1)
       {
         //何らかのエラー
-        Log.WriteLine("★LogoGuillo ExitCode = " + prc.ExitCode + " :  エラー");
-        //File.Create(Path.Combine(PathList.AppDir, "★errLG__" + PathList.TsName + ".err")).Close();
-        return false;
+        throw new LGLException("★LogoGuillo ExitCode = " + prc.ExitCode + " :  エラー");
       }
       else
       {
         //強制終了すると ExitCode = 1
-        Log.WriteLine("LogoGuillo ExitCode = " + prc.ExitCode + " :  Unknown code");
-        return false;
+        throw new LGLException("★LogoGuillo ExitCode = " + prc.ExitCode + " :  Unknown code");
       }
 
 
@@ -414,50 +393,50 @@ namespace LGLauncher
 
 
 
-    //================================
-    //作業ファイル削除
-    //================================
-    #region DeleteWorkItem
-
-    //
-    //分割処理の初回ならファイル削除
+    #region 作業ファイル削除
+    /// <summary>
+    /// 分割処理の初回ならファイル削除
+    /// </summary>
     static void DeleteWorkItem_Beforehand()
     {
       //LWorkDir
       if (PathList.No == 1)
       {
-        Delete_file(0.0, PathList.LWorkDir, "*.p?*.*");    //ワイルドカード指定可、not Regex
+        Delete_file(0.0, PathList.LWorkDir, "*.p?*.*");    //ワイルドカード指定可
       }
 
     }
 
 
-    //
-    //終了時にファイル削除
+    /// <summary>
+    /// 終了処理でのファイル削除
+    /// </summary>
     static void DeleteWorkItem_Lastly()
     {
-      //使い終わったファイルを直ぐに削除
-      if (2 <= Setting.file.iDeleteWorkItem)
+      //使い終わったファイルを削除？
+      if (2 <= PathList.Mode_DeleteWorkItem)
       {
         //LWorkDir
-        //  全ての作業ファイル削除
-        if (PathList.IsLast)
+        //  IsLast　→　全ての作業ファイル削除
+        if (PathList.Mode_IsLast)
         {
           Delete_file(0.0, PathList.LWorkDir, "_" + PathList.TsShortName + "*");
           Delete_file(0.0, PathList.LWorkDir, PathList.TsShortName + "*");
         }
-        //  １つ前の作業ファイル削除
+        //  通常　→　１つ前の作業ファイル削除
         else if (2 <= PathList.No)
           Delete_file(0.0, PathList.LWorkDir, PathList.WorkName_m1 + "*", "catframe.txt");
       }
 
-      //古いファイル削除
-      if (1 <= Setting.file.iDeleteWorkItem)
+
+      //古いファイル削除？
+      if (1 <= PathList.Mode_DeleteWorkItem)
       {
-        if (PathList.No == 1 || PathList.IsLast)
+        if (PathList.No == 1 || PathList.No == -1)
         {
           const double ndaysBefore = 2.0;
           //LTopWorkDir
+          //サブフォルダ内も対象
           Delete_file(ndaysBefore, PathList.LTopWorkDir, "*.all.*");
           Delete_file(ndaysBefore, PathList.LTopWorkDir, "*.p?*.*");
           Delete_file(ndaysBefore, PathList.LTopWorkDir, "*.sys.*");
@@ -467,7 +446,6 @@ namespace LGLauncher
           Delete_file(ndaysBefore, Path.GetTempPath(), "logoGuillo_*.avs");
           Delete_file(ndaysBefore, Path.GetTempPath(), "logoGuillo_*.txt");
           Delete_file(ndaysBefore, Path.GetTempPath(), "DGI_pf.tmp*");
-          Delete_file(ndaysBefore, Path.GetTempPath(), "DGI_pf.log");
         }
       }
 
@@ -475,17 +453,24 @@ namespace LGLauncher
 
 
 
-    //
-    //削除処理の実行部
-    //searchKey:　*が使える    ingnoreKey:　*は使えない
+
+
+    /// <summary>
+    /// 削除処理の実行部
+    /// </summary>
+    /// <param name="nDaysBefore">Ｎ日前のファイルを削除対象にする</param>
+    /// <param name="directory">ファイルを探すフォルダ。　サブフォルダ内も対象</param>
+    /// <param name="searchKey">ファイル名に含まれる文字。ワイルドカード可*</param>
+    /// <param name="ignoreKey">除外するファイルに含まれる文字。ワイルドカード不可×</param>
     static void Delete_file(double nDaysBefore, string directory, string searchKey, string ignoreKey = null)
     {
       if (Directory.Exists(directory) == false) return;
-      Thread.Sleep(300);
+      Thread.Sleep(500);
 
       //ファイル取得
       var dirInfo = new DirectoryInfo(directory);
       var files = dirInfo.GetFiles(searchKey, SearchOption.AllDirectories);
+
 
       foreach (var onefile in files)
       {
@@ -497,8 +482,8 @@ namespace LGLauncher
         bool over_lastwrite = nDaysBefore < (DateTime.Now - onefile.LastWriteTime).TotalDays;
         if (over_creation && over_lastwrite)
         {
-          try { onefile.Delete(); }    //ファイル削除
-          catch { }                    //ファイル使用中
+          try { onefile.Delete(); }
+          catch { /*ファイル使用中*/ }
         }
       }
 
@@ -506,14 +491,17 @@ namespace LGLauncher
 
 
 
-    //
-    //空フォルダ削除
-    static void Delete_emptydir(string directory)
+    /// <summary>
+    /// 空フォルダ削除
+    /// </summary>
+    /// <param name="parent_directory">親フォルダを指定。空のサブフォルダが削除対象、親フォルダ自身は削除されない。</param>
+    static void Delete_emptydir(string parent_directory)
     {
-      if (Directory.Exists(directory) == false) return;
+      if (Directory.Exists(parent_directory) == false) return;
 
-      var dirInfo = new DirectoryInfo(directory);
+      var dirInfo = new DirectoryInfo(parent_directory);
       var dirs = dirInfo.GetDirectories("*", SearchOption.AllDirectories);
+
 
       foreach (var onedir in dirs)
       {
@@ -524,7 +512,7 @@ namespace LGLauncher
         if (files.Count() == 0)
         {
           try { onedir.Delete(); }
-          catch { }
+          catch { /*フォルダ使用中*/ }
         }
       }
 
@@ -534,7 +522,128 @@ namespace LGLauncher
 
 
 
-  }
+  }//class
+
+
+
+
+  #region コマンドライン
+  /// <summary>
+  /// コマンドライン
+  /// </summary>
+  class CommandLine
+  {
+    public int No { get; private set; }
+    public string TsPath { get; private set; }
+    public string D2vPath { get; private set; }
+    public string LwiPath { get; private set; }
+    public string SrtPath { get; private set; }
+    public string Channel { get; private set; }
+    public string Program { get; private set; }
+    public bool IsLast { get; private set; }
+
+
+
+    public CommandLine(string[] args)
+    {
+      Parse(args);
+    }
+
+
+    /// <summary>
+    /// コマンドライン解析
+    /// </summary>
+    /// <param name="args">解析するコマンドライン</param>
+    private void Parse(string[] args)
+    {
+      for (int i = 0; i < args.Count(); i++)
+      {
+        string key, sValue;
+        bool canParse;
+        int iValue;
+
+        key = args[i].ToLower();
+        sValue = (i + 1 < args.Count()) ? args[i + 1] : "";
+        canParse = int.TryParse(sValue, out iValue);
+
+
+        //  - / をはずす
+        if (key.IndexOf("-") == 0 || key.IndexOf("/") == 0)
+          key = key.Substring(1, key.Length - 1);
+        else
+          continue;
+
+
+        //小文字で比較
+        switch (key)
+        {
+          case "no":
+            if (canParse)
+              this.No = iValue;
+            break;
+
+          case "ts":
+            this.TsPath = sValue;
+            break;
+
+          case "d2v":
+            this.D2vPath = sValue;
+            break;
+
+          case "lwi":
+            this.LwiPath = sValue;
+            break;
+
+          case "srt":
+            this.SrtPath = sValue;
+            break;
+
+          case "ch":
+          case "channel":
+            this.Channel = sValue;
+            break;
+
+          case "program":
+            this.Program = sValue;
+            break;
+
+          case "last":
+            this.IsLast = true;
+            break;
+
+          default:
+            break;
+
+        }//switch
+      }//for
+
+    }//func
+
+
+
+
+    /// <summary>
+    /// コマンドライン一覧を出力する。
+    /// </summary>
+    /// <returns></returns>
+    public new string ToString()
+    {
+      var sb = new StringBuilder();
+      sb.AppendLine("    No      = " + No);
+      sb.AppendLine("    TsPath  = " + TsPath);
+      sb.AppendLine("    D2vPath = " + D2vPath);
+      sb.AppendLine("    LwiPath = " + LwiPath);
+      sb.AppendLine("    SrtPath = " + SrtPath);
+      sb.AppendLine("    Channel = " + Channel);
+      sb.AppendLine("    Program = " + Program);
+      sb.AppendLine("    IsLast  = " + IsLast);
+      return sb.ToString();
+    }
+
+
+
+  }//class
+  #endregion
 
 
 
@@ -543,9 +652,7 @@ namespace LGLauncher
 
 
 
-
-
-}
+}//namespace
 
 
 
