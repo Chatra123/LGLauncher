@@ -1,22 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
+﻿using System.IO;
 using System.Text.RegularExpressions;
-using System.Diagnostics;
-using System.Threading;
-
 
 namespace LGLauncher
 {
-  class AvsWithD2v : AbstractAvsMaker
+  internal class AvsWithD2v : AbstractAvsMaker
   {
     public override string AvsPath { get; protected set; }
     public override int[] TrimFrame { get; protected set; }
     public override int[] TrimFrame_m1 { get; protected set; }
-
 
     /// <summary>
     /// Trim付きd2v作成
@@ -27,10 +18,6 @@ namespace LGLauncher
       //ファイルチェック
       if (File.Exists(PathList.D2vPath) == false) throw new LGLException("D2vPath not exist");
 
-
-
-
-
       //フォーマットを整える
       string formatD2vPath = FormatD2v();
 
@@ -40,12 +27,9 @@ namespace LGLauncher
       //avs実行
       MakeAvsCommon.RunInfoAvs(infoAvsPath);
 
-
-
       //総フレーム数取得
       var avsInfo = MakeAvsCommon.GetAvsInfo(PathList.WorkName + ".d2vinfo.txt");
       int totalframe = (int)avsInfo[0];
-
 
       //前回のトリム用フレーム数取得
       this.TrimFrame_m1 = (2 <= PathList.No)
@@ -55,31 +39,21 @@ namespace LGLauncher
       //トリム用フレーム数取得
       this.TrimFrame = MakeAvsCommon.GetTrimFrame(totalframe, TrimFrame_m1);
 
-
-
       //Trim付きavs作成
       this.AvsPath = CreateTrimAvs_d2v(formatD2vPath, TrimFrame);
-
     }
 
-
-
-
-
-
-
-
     #region FormatD2v
+
     /// <summary>
     /// フォーマットを整える
     /// </summary>
     /// <returns>作成したd2vパス</returns>
-    string FormatD2v()
+    private string FormatD2v()
     {
       //ファイル読込み
       var readText = FileR.ReadAllLines(PathList.D2vPath);
       if (readText == null) throw new LGLException("d2v read error");
-
 
       //d2vファイルの簡易チェック
       bool isMatch = true;
@@ -89,7 +63,6 @@ namespace LGLauncher
         isMatch &= Regex.IsMatch(readText[i], @"\d+ \d+ \d+ \d+ \d+ \d+ \d+ .*");
       }
       if (isMatch == false) throw new LGLException("d2v format error");        //d2vファイルでない
-
 
       //FINISHEDがあるか？
       bool isFinished = false, haveFF = false;
@@ -103,8 +76,6 @@ namespace LGLauncher
 
       if (PathList.Mode_IsLast && isFinished == false)
         throw new LGLException("d2v format is not finished");
-
-
 
       //終端のフォーマットを整える
       var formatText = readText;
@@ -120,33 +91,26 @@ namespace LGLauncher
         //　・FINISHEDは書かない
       }
 
-
-
       //ファイル書込み
       string outPath = PathList.WorkPath + ".d2v";
       File.WriteAllLines(outPath, formatText, TextEnc.Shift_JIS);
 
       return outPath;
     }
-    #endregion
 
-
-
-
-
-
+    #endregion FormatD2v
 
     #region CreateInfoAvs_d2v
+
     /// <summary>
     /// フレーム数取得用のAVS作成
     /// </summary>
     /// <param name="d2vPath">フレーム数取得対象のd2vパス</param>
     /// <returns>作成したavsパス</returns>
-    string CreateInfoAvs_d2v(string d2vPath)
+    private string CreateInfoAvs_d2v(string d2vPath)
     {
       //リソース読込み
       var avsText = FileR.ReadFromResource("LGLauncher.ResourceText.BaseGetInfo.avs");
-
 
       //AVS書き換え
       string d2vName = Path.GetFileName(d2vPath);
@@ -161,34 +125,29 @@ namespace LGLauncher
         avsText[i] = line;
       }
 
-
       //書込み
       string outAvsPath = PathList.WorkPath + ".d2vinfo.avs";
       File.WriteAllLines(outAvsPath, avsText, TextEnc.Shift_JIS);
 
       return outAvsPath;
     }
+
     /*
      * avs内のWriteFileStart()のファイル名が長いと*.d2vinfo.txtのファイル名が途中で切れる。
      * ファイルパスの長さが255byteあたりでファイル名が切れる
      */
-    #endregion
 
-
-
-
-
-
-
+    #endregion CreateInfoAvs_d2v
 
     #region CreateTrimAvs_d2v
+
     /// <summary>
     /// トリムつきAVS作成
     /// </summary>
     /// <param name="d2vPath">avs内で読み込むd2vファイルパス</param>
     /// <param name="trimBeginEnd">トリムする開始、終了フレーム数</param>
     /// <returns>作成したavsパス</returns
-    string CreateTrimAvs_d2v(string d2vPath, int[] trimBeginEnd)
+    private string CreateTrimAvs_d2v(string d2vPath, int[] trimBeginEnd)
     {
       int beginFrame = trimBeginEnd[0];
       int endFrame = trimBeginEnd[1];
@@ -212,7 +171,6 @@ namespace LGLauncher
         }
         avsText[i] = line;
       }
-
 
       //長さチェック
       //　30frame以下だとlogoGuilloでavs2pipemodがエラーで落ちる。
@@ -240,16 +198,7 @@ namespace LGLauncher
         throw new LGLException("short video length");
       }
     }
-    #endregion
 
+    #endregion CreateTrimAvs_d2v
   }
-
-
-
 }
-
-
-
-
-
-

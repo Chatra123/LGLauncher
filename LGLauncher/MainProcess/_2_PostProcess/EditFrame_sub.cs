@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LGLauncher
 {
   static partial class EditFrame
   {
-
-
     #region ConvertToTvtPlayChap
+
     /// <summary>
     /// TvtPlayチャプター形式に変換
     /// </summary>
@@ -32,7 +28,6 @@ namespace LGLauncher
           timeList[i]++;
       }
 
-
       //
       var chapText = new List<string>() { "c-" };
       for (int i = 0; i < timeList.Count; i++)
@@ -47,10 +42,9 @@ namespace LGLauncher
         if (i % 2 == 0)
           chapText.Add("" + time + "dox-");                //even  cm out
         else
-          chapText.Add("" + time + "dix-");                //odd   cm in    
+          chapText.Add("" + time + "dix-");                //odd   cm in
       }
       chapText.Add("0eox-c");          //閉じる
-
 
       //１行にする
       string oneliner = "";
@@ -59,12 +53,13 @@ namespace LGLauncher
 
       return oneliner;
     }
+
     /*
      *  ＣＭから開始                      ＣＭで終わり
      *        0    1    2    3    4    5    6    7    8    9    10
      * main          ■  ■          ■
      * cm        □          □  □      □
-     * 
+     *
      * 　本編から開始                      本編で終わり
      *        0    1    2    3    4    5    6    7    8    9    10
      * main      ■  ■  ■          ■  ■
@@ -98,15 +93,11 @@ namespace LGLauncher
     //1.4        18dix-
     //1.6        20dix-
     //
-    #endregion
 
-
-
-
-
-
+    #endregion ConvertToTvtPlayChap
 
     #region FlatOut
+
     /// <summary>
     /// 短いＭａｉｎをつぶす
     /// </summary>
@@ -123,7 +114,6 @@ namespace LGLauncher
       if (frameList.Count == 0) return null;
       if (frameList.Count % 2 == 1) return null;
 
-
       var newList = new List<int>();
       for (int i = 0; i < frameList.Count; i += 2)
       {
@@ -138,8 +128,6 @@ namespace LGLauncher
 
       return newList;
     }
-
-
 
     /// <summary>
     /// 短いＣＭをつぶす
@@ -157,7 +145,6 @@ namespace LGLauncher
       if (frameList == null) return null;
       if (frameList.Count == 0) return null;
       if (frameList.Count % 2 == 1) return null;
-
 
       var newList = new List<int>();
 
@@ -189,19 +176,6 @@ namespace LGLauncher
       return newList;
     }
 
-
-    #endregion
-
-
-
-
-
-
-
-
-
-
-
-
+    #endregion FlatOut
   }
 }

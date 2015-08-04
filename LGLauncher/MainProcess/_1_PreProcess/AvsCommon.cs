@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using System.Text.RegularExpressions;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
-
 
 namespace LGLauncher
 {
-  abstract class AbstractAvsMaker
+  internal abstract class AbstractAvsMaker
   {
     public abstract string AvsPath { get; protected set; }
     public abstract int[] TrimFrame { get; protected set; }           //EditFrameに渡す値
@@ -20,12 +16,10 @@ namespace LGLauncher
     public abstract void Make();
   }
 
-
-
-  static class MakeAvsCommon
+  internal static class MakeAvsCommon
   {
-
     #region RunInfoAvs
+
     /// <summary>
     /// InfoAvs実行
     /// </summary>
@@ -34,7 +28,6 @@ namespace LGLauncher
     {
       if (File.Exists(PathList.AVS2X) == false)
         throw new LGLException();
-
 
       var psi = new ProcessStartInfo();
       psi.FileName = PathList.AVS2X;
@@ -47,17 +40,14 @@ namespace LGLauncher
       //実行
       if (prc.Start() == false) throw new LGLException();
       prc.WaitForExit(20 * 1000);      //目測だと３秒程はかかる
-
     }
-    #endregion
 
-
-
-
+    #endregion RunInfoAvs
 
     #region GetAvsInfo
+
     /// <summary>
-    /// *.info.txtからフレーム数、fps、時間を取得    
+    /// *.info.txtからフレーム数、fps、時間を取得
     /// </summary>
     /// <param name="infoName">対象のinfoテキストのパス</param>
     /// <returns>フレーム数、fps、時間</returns>
@@ -92,7 +82,6 @@ namespace LGLauncher
       if (infoText == null || infoText.Count < 4)
         throw new LGLException();
 
-
       //数値に変換
       double frame, fps, time;
       bool canParse = true;
@@ -105,14 +94,11 @@ namespace LGLauncher
 
       return new double[] { frame, fps, time };
     }
-    #endregion
 
-
-
-
-
+    #endregion GetAvsInfo
 
     #region GetTrimFrame_fromName
+
     /// <summary>
     /// ファイル名から開始、終了フレーム数取得
     /// </summary>
@@ -126,7 +112,6 @@ namespace LGLauncher
       if (files.Count() != 1)
         throw new LGLException();                          //無い or 多い
 
-
       //正規表現パターン
       //TsShortName.p1.d2v_0__2736.avs
       //TsShortName.p1.lwi_0__2736.avs
@@ -135,7 +120,6 @@ namespace LGLauncher
       var regex = new Regex(@".*\.\w+_(?<begin>\d+)__(?<end>\d+)\.avs", RegexOptions.IgnoreCase);
 
       Match match = regex.Match(files[0]);
-
 
       //成功  数値に変換
       if (match.Success)
@@ -155,13 +139,11 @@ namespace LGLauncher
       else
         return null;
     }
-    #endregion
 
-
-
-
+    #endregion GetTrimFrame_fromName
 
     #region GetTrimFrame
+
     /// <summary>
     /// トリム用フレーム数取得
     /// </summary>
@@ -193,13 +175,7 @@ namespace LGLauncher
 
       return new int[] { beginFrame, endFrame };
     }
-    #endregion
 
-
-
-
-
-
-
+    #endregion GetTrimFrame
   }
 }

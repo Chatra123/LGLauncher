@@ -1,17 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using System.Text.RegularExpressions;
 using System.Diagnostics;
-using System.Threading;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace LGLauncher
 {
-
-  static class LGLauncherBat
+  internal static class LGLauncherBat
   {
     /// <summary>
     /// LogoGuillo起動用バッチ作成
@@ -24,7 +20,6 @@ namespace LGLauncher
       //引数チェック
       if (File.Exists(avsPath) == false)
         throw new LGLException();           //avsがなければ終了
-
 
       //srtをavsと同じ名前にリネーム
       if (File.Exists(srtPath))
@@ -39,7 +34,6 @@ namespace LGLauncher
         }
         catch { }
       }
-
 
       //
       //BaseLGLauncher.bat読込み
@@ -56,8 +50,6 @@ namespace LGLauncher
       //else
       batText = FileR.ReadFromResource("LGLauncher.ResourceText.BaseLGLauncher.bat");
 
-
-
       //ロゴデータ取得
       var logoAndParam = GetLogoAndParam(PathList.Channel, PathList.Program, PathList.TsPath);
       if (logoAndParam == null) throw new LGLException("logoAndParam is null");
@@ -68,8 +60,6 @@ namespace LGLauncher
       if (File.Exists(logoPath) == false) throw new LGLException("logoPath is not exist");
       if (File.Exists(paramPath) == false) throw new LGLException("paramPath is not exist");
       if (File.Exists(PathList.LogoGuillo) == false) throw new LGLException("LogoGuillo is not exist");
-
-
 
       //#LOGOG_PATH#
       string LOGOG_PATH = @"..\..\LSystem\LogoGuillo.exe";
@@ -85,8 +75,6 @@ namespace LGLauncher
       string PRM_PATH = paramPath;
       //#OUTPUT_PATH#
       string OUTPUT_PATH = PathList.WorkName + ".frame.txt";
-
-
 
       //bat書き換え
       for (int i = 0; i < batText.Count; i++)
@@ -107,8 +95,6 @@ namespace LGLauncher
         batText[i] = line;
       }
 
-
-
       //出力ファイル名
       string outBatPath;
       outBatPath = PathList.WorkPath + ".bat";
@@ -116,13 +102,11 @@ namespace LGLauncher
       //ファイル書込み
       File.WriteAllLines(outBatPath, batText, TextEnc.Shift_JIS);
 
-
       return outBatPath;
     }
 
-
-
     #region GetLogoAndParam
+
     /// <summary>
     /// ロゴデータのパス取得
     /// </summary>
@@ -130,12 +114,11 @@ namespace LGLauncher
     /// <param name="program">LogoSelectorに渡すプログラム名</param>
     /// <param name="tsPath">LogoSelectorに渡すTSパス</param>
     /// <returns>ロゴ、パラメーターパス</returns>
-    static List<string> GetLogoAndParam(string channel, string program, string tsPath)
+    private static List<string> GetLogoAndParam(string channel, string program, string tsPath)
     {
       //ファイルチェック
       if (File.Exists(PathList.LogoSelector) == false)
         throw new LGLException("LogoSelector is not exist");
-
 
       //パス、引数
       string exepath = "", arg = "";
@@ -156,8 +139,6 @@ namespace LGLauncher
       else
         exepath = "ext does not correspond";
 
-
-
       //実行
       Log.WriteLine();
       Log.WriteLine("LogoSelector:");
@@ -174,19 +155,18 @@ namespace LGLauncher
 
       return split;
     }
-    #endregion
 
-
-
+    #endregion GetLogoAndParam
 
     #region Get_stdout
+
     /// <summary>
     /// プロセス実行  標準出力を読み取る
     /// </summary>
     /// <param name="exepath">実行ファイルパス</param>
     /// <param name="arg">実行ファイルに渡す引数</param>
     /// <returns>取得した標準出力</returns>
-    static string Get_stdout(string exepath, string arg)
+    private static string Get_stdout(string exepath, string arg)
     {
       var prc = new Process();
       prc.StartInfo.FileName = exepath;
@@ -211,22 +191,7 @@ namespace LGLauncher
         return exc.ToString();
       }
     }
-    #endregion
 
-
-
-
+    #endregion Get_stdout
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-

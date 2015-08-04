@@ -1,25 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace LGLauncher
 {
-
   /*
    * 想定できる例外はLGLExceptionを発生させてtry{}catch{}で捕まえる。
    * 録画中にダイアログを表示したくないので、 Windowsのエラーダイアログは表示させない。
-   * 
-   * 
+   *
+   *
    * LGLException以外の想定外の例外はOnUnhandledException()で処理する。
    *    LGLException　　　　　　  通常のログに追記　　　エラーダイアログを出さない
    *    OnUnhandledException()    専用のerrlogを作成　　エラーダイアログを出す
    */
 
-  class LGLException : Exception
+  internal class LGLException : Exception
   {
-    object[] InfoList;
+    private object[] InfoList;
 
     public LGLException(Exception innerException)
       : base(string.Empty, innerException) { }
@@ -29,8 +25,6 @@ namespace LGLauncher
     {
       InfoList = info;
     }
-
-
 
     public override string ToString()
     {
@@ -53,8 +47,5 @@ namespace LGLauncher
         return base.ToString();
       }
     }
-
-
   }
-
 }

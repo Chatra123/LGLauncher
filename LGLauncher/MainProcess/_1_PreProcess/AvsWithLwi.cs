@@ -1,22 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
-using System.Diagnostics;
 using System.Threading;
-
 
 namespace LGLauncher
 {
-  class AvsWithLwi : AbstractAvsMaker
+  internal class AvsWithLwi : AbstractAvsMaker
   {
     public override string AvsPath { get; protected set; }
     public override int[] TrimFrame { get; protected set; }
     public override int[] TrimFrame_m1 { get; protected set; }
-
 
     /// <summary>
     /// Trim付きavs作成
@@ -36,10 +30,6 @@ namespace LGLauncher
       if ((PathList.LwiPath).ToLower() == (PathList.TsPath + ".lwi").ToLower())
         throw new LGLException();
 
-
-
-
-
       //フォーマットを整える
       string formatLwiPath = FormatLwi();
 
@@ -51,12 +41,9 @@ namespace LGLauncher
       MakeAvsCommon.RunInfoAvs(infoAvsPath);
       BackLwi();
 
-
-
       //フレーム数取得
       var avsInfo = MakeAvsCommon.GetAvsInfo(PathList.WorkName + ".lwiinfo.txt");
       int totalframe = (int)avsInfo[0];
-
 
       //前回のトリム用フレーム数取得
       this.TrimFrame_m1 = (2 <= PathList.No)
@@ -66,26 +53,17 @@ namespace LGLauncher
       //トリム用フレーム数取得
       this.TrimFrame = MakeAvsCommon.GetTrimFrame(totalframe, TrimFrame_m1);
 
-
-
       //Trim付きavs作成
       this.AvsPath = CreateTrimAvs_lwi(TrimFrame);
-
     }
 
-
-
-
-
-
-
-
     #region FormatLwi
+
     /// <summary>
     /// lwiのフォーマットを整える
     /// </summary>
     /// <returns>フォーマット済みlwiのパス</returns>
-    string FormatLwi()
+    private string FormatLwi()
     {
       /*
        * ts  60min  5.68 GB    lwi  40.3 MB  535,345 line
@@ -100,8 +78,6 @@ namespace LGLauncher
       var writeBuff = new List<string>();
       var readBuff = new List<string>();
       readBuff = reader.ReadNLines(500);         //５００行ずつ読込む
-
-
 
       try
       {
@@ -125,7 +101,6 @@ namespace LGLauncher
           throw new LGLException("lwi format error");
         }
 
-
         //
         //読込みループ
         writeBuff = readBuff;
@@ -147,8 +122,6 @@ namespace LGLauncher
           }
         }
 
-
-
         //
         //lwiファイル終端
         //　最後の"index=..."行以降を削除
@@ -167,9 +140,6 @@ namespace LGLauncher
           //writer.Close();
           throw new LGLException();
         }
-
-
-
 
         //
         //lwiファイル作成
@@ -204,9 +174,7 @@ namespace LGLauncher
           //writer.Close();
         }
 
-
         return outlwiPath;
-
       }
       finally
       {
@@ -214,8 +182,6 @@ namespace LGLauncher
         writer.Close();
       }
     }//func
-
-
 
     /// <summary>
     /// footerファイル読込    binaryモードで読み込む
@@ -228,11 +194,10 @@ namespace LGLauncher
     ///   lwiファイルの<ExtraDataList>だけはバイナリーで書かれているので
     ///   バイナリーモードで読み込む。
     /// </remarks>
-    byte[] ReadFile_footer()
+    private byte[] ReadFile_footer()
     {
       const string tag = "</LibavReaderIndexFile>\n";
       byte[] footer = null;
-
 
       //footerは数秒間隔でファイル全体が更新されるので、
       //</LibavReaderIndexFile>を確認するまで繰り返す。
@@ -242,7 +207,6 @@ namespace LGLauncher
 
         //read
         footer = FileR.ReadBytes(PathList.LwiFooterPath);
-
 
         if (footer != null)
         {
@@ -260,17 +224,15 @@ namespace LGLauncher
       return footer;
     }
 
-
-
     /// <summary>
     /// footer作成　footerファイルが無いときに使用。
     /// </summary>
     /// <param name="lwiText"></param>
     /// <returns></returns>
-    string Create_footer(List<string> lwiText)
+    private string Create_footer(List<string> lwiText)
     {
       //
-      //lwiText line sample 
+      //lwiText line sample
       //  Key=0,Pic=3,POC=0,Repeat=1,Field=1,Width=1440,Height=1080,Format=yuv420p,ColorSpace=1
       //
 
@@ -296,7 +258,6 @@ namespace LGLauncher
         throw new LGLException();
       }
 
-
       //footerの置換
       const string footer_const =
                   @"</LibavReaderIndex>
@@ -320,26 +281,19 @@ namespace LGLauncher
 
       return footer_rpl;
     }
-    #endregion
 
-
-
-
-
-
-
+    #endregion FormatLwi
 
     #region CreateInfoAvs_lwi
+
     /// <summary>
     /// フレーム数取得用のAVS作成
     /// </summary>
     /// <returns>作成したAVSのパス</returns>
-    string CreateInfoAvs_lwi()
+    private string CreateInfoAvs_lwi()
     {
       //リソース読込み
       var avsText = FileR.ReadFromResource("LGLauncher.ResourceText.BaseGetInfo.avs");
-
-
 
       //AVS書き換え
       string lwiName = PathList.TsName + ".lwi";
@@ -356,33 +310,28 @@ namespace LGLauncher
         avsText[i] = line;
       }
 
-
       //書込み
       string outAvsPath = PathList.WorkPath + ".lwiinfo.avs";
       File.WriteAllLines(outAvsPath, avsText, TextEnc.Shift_JIS);
 
       return outAvsPath;
     }
+
     /*
      * avs内のWriteFileStart()のファイル名が長いと*.d2vinfo.txtのファイル名が途中で切れる。
      * ファイルパスの長さが255byteあたりでファイル名が切れる
      */
-    #endregion
 
-
-
-
-
-
-
+    #endregion CreateInfoAvs_lwi
 
     #region CreateTrimAvs_lwi
+
     /// <summary>
     /// トリムつきAVS作成
     /// </summary>
     /// <param name="trimBeginEnd">トリムする開始、終了フレーム数</param>
     /// <returns>作成したAVSのパス</returns>
-    string CreateTrimAvs_lwi(int[] trimBeginEnd)
+    private string CreateTrimAvs_lwi(int[] trimBeginEnd)
     {
       int beginFrame = trimBeginEnd[0];
       int endFrame = trimBeginEnd[1];
@@ -408,7 +357,6 @@ namespace LGLauncher
         avsText[i] = line;
       }
 
-
       //長さチェック
       //　30frame以下だとlogoGuilloでavs2pipemodがエラーで落ちる。
       //　120frame以下ならno frame errorと表示されて終了する。
@@ -421,7 +369,6 @@ namespace LGLauncher
         File.WriteAllLines(outAvsPath, avsText, TextEnc.Shift_JIS);
 
         return outAvsPath;
-
       }
       else
       {
@@ -434,15 +381,12 @@ namespace LGLauncher
         throw new LGLException();
       }
     }
-    #endregion
 
-
-
-
-
+    #endregion CreateTrimAvs_lwi
 
     #region Set & Back lwi
-    static FileStream lock_lwi;
+
+    private static FileStream lock_lwi;
 
     /// <summary>
     /// lwiをTsDirに移動
@@ -473,17 +417,7 @@ namespace LGLauncher
 
       return;
     }
-    #endregion
 
+    #endregion Set & Back lwi
   }
-
-
-
-
-
 }
-
-
-
-
-
