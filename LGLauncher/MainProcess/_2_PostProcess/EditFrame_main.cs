@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Reflection;
+using System.Linq;
 
 namespace LGLauncher
 {
@@ -43,8 +38,6 @@ namespace LGLauncher
       //新しいcatframe                            *.p6.catframe.txt
       string newConcatPath = PathList.WorkPath + ".catframe.txt";
 
-
-
       //ファイル名からフレーム数取得
       int beginFrame = int.MaxValue, endFrame = int.MaxValue;                  //値の異常がわかるように０でなくint.MaxValueを初期値にする。
       if (1 <= PathList.No)
@@ -61,8 +54,6 @@ namespace LGLauncher
         }
       }
 
-
-
       //
       //読込み
       //　addFrameListがなくても処理は継続する。
@@ -73,8 +64,6 @@ namespace LGLauncher
         throw new LGLException("not detect frame file");
 
       oldConcatList = oldConcatList ?? new List<int>();
-
-
 
       //
       //連結 with offset
@@ -89,9 +78,6 @@ namespace LGLauncher
         newConcatList.AddRange(addFrameList);
       }
 
-
-
-
       //
       //編集
       //フレームリストのつなぎ目をけす
@@ -99,14 +85,11 @@ namespace LGLauncher
       if (newConcatList == null)
         throw new LGLException("frame edit error");
 
-
-
       //
       //frame書込み
       var newConcatText = newConcatList.Select(
                             (frame) => frame.ToString()).ToList();             //List<int>  -->  List<string>に変換
       File.WriteAllLines(newConcatPath, newConcatText, TextEnc.Shift_JIS);
-
 
       //外部フォルダにも出力
       if (Directory.Exists(PathList.FrameDir))
@@ -125,9 +108,6 @@ namespace LGLauncher
         }
       }
 
-
-
-
       //
       //編集
       //短いＭａｉｎ、ＣＭをけす
@@ -135,8 +115,6 @@ namespace LGLauncher
       editList = EditFrame.FlatOut_CM__(editList, 29.0);
       editList = EditFrame.FlatOut_Main(editList, 29.0);
       if (editList == null) throw new LGLException("frame edit error2");
-
-
 
       //
       //TvtPlayChap用に編集
@@ -150,8 +128,6 @@ namespace LGLauncher
         else editList.RemoveAt(editList.Count - 1);                            //  終端が本編の途中　→　最後のフレーム削除
       }
 
-
-
       //
       //chapter書込み
       string outChapPath = Path.Combine(PathList.ChapDir,
@@ -161,17 +137,10 @@ namespace LGLauncher
 
       if (Directory.Exists(PathList.ChapDir))                                  //フォルダがある？
         File.WriteAllLines(outChapPath, new string[] { chapText }, TextEnc.UTF8_bom);
-
     }
 
-
-
-
-
-
-
-
     #region GetFrameList
+
     /// <summary>
     /// フレームファイルを取得する。
     /// </summary>
@@ -180,7 +149,7 @@ namespace LGLauncher
     /// 取得成功　→　リストをList<int>で返す。
     /// 　　失敗　→　null
     /// </returns>
-    static List<int> GetFrameList(string framePath)
+    private static List<int> GetFrameList(string framePath)
     {
       //convert List<string>  to  List<int>
       var ConvertToIntList = new Func<List<string>, List<int>>(
@@ -200,12 +169,10 @@ namespace LGLauncher
           return intList;
         });
 
-
       //読込み
       if (File.Exists(framePath) == false) return null;    //ファイルチェック
       var frameText = FileR.ReadAllLines(framePath);       //List<string>でファイル取得
       if (frameText == null) return null;
-
 
       //List<int>に変換
       var frameList = ConvertToIntList(frameText);
@@ -215,18 +182,7 @@ namespace LGLauncher
       if (frameList.Count % 2 == 1) return null;           //奇数ならエラー
       return frameList;
     }
-    #endregion
 
-
-
+    #endregion GetFrameList
   }//class
-
-
-
-
-
-
-
-
 }
-

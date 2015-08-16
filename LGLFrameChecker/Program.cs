@@ -1,23 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using System.Threading;
 using System.Text.RegularExpressions;
-using System.Reflection;
-
-#region region_title
-#endregion
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace LGLFrameChecker
 {
-  class Program
+  internal class Program
   {
-
-
-    static void Main(string[] args)
+    private static void Main(string[] args)
     {
       Console.WriteLine("LGLFrameChecker");
       string checkResult = CheckFrame();
@@ -32,12 +26,7 @@ namespace LGLFrameChecker
       Console.Read();
     }
 
-
-
-
-
-
-    static string CheckFrame()
+    private static string CheckFrame()
     {
       //カレントパス
       string AppPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
@@ -46,10 +35,6 @@ namespace LGLFrameChecker
       string LWorkDir = AppDir;
       //LWorkDir = @"";
       Directory.SetCurrentDirectory(LWorkDir);
-
-
-
-
 
       //d2v lwi  iPluginチェック
       string iPluginType = "";
@@ -76,15 +61,9 @@ namespace LGLFrameChecker
         return "Error:  not found  *.p*.d2v_*__*.avs";
       }
 
-
-
-
-
-
       //frameset_all取得
       var frameset_all = FrameSet.Create(LWorkDir, -1, iPluginType);
       if (frameset_all.HaveValidData == false) return frameset_all.ErrMessage;
-
 
       //FrameSetList
       var FrameSetList = new List<FrameSet>();
@@ -115,11 +94,6 @@ namespace LGLFrameChecker
 
       if (FrameSetList.Count() == 0) return "Error:  Not found  *.p*.frame.txt";
 
-
-
-
-
-
       //
       //結果一覧作成
       var text = new StringBuilder();
@@ -134,7 +108,6 @@ namespace LGLFrameChecker
         if (fs_one == null) { text.AppendLine(); continue; }
         text.AppendLine(fs_one.GetResult());
       }
-
 
       //total
       int Match_Main = FrameSetList.Select(fs => { if (fs != null) return fs.Match_Main; else return 0; }).Sum();
@@ -155,12 +128,8 @@ namespace LGLFrameChecker
       return text.ToString();
     }
 
-
-
-
-
-
     #region Compare
+
     /// <summary>
     /// 全体フレームと個別フレームを比較
     /// </summary>
@@ -168,12 +137,11 @@ namespace LGLFrameChecker
     /// <param name="frameOne_bool">個別フレームリストのブールリスト</param>
     /// <param name="frameOne_beginEnd">個別フレームリストの開始、終了フレーム数</param>
     /// <returns></returns>
-    static int[] Compare(bool[] FrameAll_Bool, bool[] frameOne_bool, int[] frameOne_beginEnd)
+    private static int[] Compare(bool[] FrameAll_Bool, bool[] frameOne_bool, int[] frameOne_beginEnd)
     {
       int fbegin = frameOne_beginEnd[0];
       int fend = frameOne_beginEnd[1];
       int Match_main = 0, Match___cm = 0, Match__not = 0;
-
 
       for (int f = fbegin; f <= fend; f++)
       {
@@ -186,17 +154,15 @@ namespace LGLFrameChecker
         else
           f_all = false;		                     // as cm
 
-
         //インデックスの変換
         //FrameAllのフレーム数 ( 0 to 1000 )を frameOne内( 0 to 100)のインデックス番号に変換
         //  fbegin = 500, fend = 600
-        //  FrameAll_Bool[567]  →  frameOne_bool[67] 
+        //  FrameAll_Bool[567]  →  frameOne_bool[67]
         int idx_at_frameOne = f - fbegin;
         if (idx_at_frameOne < frameOne_bool.Count())
           f_one = frameOne_bool[idx_at_frameOne];
         else
           f_one = false; 		                     // as cm
-
 
         //match?
         if (f_all == true && f_one == true)
@@ -209,23 +175,18 @@ namespace LGLFrameChecker
 
       return new int[] { Match_main, Match___cm, Match__not };
     }
-    #endregion
 
+    #endregion Compare
   }
 
-
-
-
-
-
-
   #region FrameSet
+
   /// <summary>
   /// FrameListデータ格納用
   /// </summary>
-  class FrameSet
+  internal class FrameSet
   {
-    int No;
+    private int No;
     public List<int> List;
     public bool[] boolList;
     public string ErrMessage;
@@ -240,6 +201,7 @@ namespace LGLFrameChecker
 
     //Match
     public int Match_Main { get { return MatchResult[0]; } }
+
     public int Match___CM { get { return MatchResult[1]; } }
     public int Match__Not { get { return MatchResult[2]; } }
     public int Match__Sum { get { return MatchResult.Sum(); } }
@@ -258,9 +220,8 @@ namespace LGLFrameChecker
       return line;
     }
 
-
-
     #region FrameSet作成
+
     /// <summary>
     /// FrameSet作成
     /// </summary>
@@ -310,17 +271,15 @@ namespace LGLFrameChecker
       return frameset;
     }
 
-
-
-
     #region Utility
+
     /// <summary>
     /// List<int>のフレームリストをbool[] に変換
     /// </summary>
     /// <param name="framelist">変換元のフレームリスト</param>
     /// <param name="beginEnd">開始、終了フレーム数</param>
     /// <returns></returns>
-    static bool[] ConvertToBoolArray(List<int> framelist, int[] beginEnd)
+    private static bool[] ConvertToBoolArray(List<int> framelist, int[] beginEnd)
     {
       int TotalFrame = beginEnd[1] - beginEnd[0] + 1;
       var boolArray = new bool[TotalFrame];
@@ -339,8 +298,6 @@ namespace LGLFrameChecker
       return boolArray;
     }
 
-
-
     /// <summary>
     /// ファイル名からフレーム数取得
     /// </summary>
@@ -353,14 +310,12 @@ namespace LGLFrameChecker
       var files = Directory.GetFiles(directory, nameKey);
       if (files.Count() != 1) return null;		             //見つからない or 多い
 
-
       //正規表現パターン
       //TsShortName.p1.d2v_0__2736.avs
       //TsShortName.p1.lwi_0__2736.avs
       var regex = new Regex(@".*\.\w+_(?<begin>\d+)__(?<end>\d+)\.avs", RegexOptions.IgnoreCase);
       //検索
       Match match = regex.Match(files[0]);
-
 
       //検索成功
       if (match.Success)
@@ -376,10 +331,7 @@ namespace LGLFrameChecker
       }
       else
         return null;
-
     }
-
-
 
     /// <summary>
     /// *.frame.txtを取得する
@@ -405,7 +357,6 @@ namespace LGLFrameChecker
           return intList;
         });
 
-
       //読込み
       if (File.Exists(framePath) == false) return null;								         //ファイルチェック
       var frameText = File.ReadAllLines(framePath, Encoding.GetEncoding("Shift_JIS")).ToList();	   //List<string>でファイル取得
@@ -418,15 +369,11 @@ namespace LGLFrameChecker
       if (frameList.Count % 2 == 1) return null;
       return frameList;
     }
-    #endregion
 
+    #endregion Utility
 
-    #endregion
-
+    #endregion FrameSet作成
   }//class FrameSet
-  #endregion
 
-
-
-
+  #endregion FrameSet
 }//namespace

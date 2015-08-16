@@ -1,23 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using System.Text.RegularExpressions;
-using System.Diagnostics;
 using System.Threading;
-using Microsoft.Win32;
-
-
-#region region_title
-#endregion
 
 namespace LGLauncher
 {
-  class Program
+  internal class Program
   {
-    static void Main(string[] args)
+    private static void Main(string[] args)
     {
       ///*テスト用引数*/
       //var testArgs = new List<string>() { "-no", "1", "-last" , "-ts",
@@ -27,8 +19,6 @@ namespace LGLauncher
 
       //例外を捕捉する
       AppDomain.CurrentDomain.UnhandledException += ExceptionInfo.OnUnhandledException;
-
-
 
       //初期化
       var cmdline = new CommandLine(args);                 //引数解析
@@ -46,7 +36,6 @@ namespace LGLauncher
         LockTheFile();
 
         DeleteWorkItem_Beforehand();
-
       }
       catch (LGLException e)                               //LGLExceptionのみ捕捉、その他はOnUnhandledExceptionで捕捉する。
       {
@@ -56,8 +45,6 @@ namespace LGLauncher
         Log.WriteException(e);
         Environment.Exit(1);                               //アプリ強制終了
       }
-
-
 
       //メイン処理
       int[] trimFrame = null;
@@ -72,9 +59,7 @@ namespace LGLauncher
         Log.WriteException(e);
       }
 
-
-
-      //後処理      
+      //後処理
       try
       {
         //フレーム合成＆チャプターファイル作成
@@ -89,19 +74,14 @@ namespace LGLauncher
         Environment.Exit(1);                               //アプリ強制終了
       }
 
-
-
       //ファイル削除
       Log.Close();
       DeleteWorkItem_Lastly();
-
     }
 
-
-
-
     #region メイン処理
-    static int[] MainProcess()
+
+    private static int[] MainProcess()
     {
       //avs
       var avsMaker = PathList.Mode_D2v
@@ -114,8 +94,6 @@ namespace LGLauncher
 
       //bat
       var batPath = LGLauncherBat.Make(avsMaker.AvsPath, srtPath);
-
-
 
       try
       {
@@ -142,22 +120,18 @@ namespace LGLauncher
         if (LGLSemaphore != null) LGLSemaphore.Release();            //セマフォ解放
       }
     }
-    #endregion
 
-
-
-
-
-
-
+    #endregion メイン処理
 
     #region ファイルの移動禁止
-    static FileStream lock_ts, lock_d2v, lock_lwi, lock_lwifooter, lock_srt;             //プロセス終了でロック解放
+
+    private static FileStream lock_ts, lock_d2v, lock_lwi, lock_lwifooter, lock_srt;             //プロセス終了でロック解放
+
     /// <summary>
     /// ファイルを移動禁止にする。
     /// </summary>
     /// <returns></returns>
-    static void LockTheFile()
+    private static void LockTheFile()
     {
       //ts
       try
@@ -191,7 +165,6 @@ namespace LGLauncher
           }
           catch { throw new LGLException(); }
 
-
       //srt
       if (File.Exists(PathList.SrtPath))                   //srtファイルは無い場合もある
         try
@@ -204,24 +177,20 @@ namespace LGLauncher
         catch { throw new LGLException(); }
     }
 
-    #endregion
-
-
-
-
+    #endregion ファイルの移動禁止
 
     #region LogoGuillo同時起動数の制限
-    static Semaphore LGLSemaphore = null;
+
+    private static Semaphore LGLSemaphore = null;
 
     /// <summary>
     /// LogoGuillo同時起動数の制限
     /// </summary>
-    static bool WaitForReady()
+    private static bool WaitForReady()
     {
       //同時起動数
       int multiRun = PathList.LogoGuillo_MultipleRun;
       if (multiRun <= 0) return false;
-
 
       /// <summary>
       /// セマフォを取得
@@ -254,8 +223,6 @@ namespace LGLauncher
         return semaphore;
       });
 
-
-
       /// <summary>
       /// LogoGuilloのプロセス数が規定値未満か？
       ///   LogoGuillo単体、外部ランチャーとの衝突回避
@@ -279,7 +246,6 @@ namespace LGLauncher
         return false;
       });
 
-
       /// <summary>
       /// システムがアイドル状態か？
       /// </summary>
@@ -301,9 +267,6 @@ namespace LGLauncher
         return prc.HasExited && prc.ExitCode == 0;
       });
 
-
-
-
       //
       //WaitForReady
       LGLSemaphore = GetSemaphore();                       //セマフォを取得
@@ -315,7 +278,6 @@ namespace LGLauncher
 
         while (LogoGuilloHasExited(extraWait) == false)    //LogoGuilloプロセス数をチェック
           Thread.Sleep(20 * 1000);
-
 
         if (SystemIsIdle() == false)                       //システム負荷が高い、１０分待機
         {
@@ -331,25 +293,21 @@ namespace LGLauncher
       }
 
       return true;
-
     }
-    #endregion
 
-
-
-
+    #endregion LogoGuillo同時起動数の制限
 
     #region LogoGuillo実行
+
     /// <summary>
     /// LogoGuillo実行
     /// </summary>
     /// <param name="batPath">実行するパッチパス</param>
     /// <returns></returns>
-    static void LaunchLogoGuillo(string batPath)
+    private static void LaunchLogoGuillo(string batPath)
     {
       if (File.Exists(batPath) == false)
         throw new LGLException();
-
 
       var prc = new Process();
       prc.StartInfo.FileName = batPath;
@@ -368,7 +326,6 @@ namespace LGLauncher
       {
         //ロゴ未検出
         throw new LGLException("★LogoGuillo ExitCode = " + prc.ExitCode + " :  ロゴ未検出");
-
       }
       else if (prc.ExitCode == -1)
       {
@@ -380,38 +337,34 @@ namespace LGLauncher
         //強制終了すると ExitCode = 1
         throw new LGLException("★LogoGuillo ExitCode = " + prc.ExitCode + " :  Unknown code");
       }
-
-
     }
+
     //logoGuillo_v210_r1  readme_v210.txt
     // ◎終了コード
     // 0：正常終了
     //-9：ロゴ未検出
     //-1：何らかのエラー
-    #endregion
 
-
-
+    #endregion LogoGuillo実行
 
     #region 作業ファイル削除
+
     /// <summary>
     /// 分割処理の初回ならファイル削除
     /// </summary>
-    static void DeleteWorkItem_Beforehand()
+    private static void DeleteWorkItem_Beforehand()
     {
       //LWorkDir
       if (PathList.No == 1)
       {
         Delete_file(0.0, PathList.LWorkDir, "*.p?*.*");    //ワイルドカード指定可
       }
-
     }
-
 
     /// <summary>
     /// 終了処理でのファイル削除
     /// </summary>
-    static void DeleteWorkItem_Lastly()
+    private static void DeleteWorkItem_Lastly()
     {
       //使い終わったファイルを削除？
       if (2 <= PathList.Mode_DeleteWorkItem)
@@ -427,7 +380,6 @@ namespace LGLauncher
         else if (2 <= PathList.No)
           Delete_file(0.0, PathList.LWorkDir, PathList.WorkName_m1 + "*", "catframe.txt");
       }
-
 
       //古いファイル削除？
       if (1 <= PathList.Mode_DeleteWorkItem)
@@ -448,12 +400,7 @@ namespace LGLauncher
           Delete_file(ndaysBefore, Path.GetTempPath(), "DGI_pf.tmp*");
         }
       }
-
     }
-
-
-
-
 
     /// <summary>
     /// 削除処理の実行部
@@ -462,7 +409,7 @@ namespace LGLauncher
     /// <param name="directory">ファイルを探すフォルダ。　サブフォルダ内も対象</param>
     /// <param name="searchKey">ファイル名に含まれる文字。ワイルドカード可*</param>
     /// <param name="ignoreKey">除外するファイルに含まれる文字。ワイルドカード不可×</param>
-    static void Delete_file(double nDaysBefore, string directory, string searchKey, string ignoreKey = null)
+    private static void Delete_file(double nDaysBefore, string directory, string searchKey, string ignoreKey = null)
     {
       if (Directory.Exists(directory) == false) return;
       Thread.Sleep(500);
@@ -470,7 +417,6 @@ namespace LGLauncher
       //ファイル取得
       var dirInfo = new DirectoryInfo(directory);
       var files = dirInfo.GetFiles(searchKey, SearchOption.AllDirectories);
-
 
       foreach (var onefile in files)
       {
@@ -486,22 +432,18 @@ namespace LGLauncher
           catch { /*ファイル使用中*/ }
         }
       }
-
     }
-
-
 
     /// <summary>
     /// 空フォルダ削除
     /// </summary>
     /// <param name="parent_directory">親フォルダを指定。空のサブフォルダが削除対象、親フォルダ自身は削除されない。</param>
-    static void Delete_emptydir(string parent_directory)
+    private static void Delete_emptydir(string parent_directory)
     {
       if (Directory.Exists(parent_directory) == false) return;
 
       var dirInfo = new DirectoryInfo(parent_directory);
       var dirs = dirInfo.GetDirectories("*", SearchOption.AllDirectories);
-
 
       foreach (var onedir in dirs)
       {
@@ -515,23 +457,17 @@ namespace LGLauncher
           catch { /*フォルダ使用中*/ }
         }
       }
-
     }
 
-    #endregion
-
-
-
+    #endregion 作業ファイル削除
   }//class
 
-
-
-
   #region コマンドライン
+
   /// <summary>
   /// コマンドライン
   /// </summary>
-  class CommandLine
+  internal class CommandLine
   {
     public int No { get; private set; }
     public string TsPath { get; private set; }
@@ -542,13 +478,10 @@ namespace LGLauncher
     public string Program { get; private set; }
     public bool IsLast { get; private set; }
 
-
-
     public CommandLine(string[] args)
     {
       Parse(args);
     }
-
 
     /// <summary>
     /// コマンドライン解析
@@ -566,13 +499,11 @@ namespace LGLauncher
         sValue = (i + 1 < args.Count()) ? args[i + 1] : "";
         canParse = int.TryParse(sValue, out iValue);
 
-
         //  - / をはずす
         if (key.IndexOf("-") == 0 || key.IndexOf("/") == 0)
           key = key.Substring(1, key.Length - 1);
         else
           continue;
-
 
         //小文字で比較
         switch (key)
@@ -613,14 +544,9 @@ namespace LGLauncher
 
           default:
             break;
-
         }//switch
       }//for
-
     }//func
-
-
-
 
     /// <summary>
     /// コマンドライン一覧を出力する。
@@ -639,23 +565,7 @@ namespace LGLauncher
       sb.AppendLine("    IsLast  = " + IsLast);
       return sb.ToString();
     }
-
-
-
   }//class
-  #endregion
 
-
-
-
-
-
-
-
+  #endregion コマンドライン
 }//namespace
-
-
-
-
-
-

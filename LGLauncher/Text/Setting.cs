@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using System.Reflection;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 
 namespace LGLauncher
 {
@@ -24,15 +20,12 @@ namespace LGLauncher
     public string sFrameDir_Path = @"   C:\frame_dir   ";
     public int iDeleteWorkItem = 1;
 
-
     //設定ファイル名
-    static readonly string
+    private static readonly string
             AppPath = System.Reflection.Assembly.GetExecutingAssembly().Location,
             AppDir = Path.GetDirectoryName(AppPath),
             AppName = Path.GetFileNameWithoutExtension(AppPath),
             DefXmlName = AppName + ".xml";
-
-
 
     /// <summary>
     /// ファイルから読込む
@@ -42,7 +35,6 @@ namespace LGLauncher
     {
       //カレントディレクトリ設定
       Directory.SetCurrentDirectory(AppDir);
-
 
       if (xmlpath == null)
       {
@@ -64,9 +56,7 @@ namespace LGLauncher
       file.sFrameDir_Path = (string.IsNullOrWhiteSpace(file.sFrameDir_Path))
                               ? new String(' ', 8) : file.sFrameDir_Path;
 
-
       XmlRW.Save(xmlpath, file);                 //古いバージョンのファイルなら新たに追加された項目がxmlに加わる。
-
 
       //優先度
       if (file.iPriority == 0)
@@ -80,19 +70,17 @@ namespace LGLauncher
     }
   }
 
-
-
-
   #region PathList
+
   /// <summary>
   /// パス一覧　＆　アプリ設定
   /// </summary>
-  static class PathList
+  internal static class PathList
   {
-
     //Input file
     //    Ts
     public static string TsPath { get; private set; }
+
     public static string TsDir { get; private set; }
     public static string TsName { get; private set; }
     public static string TsNameWithoutExt { get; private set; }
@@ -100,48 +88,59 @@ namespace LGLauncher
 
     //    D2v
     public static string D2vPath { get; private set; }
+
     public static string D2vDir { get; private set; }
     public static string D2vName { get; private set; }
+
     //    Lwi
     public static string LwiPath { get; private set; }
+
     public static string LwiDir { get; private set; }
     public static string LwiName { get; private set; }
+
     //    LwiFooter
     public static string LwiFooterPath { get; private set; }
+
     public static string LwiFooterDir { get; private set; }
     public static string LwiFooterName { get; private set; }
+
     //    Srt
     public static string SrtPath { get; private set; }
+
     public static string SrtDir { get; private set; }
     public static string SrtName { get; private set; }
-
 
     //Work item
     //    AppPath
     public static string AppPath { get; private set; }
+
     public static string AppDir { get; private set; }
     public static string AppName { get; private set; }
+
     //    LSystemDir
     public static string LSystemDir { get; private set; }
+
     public static string LTopWorkDir { get; private set; }
     public static string LWorkDir { get; private set; }
+
     //    WorkPath
     public static string WorkPath { get; private set; }
+
     public static string WorkName { get; private set; }
     public static string WorkPath_m1 { get; private set; }
     public static string WorkName_m1 { get; private set; }
 
-
     //LogoGuillo
     public static int LogoGuillo_MultipleRun { get; private set; }
+
     public static string LogoGuillo { get; private set; }
     public static string AVS2X { get; private set; }
     public static string AVSPLG { get; private set; }
     public static string LogoSelector { get; private set; }
 
-
     //App setting
     public static int No { get; private set; }
+
     public static bool Mode_D2v { get; private set; }
     public static bool Mode_IsLast { get; private set; }
 
@@ -152,17 +151,11 @@ namespace LGLauncher
     public static string FrameDir { get; private set; }
     public static int Mode_DeleteWorkItem { get; private set; }
 
-
-
-
-
-
     /// <summary>
     /// パス作成
     /// </summary>
     public static void Make(CommandLine cmdline, Setting setting)
     {
-
       CopyFromCommandLine(cmdline);
 
       Make_InputPath(setting);
@@ -170,7 +163,6 @@ namespace LGLauncher
 
       Make_LogoGuillo(setting);
       Make_MiscPath(setting);
-
 
       //ファイルチェック
       //パス作成直後でなく、WorkDir作成後に行う。
@@ -180,13 +172,10 @@ namespace LGLauncher
         throw new LGLException("LwiPath not exist");
     }
 
-
-
-
     /// <summary>
     /// コマンドラインからの設定コピー
     /// </summary>
-    static void CopyFromCommandLine(CommandLine cmdline)
+    private static void CopyFromCommandLine(CommandLine cmdline)
     {
       No = cmdline.No;
       TsPath = cmdline.TsPath;
@@ -211,18 +200,13 @@ namespace LGLauncher
       if (D2vPath != null && Path.GetExtension(D2vPath).ToLower() != ".d2v") throw new LGLException();
       if (LwiPath != null && Path.GetExtension(LwiPath).ToLower() != ".lwi") throw new LGLException();
       if (SrtPath != null && Path.GetExtension(SrtPath).ToLower() != ".srt") throw new LGLException();
-
     }
-
-
-
 
     /// <summary>
     /// 入力ファイルの設定
     /// </summary>
-    static void Make_InputPath(Setting setting)
+    private static void Make_InputPath(Setting setting)
     {
-
       //TsPath
       TsDir = Path.GetDirectoryName(TsPath);
       TsName = Path.GetFileName(TsPath);
@@ -251,16 +235,12 @@ namespace LGLauncher
 
       //Mode_D2v
       Mode_D2v = (0 < setting.bPrefer_d2v);
-
     }
-
-
-
 
     /// <summary>
     /// WorkDirの設定
     /// </summary>
-    static void Make_WorkDir(Setting setting)
+    private static void Make_WorkDir(Setting setting)
     {
       AppPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
       AppDir = Path.GetDirectoryName(AppPath);
@@ -270,7 +250,6 @@ namespace LGLauncher
       LSystemDir = Path.Combine(AppDir, "LSystem");
       if (Directory.Exists(LTopWorkDir) == false) Directory.CreateDirectory(LTopWorkDir);
       if (Directory.Exists(LSystemDir) == false) Directory.CreateDirectory(LSystemDir);
-
 
       //
       //WorkDir
@@ -286,7 +265,6 @@ namespace LGLauncher
       LWorkDir = Path.Combine(LTopWorkDir, workDirName);
       if (Directory.Exists(LWorkDir) == false) Directory.CreateDirectory(PathList.LWorkDir);
 
-
       //WorkPath
       WorkName = (1 <= No) ? TsShortName + ".p" + No : TsShortName + ".all";
       WorkPath = Path.Combine(LWorkDir, WorkName);
@@ -294,13 +272,10 @@ namespace LGLauncher
       WorkPath_m1 = Path.Combine(LWorkDir, WorkName_m1);
     }
 
-
-
-
     /// <summary>
     /// LogoGuillo関連の設定
     /// </summary>
-    static void Make_LogoGuillo(Setting setting)
+    private static void Make_LogoGuillo(Setting setting)
     {
       LogoGuillo_MultipleRun = setting.iLogoGuillo_MultipleRun;
 
@@ -312,11 +287,9 @@ namespace LGLauncher
       AVS2X = avs2pipemod;
       if (File.Exists(AVS2X) == false) Log.WriteLine("File.Exists(AVS2X) == false");
 
-
       //USE_AVS    LTopWorkDirに作成
       AVSPLG = Path.Combine(LTopWorkDir, "USE_AVS");
       if (File.Exists(AVSPLG) == false) File.Create(AVSPLG).Close();
-
 
       //LogoSelector
       //  SystemDirにあるLogoSelectorを取得。複数ある場合の優先順位は、
@@ -328,16 +301,12 @@ namespace LGLauncher
                                    };
       //  ファイルの有無でフィルター、最初の要素を取得
       LogoSelector = lsPathList.Where((lspath) => File.Exists(lspath)).FirstOrDefault();
-
     }
-
-
-
 
     /// <summary>
     /// その他の設定
     /// </summary>
-    static void Make_MiscPath(Setting setting)
+    private static void Make_MiscPath(Setting setting)
     {
       //output external directory
       if (0 < setting.bUseTSDir_asChapDir)
@@ -351,17 +320,14 @@ namespace LGLauncher
 
       //delete work item
       Mode_DeleteWorkItem = setting.iDeleteWorkItem;
-
     }
-
-
 
     /// <summary>
     /// ＭＤ５作成
     /// </summary>
     /// <param name="srcText">ＭＤ５の元になるテキスト</param>
     /// <returns>ＭＤ５文字列</returns>
-    static string ComputeMD5(string srcText)
+    private static string ComputeMD5(string srcText)
     {
       byte[] data = System.Text.Encoding.UTF8.GetBytes(srcText);                         //文字列をbyte型配列に変換する
       var md5 = System.Security.Cryptography.MD5.Create();
@@ -370,26 +336,7 @@ namespace LGLauncher
       string result = BitConverter.ToString(bytes_md5).ToLower().Replace("-", "");       //16進数の文字列に変換
       return result;
     }
-
-
   }
-  #endregion
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  #endregion PathList
 }

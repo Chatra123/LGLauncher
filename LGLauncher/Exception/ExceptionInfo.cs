@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
 using System.Diagnostics;
+using System.IO;
+using System.Text;
 
 namespace LGLauncher
 {
-
-  static class ExceptionInfo
+  internal static class ExceptionInfo
   {
     /// <summary>
     /// 例外の発生時に内容をファイルに保存する。
@@ -21,7 +17,6 @@ namespace LGLauncher
       try
       {
         var excp = (Exception)args.ExceptionObject;
-
 
         //例外の情報
         string excpInfo =
@@ -35,11 +30,9 @@ namespace LGLauncher
             return info.ToString();
           })(excp);
 
-
         //出力テキスト
         var text = new StringBuilder();
         text.AppendLine(excpInfo);
-
 
         //出力ファイル名
         string logPath =
@@ -56,11 +49,8 @@ namespace LGLauncher
             return Path.Combine(AppDir, logName);
           })();
 
-
         //ファイルに書き加える
         File.AppendAllText(logPath, text.ToString(), new UTF8Encoding(true));
-
-
       }
       finally
       {
@@ -69,6 +59,4 @@ namespace LGLauncher
       }
     }
   }
-
-
 }

@@ -1,32 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 using System.Reflection;
-using System.Diagnostics;
+using System.Text;
 
 namespace LGLauncher
 {
-
   //======================================
   //  ログ
   //======================================
+
   #region Log
-  static class Log
+
+  internal static class Log
   {
     public static bool Enable = true;
-    static StreamWriter writer = null;
-
+    private static StreamWriter writer = null;
 
     /// <summary>
     /// ライター作成
     /// </summary>
     /// <returns></returns>
-    static StreamWriter CreateWriter()
+    private static StreamWriter CreateWriter()
     {
-
       string LogDir = new Func<string>(() =>
       {
         var AppPath = Assembly.GetExecutingAssembly().Location;
@@ -51,8 +46,6 @@ namespace LGLauncher
       string LogName = string.IsNullOrEmpty(PathList.TsShortName)
                                  ? "LGLauncher" : PathList.TsShortName;
 
-
-
       //ライター作成
       //　*.sys.1.log ～ *.sys.16.logを割り当てる。
       for (int i = 1; i <= 16; i++)
@@ -68,7 +61,6 @@ namespace LGLauncher
         catch { }  //オープン失敗。別プロセスがファイル使用中
       }
 
-
       //ライター作成成功、ヘッダー書込み
       if (writer != null)
       {
@@ -81,13 +73,13 @@ namespace LGLauncher
       return writer;
     }
 
-
     /// <summary>
     /// 閉じる
     /// </summary>
-    public static void Close() { if (writer != null) { writer.Close(); } }
-
-
+    public static void Close()
+    {
+      if (writer != null) { writer.Close(); }
+    }
 
     /// <summary>
     /// テキストを書込む
@@ -99,8 +91,6 @@ namespace LGLauncher
       if (writer == null) { writer = CreateWriter(); }
       if (writer != null) { writer.WriteLine(line); writer.Flush(); }
     }
-
-
 
     /// <summary>
     /// 例外情報を書込む
@@ -117,13 +107,7 @@ namespace LGLauncher
 
       WriteLine(sb.ToString());
     }
-
-
-
-
   }
-  #endregion
 
-
-
+  #endregion Log
 }
