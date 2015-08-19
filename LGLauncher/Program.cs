@@ -101,13 +101,15 @@ namespace LGLauncher
         bool isReady = WaitForReady();                               //セマフォ取得
         if (isReady == false) return null;
 
-        //実行
+        //LogoGuillo実行
         if (PathList.Mode_D2v)
         {
+          //d2v
           LaunchLogoGuillo(batPath);
         }
         else
         {
+          //lwi
           AvsWithLwi.SetLwi();
           LaunchLogoGuillo(batPath);
           AvsWithLwi.BackLwi();
@@ -130,7 +132,6 @@ namespace LGLauncher
     /// <summary>
     /// ファイルを移動禁止にする。
     /// </summary>
-    /// <returns></returns>
     private static void LockTheFile()
     {
       //ts
@@ -153,28 +154,19 @@ namespace LGLauncher
         try
         {
           lock_lwi = new FileStream(PathList.LwiPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+
+          if (File.Exists(PathList.LwiFooterPath))  //lwifooterファイルが無い場合もある
+            lock_lwifooter = new FileStream(PathList.LwiFooterPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         }
         catch { throw new LGLException(); }
-
-      //lwifooter
-      if (PathList.Mode_D2v == false)
-        if (File.Exists(PathList.LwiFooterPath))           //lwifooterファイルは無い場合もある
-          try
-          {
-            lock_lwifooter = new FileStream(PathList.LwiFooterPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-          }
-          catch { throw new LGLException(); }
 
       //srt
-      if (File.Exists(PathList.SrtPath))                   //srtファイルは無い場合もある
-        try
-        {
-          /*　srtファイルはCaption2Ass_PCR_pfによって削除される可能性があるのでファイルサイズを調べてからロックする。*/
-          var finfo = new FileInfo(PathList.SrtPath);
-          if (3 < finfo.Length)        // -gt 3byte bom size
-            lock_srt = new FileStream(PathList.SrtPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-        }
-        catch { throw new LGLException(); }
+      try
+      {
+        if (File.Exists(PathList.SrtPath))  //srtファイルはすでに削除されている場合もある
+          lock_srt = new FileStream(PathList.SrtPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+      }
+      catch { throw new LGLException(); }
     }
 
     #endregion ファイルの移動禁止
@@ -350,7 +342,7 @@ namespace LGLauncher
     #region 作業ファイル削除
 
     /// <summary>
-    /// 分割処理の初回ならファイル削除
+    /// 分割処理の初回ならLWorkDir内のファイル削除
     /// </summary>
     private static void DeleteWorkItem_Beforehand()
     {

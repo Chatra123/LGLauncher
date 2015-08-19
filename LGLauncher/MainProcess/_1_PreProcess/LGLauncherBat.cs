@@ -35,19 +35,8 @@ namespace LGLauncher
         catch { }
       }
 
-      //
       //BaseLGLauncher.bat読込み
-      //　ファイルがあればファイルから読込み
-      //  　　　　　なければ内部リソースから読込み
       var batText = new List<string>();
-      //string batPath = Path.Combine(PathList.AppDir, "BaseLGLauncher.bat");
-
-      //if (File.Exists(batPath))
-      //{
-      //  batText = FileR.ReadAllLines(batPath);
-      //  if (batText == null) throw new LGLException();
-      //}
-      //else
       batText = FileR.ReadFromResource("LGLauncher.ResourceText.BaseLGLauncher.bat");
 
       //ロゴデータ取得
@@ -57,8 +46,8 @@ namespace LGLauncher
 
       string logoPath = logoAndParam[0];
       string paramPath = logoAndParam[1];
-      if (File.Exists(logoPath) == false) throw new LGLException("logoPath is not exist");
-      if (File.Exists(paramPath) == false) throw new LGLException("paramPath is not exist");
+      if (File.Exists(logoPath) == false) throw new LGLException("LogoPath is not exist");
+      if (File.Exists(paramPath) == false) throw new LGLException("ParamPath is not exist");
       if (File.Exists(PathList.LogoGuillo) == false) throw new LGLException("LogoGuillo is not exist");
 
       //#LOGOG_PATH#
@@ -126,12 +115,14 @@ namespace LGLauncher
 
       if (ext == ".exe")
       {
+        //LogoSelector.exe
         exepath = PathList.LogoSelector;
         arg = string.Format("  \"{0}\"   \"{1}\"   \"{2}\"  ",
                               channel, program, tsPath);
       }
       else if (ext == ".vbs" || ext == ".js")
       {
+        //LogoSelector.vbs  LogoSelector.js
         exepath = "cscript.exe";
         arg = string.Format("  \"{0}\"   \"{1}\"   \"{2}\"   \"{3}\"  ",
                               PathList.LogoSelector, channel, program, tsPath);
