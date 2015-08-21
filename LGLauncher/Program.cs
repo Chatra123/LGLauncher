@@ -93,7 +93,7 @@ namespace LGLauncher
       var srtPath = TimeShiftSrt.Make(avsMaker.TrimFrame_m1);
 
       //bat
-      var batPath = LGLauncherBat.Make(avsMaker.AvsPath, srtPath);
+      var batPath = BatLogoGuillo.Make(avsMaker.AvsPath, srtPath);
 
       try
       {

@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace LGLauncher
 {
-  internal static class LGLauncherBat
+  internal static class BatLogoGuillo
   {
     /// <summary>
     /// LogoGuillo起動用バッチ作成
@@ -41,14 +41,24 @@ namespace LGLauncher
 
       //ロゴデータ取得
       var logoAndParam = GetLogoAndParam(PathList.Channel, PathList.Program, PathList.TsPath);
-      if (logoAndParam == null) throw new LGLException("logoAndParam is null");
-      if (logoAndParam.Count < 2) throw new LGLException("logoAndParam is not detect");
+
+      if (logoAndParam == null) 
+        throw new LGLException("logoAndParam is null");
+
+      if (logoAndParam.Count < 2) 
+        throw new LGLException("logoAndParam is not detect");
 
       string logoPath = logoAndParam[0];
       string paramPath = logoAndParam[1];
-      if (File.Exists(logoPath) == false) throw new LGLException("LogoPath is not exist");
-      if (File.Exists(paramPath) == false) throw new LGLException("ParamPath is not exist");
-      if (File.Exists(PathList.LogoGuillo) == false) throw new LGLException("LogoGuillo is not exist");
+
+      if (File.Exists(logoPath) == false)
+        throw new LGLException("LogoPath is not exist");
+
+      if (File.Exists(paramPath) == false) 
+        throw new LGLException("ParamPath is not exist");
+
+      if (File.Exists(PathList.LogoGuillo) == false) 
+        throw new LGLException("LogoGuillo is not exist");
 
       //#LOGOG_PATH#
       string LOGOG_PATH = @"..\..\LSystem\LogoGuillo.exe";
@@ -57,7 +67,7 @@ namespace LGLauncher
       //#AVSPLG_PATH#
       string AVSPLG_PATH = @"..\..\LWork\USE_AVS";
       //#VIDEO_PATH#
-      string VIDEO_PATH = avsPath;     //相対バスだとLOGOGの作業フォルダから検索される。フルパスで指定
+      string VIDEO_PATH = avsPath;     //相対パスだとLogoGuilloの作業フォルダから検索される。フルパスで指定
       //#LOGO_PATH#
       string LOGO_PATH = logoPath;
       //#PRM_PATH#
