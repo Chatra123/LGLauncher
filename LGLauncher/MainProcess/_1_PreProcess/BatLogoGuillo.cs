@@ -35,9 +35,9 @@ namespace LGLauncher
         catch { }
       }
 
-      //BaseLGLauncher.bat読込み
+      //BaseLogoGuillo.bat読込み
       var batText = new List<string>();
-      batText = FileR.ReadFromResource("LGLauncher.ResourceText.BaseLGLauncher.bat");
+      batText = FileR.ReadFromResource("LGLauncher.ResourceText.BaseLogoGuillo.bat");
 
       //ロゴデータ取得
       var logoAndParam = GetLogoAndParam(PathList.Channel, PathList.Program, PathList.TsPath);
@@ -46,7 +46,7 @@ namespace LGLauncher
         throw new LGLException("logoAndParam is null");
 
       if (logoAndParam.Count < 2) 
-        throw new LGLException("logoAndParam is not detect");
+        throw new LGLException("logoAndParam is -lt 2 lines");
 
       string logoPath = logoAndParam[0];
       string paramPath = logoAndParam[1];
@@ -79,11 +79,13 @@ namespace LGLauncher
       for (int i = 0; i < batText.Count; i++)
       {
         var line = batText[i];
-        //LGL
+
+        //LGLauncher
         line = Regex.Replace(line, "#WorkDir#", PathList.LWorkDir, RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#PartNo#", "" + PathList.No, RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#TsShortName#", PathList.TsShortName, RegexOptions.IgnoreCase);
-        //LOGOG
+
+        //LogoGuillo
         line = Regex.Replace(line, "#LOGOG_PATH#", LOGOG_PATH, RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#AVS2X_PATH#", AVS2X_PATH, RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#AVSPLG_PATH#", AVSPLG_PATH, RegexOptions.IgnoreCase);

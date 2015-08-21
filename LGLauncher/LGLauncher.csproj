@@ -52,7 +52,7 @@
     <Compile Include="Text\Setting.cs" />
     <Compile Include="MainProcess\_1_PreProcess\AvsWithD2v.cs" />
     <Compile Include="MainProcess\_1_PreProcess\TimeShiftSrt.cs" />
-    <Compile Include="MainProcess\_1_PreProcess\LGLauncherBat.cs" />
+    <Compile Include="MainProcess\_1_PreProcess\BatLogoGuillo.cs" />
     <Compile Include="MainProcess\_2_PostProcess\EditFrame_main.cs" />
     <Compile Include="MainProcess\_2_PostProcess\EditFrame_sub.cs" />
     <Compile Include="Program.cs" />
@@ -60,7 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <EmbeddedResource Include="ResourceText\BaseLGLauncher.bat" />
+    <EmbeddedResource Include="ResourceText\BaseLogoGuillo.bat" />
     <EmbeddedResource Include="ResourceText\BaseTrimAvs.avs" />
   </ItemGroup>
   <ItemGroup>
