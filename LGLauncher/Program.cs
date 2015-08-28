@@ -163,8 +163,15 @@ namespace LGLauncher
       //srt
       try
       {
-        if (File.Exists(PathList.SrtPath))  //srtファイルはすでに削除されている場合もある
-          lock_srt = new FileStream(PathList.SrtPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        //srtファイルはすでに削除されている場合も。ある
+        //また、テキストが書き込まれて無いとCaption2Ass_PCR_pfによって削除される可能性がある。
+        if (File.Exists(PathList.SrtPath)) 
+        {
+          var filesize = new FileInfo(PathList.SrtPath).Length;
+
+          if (3 < filesize)  // -gt 3byte bom
+            lock_srt = new FileStream(PathList.SrtPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        }
       }
       catch { throw new LGLException(); }
     }
@@ -271,9 +278,9 @@ namespace LGLauncher
         while (LogoGuilloHasExited(extraWait) == false)    //LogoGuilloプロセス数をチェック
           Thread.Sleep(20 * 1000);
 
-        if (SystemIsIdle() == false)                       //システム負荷が高い、１０分待機
+        if (SystemIsIdle() == false)                       //システム負荷が高い、５分待機
         {
-          Thread.Sleep(10 * 60 * 1000);
+          Thread.Sleep(5 * 60 * 1000);
           continue;
         }
 
