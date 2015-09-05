@@ -5,12 +5,12 @@ namespace LGLauncher
 {
   internal class AvsWithD2v : AbstractAvsMaker
   {
-    public override string AvsPath { get; protected set; }
-    public override int[] TrimFrame { get; protected set; }
-    public override int[] TrimFrame_m1 { get; protected set; }
+    public override string AvsPath { get; protected set; }            //作成したAVSのパス
+    public override int[] TrimFrame { get; protected set; }           //今回のトリム用フレーム数
+    public override int[] TrimFrame_m1 { get; protected set; }        //前回のトリム用フレーム数
 
     /// <summary>
-    /// Trim付きd2v作成
+    /// Trim付きavs作成
     /// </summary>
     /// <returns>作成したd2vパス</returns>
     public override void Make()

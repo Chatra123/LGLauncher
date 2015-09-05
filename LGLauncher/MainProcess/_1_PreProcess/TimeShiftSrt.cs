@@ -44,7 +44,7 @@ namespace LGLauncher
       //
       //フォーマット
       //
-      //最後の時間行を抽出
+      //最後の時間行から下を切り捨てる
       int idx_LastTimeline = 0;
       for (int idx = srtText.Count - 1; 0 <= idx; idx--)
       {
@@ -74,9 +74,13 @@ namespace LGLauncher
         if (trimFrame_m1 == null
               && 2 <= trimFrame_m1.Count()) throw new LGLException();
 
-        //シフト
+        //前回までの総時間
+        //   trimFrame_m1[0]  前回のTrim開始フレーム
+        //   trimFrame_m1[1]　前回のTrim終了フレーム
         double shiftSec = 1.0 * trimFrame_m1[1] / 29.970;
-        shiftText = Shift_SrtTime(shiftText, shiftSec);
+
+        //シフト
+        shiftText = Shift_SrtText(shiftText, shiftSec);
       }
 
       if (shiftText.Count == 0) return "";
@@ -90,7 +94,7 @@ namespace LGLauncher
       return dstPath;
     }
 
-    #region ShiftTime_Srt
+    #region Shift_SrtText
 
     //76                                         BlockIndex
     //00:10:04,630 --> 00:10:07,500              1stTimecode
@@ -103,7 +107,7 @@ namespace LGLauncher
     //
 
     /// <summary>
-    /// 一部を取り出し、０秒から振りなおしたsrtテキスト作成
+    /// ０秒からに振りなおしたsrtテキスト作成
     /// </summary>
     /// <param name="srtText">元になるsrtテキスト</param>
     /// <param name="shift_sec">指定秒数だけ時間をスライド</param>
@@ -114,7 +118,7 @@ namespace LGLauncher
     ///  １つ目から２つ目手前までを書き込む。
     ///  繰り返し
     ///
-    private static List<string> Shift_SrtTime(List<string> srtText, double shift_sec)
+    private static List<string> Shift_SrtText(List<string> srtText, double shift_sec)
     {
       var shiftText = new List<string>();
       int BlockIndex_shift = 1;
@@ -126,8 +130,8 @@ namespace LGLauncher
         if (Regex.IsMatch(srtText[line1], @"\d\d:\d\d:\d\d,\d\d\d\s*-->\s*\d\d:\d\d:\d\d,\d\d\d"))
         {
           //シフトして、０秒以上か？
-          string timecode_shift;
-          bool canShift = Shift_Timecode(srtText[line1], out timecode_shift, shift_sec);
+          string shifted_timecode;
+          bool canShift = Shift_Timecode(srtText[line1], shift_sec, out shifted_timecode);
           if (canShift == false) continue;                  //０秒以下になったのでとばす
 
           //２つ目のタイムコードを探す
@@ -147,11 +151,11 @@ namespace LGLauncher
           if (line_2ndTimecode != -1)                      //2ndTimecodeがある
             line_blockend = line_2ndTimecode - 2;          //  →　2ndタイムコードの2つ前
           else                                             //2ndTimecodeがない
-            line_blockend = srtText.Count - 1;             //  →　2リストの最後
+            line_blockend = srtText.Count - 1;             //  →　テキストの最後
 
           //ブロックを取り出す
           shiftText.Add("" + BlockIndex_shift);            //インデックス
-          shiftText.Add(timecode_shift);                   //シフトタイムコード
+          shiftText.Add(shifted_timecode);                 //シフトタイムコード
 
           int blocksize = line_blockend - (line1 + 1) + 1;
           shiftText.AddRange(srtText.GetRange(line1 + 1, blocksize));
@@ -165,23 +169,26 @@ namespace LGLauncher
       return shiftText;
     }
 
-    //DateTimeコンストラクタ用のダミーの値、任意の値
+    //DateTimeコンストラクター用のダミー値、任意の値でいい
     private static readonly int year_ = DateTime.Now.Year,
-                        month = DateTime.Now.Month,
-                        day__ = DateTime.Now.Day;
+                                month = DateTime.Now.Month,
+                                day__ = DateTime.Now.Day;
 
     /// <summary>
     /// タイムコードをシフトした値が０秒以上か？
     /// </summary>
-    /// <param name="timecode_Full">元になるタイムコード</param>
-    /// <param name="timecode_Shift">変換後のタイムコード</param>
+    /// <param name="timecode_Base">元になるタイムコード</param>
     /// <param name="shift_sec">マイナス方向へシフトする秒数</param>
+    /// <param name="shifted_timecode">変換後のタイムコード</param>
     /// <returns>正常に変換できたか</returns>
     /// <remarks>
-    ///     timecode_Full is "00:10:04,630 --> 00:10:07,500"
+    ///     timecode_Base     "00:10:04,630 --> 00:10:07,500"
+    ///     shift_sec             02:05
+    ///     timecode_Shift    "00:07:09,630 --> 00:08:02,500"    戻り値
     /// </remarks>
-    private static bool Shift_Timecode(string timecode_Full, out string timecode_Shift, double shift_sec)
+    private static bool Shift_Timecode(string timecode_Base, double shift_sec, out string shifted_timecode)
     {
+      //型変換
       // string "00:10:04,630"  →  DateTime
       var TimecodeToDateTime = new Func<string, DateTime>(
         (timecode) =>
@@ -201,11 +208,12 @@ namespace LGLauncher
           return new DateTime(year_, month, day__, iHour, iMin_, iSec_, iMs__);
         });
 
-      timecode_Shift = "";
+      shifted_timecode = "";
 
-      if (timecode_Full.Length < 29) return false;
-      string timecode_Begin = timecode_Full.Substring(0, 12);
-      string timecode_End__ = timecode_Full.Substring(17, 12);
+      //                                                                12345678901234567890123456789    
+      if (timecode_Base.Length < 29) return false;                   //"00:10:04,630 --> 00:10:07,500"  is 29char
+      string timecode_Begin = timecode_Base.Substring(0, 12);        //00:10:04,630
+      string timecode_End__ = timecode_Base.Substring(17, 12);       //00:10:07,500
 
       var timeBegin = TimecodeToDateTime(timecode_Begin);
       var timeEnd__ = TimecodeToDateTime(timecode_End__);
@@ -223,15 +231,15 @@ namespace LGLauncher
       if (spanB <= 0 && 0 < spanE)
       {
         //開始時間が０以下
-        timecode_Shift = "00:00:00,000"
+        shifted_timecode = "00:00:00,000"
                           + " --> "
                           + timeE_shift.ToString("HH:mm:ss,fff");
         return true;
       }
       else if (0 < spanB && 0 < spanE)
       {
-        //両方０以上
-        timecode_Shift = timeB_shift.ToString("HH:mm:ss,fff")
+        //両方０より大きい
+        shifted_timecode = timeB_shift.ToString("HH:mm:ss,fff")
                           + " --> "
                           + timeE_shift.ToString("HH:mm:ss,fff");
         return true;
@@ -243,6 +251,6 @@ namespace LGLauncher
       }
     }
 
-    #endregion ShiftTime_Srt
+    #endregion Shift_SrtText
   }//class
 }

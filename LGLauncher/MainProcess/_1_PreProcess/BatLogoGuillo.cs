@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace LGLauncher
 {
-  internal static class LGLauncherBat
+  internal static class BatLogoGuillo
   {
     /// <summary>
     /// LogoGuillo起動用バッチ作成
@@ -35,31 +35,30 @@ namespace LGLauncher
         catch { }
       }
 
-      //
-      //BaseLGLauncher.bat読込み
-      //　ファイルがあればファイルから読込み
-      //  　　　　　なければ内部リソースから読込み
+      //BaseLogoGuillo.bat読込み
       var batText = new List<string>();
-      //string batPath = Path.Combine(PathList.AppDir, "BaseLGLauncher.bat");
-
-      //if (File.Exists(batPath))
-      //{
-      //  batText = FileR.ReadAllLines(batPath);
-      //  if (batText == null) throw new LGLException();
-      //}
-      //else
-      batText = FileR.ReadFromResource("LGLauncher.ResourceText.BaseLGLauncher.bat");
+      batText = FileR.ReadFromResource("LGLauncher.ResourceText.BaseLogoGuillo.bat");
 
       //ロゴデータ取得
       var logoAndParam = GetLogoAndParam(PathList.Channel, PathList.Program, PathList.TsPath);
-      if (logoAndParam == null) throw new LGLException("logoAndParam is null");
-      if (logoAndParam.Count < 2) throw new LGLException("logoAndParam is not detect");
+
+      if (logoAndParam == null) 
+        throw new LGLException("logoAndParam is null");
+
+      if (logoAndParam.Count < 2) 
+        throw new LGLException("logoAndParam is -lt 2 lines");
 
       string logoPath = logoAndParam[0];
       string paramPath = logoAndParam[1];
-      if (File.Exists(logoPath) == false) throw new LGLException("logoPath is not exist");
-      if (File.Exists(paramPath) == false) throw new LGLException("paramPath is not exist");
-      if (File.Exists(PathList.LogoGuillo) == false) throw new LGLException("LogoGuillo is not exist");
+
+      if (File.Exists(logoPath) == false)
+        throw new LGLException("LogoPath is not exist");
+
+      if (File.Exists(paramPath) == false) 
+        throw new LGLException("ParamPath is not exist");
+
+      if (File.Exists(PathList.LogoGuillo) == false) 
+        throw new LGLException("LogoGuillo is not exist");
 
       //#LOGOG_PATH#
       string LOGOG_PATH = @"..\..\LSystem\LogoGuillo.exe";
@@ -68,7 +67,7 @@ namespace LGLauncher
       //#AVSPLG_PATH#
       string AVSPLG_PATH = @"..\..\LWork\USE_AVS";
       //#VIDEO_PATH#
-      string VIDEO_PATH = avsPath;     //相対バスだとLOGOGの作業フォルダから検索される。フルパスで指定
+      string VIDEO_PATH = avsPath;     //相対パスだとLogoGuilloの作業フォルダから検索される。フルパスで指定
       //#LOGO_PATH#
       string LOGO_PATH = logoPath;
       //#PRM_PATH#
@@ -80,11 +79,13 @@ namespace LGLauncher
       for (int i = 0; i < batText.Count; i++)
       {
         var line = batText[i];
-        //LGL
+
+        //LGLauncher
         line = Regex.Replace(line, "#WorkDir#", PathList.LWorkDir, RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#PartNo#", "" + PathList.No, RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#TsShortName#", PathList.TsShortName, RegexOptions.IgnoreCase);
-        //LOGOG
+
+        //LogoGuillo
         line = Regex.Replace(line, "#LOGOG_PATH#", LOGOG_PATH, RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#AVS2X_PATH#", AVS2X_PATH, RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#AVSPLG_PATH#", AVSPLG_PATH, RegexOptions.IgnoreCase);
@@ -126,12 +127,14 @@ namespace LGLauncher
 
       if (ext == ".exe")
       {
+        //LogoSelector.exe
         exepath = PathList.LogoSelector;
         arg = string.Format("  \"{0}\"   \"{1}\"   \"{2}\"  ",
                               channel, program, tsPath);
       }
       else if (ext == ".vbs" || ext == ".js")
       {
+        //LogoSelector.vbs  LogoSelector.js
         exepath = "cscript.exe";
         arg = string.Format("  \"{0}\"   \"{1}\"   \"{2}\"   \"{3}\"  ",
                               PathList.LogoSelector, channel, program, tsPath);
