@@ -52,13 +52,13 @@ namespace LGLauncher
       string paramPath = logoAndParam[1];
 
       if (File.Exists(logoPath) == false)
-        throw new LGLException("LogoPath is not exist");
+        throw new LGLException("LogoPath does not exist");
 
-      if (File.Exists(paramPath) == false) 
-        throw new LGLException("ParamPath is not exist");
+      if (File.Exists(paramPath) == false)
+        throw new LGLException("ParamPath does not exist");
 
-      if (File.Exists(PathList.LogoGuillo) == false) 
-        throw new LGLException("LogoGuillo is not exist");
+      if (File.Exists(PathList.LogoGuillo) == false)
+        throw new LGLException("LogoGuillo does not exist");
 
       //#LOGOG_PATH#
       string LOGOG_PATH = @"..\..\LSystem\LogoGuillo.exe";

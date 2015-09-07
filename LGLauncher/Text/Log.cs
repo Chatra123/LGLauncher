@@ -2,6 +2,7 @@
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Linq;
 
 namespace LGLauncher
 {
@@ -98,12 +99,16 @@ namespace LGLauncher
     /// <param name="e"></param>
     public static void WriteException(Exception e)
     {
-      var msglist = e.ToString().Split(new string[] { "場所" }, StringSplitOptions.RemoveEmptyEntries);
+      var msglist = e.ToString().Split(new string[] { "場所", Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
+                                .Where(line => !string.IsNullOrWhiteSpace(line));
 
       var sb = new StringBuilder();
-      sb.AppendLine("  /▽  Error  ▽/  ");
+      sb.AppendLine("  /▽  Error  ▽/");
+
       foreach (var line in msglist)
-        sb.AppendLine("    →場所  " + line);
+      {
+        sb.AppendLine("    →  " + line.Replace(Environment.NewLine, ""));
+      }
 
       WriteLine(sb.ToString());
     }

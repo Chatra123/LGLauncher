@@ -248,8 +248,12 @@ namespace LGLauncher
       //LTopWorkDir、LSystemDir作成
       LTopWorkDir = Path.Combine(AppDir, "LWork");
       LSystemDir = Path.Combine(AppDir, "LSystem");
-      if (Directory.Exists(LTopWorkDir) == false) Directory.CreateDirectory(LTopWorkDir);
-      if (Directory.Exists(LSystemDir) == false) Directory.CreateDirectory(LSystemDir);
+
+      if (Directory.Exists(LTopWorkDir) == false) 
+        Directory.CreateDirectory(LTopWorkDir);
+
+      if (Directory.Exists(LSystemDir) == false)
+        Directory.CreateDirectory(LSystemDir);
 
       //
       //WorkDir
@@ -263,7 +267,8 @@ namespace LGLauncher
 
       workDirName = timecode_ID + "_" + TsShortName + "_" + MD5;
       LWorkDir = Path.Combine(LTopWorkDir, workDirName);
-      if (Directory.Exists(LWorkDir) == false) Directory.CreateDirectory(PathList.LWorkDir);
+      if (Directory.Exists(LWorkDir) == false) 
+        Directory.CreateDirectory(PathList.LWorkDir);
 
       //WorkPath
       WorkName = (1 <= No) ? TsShortName + ".p" + No : TsShortName + ".all";
@@ -279,17 +284,22 @@ namespace LGLauncher
     {
       LogoGuillo_MultipleRun = setting.iLogoGuillo_MultipleRun;
 
+      //LogoGuillo
       LogoGuillo = Path.Combine(LSystemDir, "logoGuillo.exe");
-      if (File.Exists(LogoGuillo) == false) Log.WriteLine("File.Exists(LogoGuillo) == false");     //無くても継続
+      if (File.Exists(LogoGuillo) == false)
+        throw new LGLException("LogoGuillo does not exist");
 
       //avs2pipemod
       var avs2pipemod = Path.Combine(LSystemDir, "avs2pipemod.exe");
       AVS2X = avs2pipemod;
-      if (File.Exists(AVS2X) == false) Log.WriteLine("File.Exists(AVS2X) == false");
+      if (File.Exists(AVS2X) == false)
+        throw new LGLException("avs2pipemod does not exist");
+
 
       //USE_AVS    LTopWorkDirに作成
       AVSPLG = Path.Combine(LTopWorkDir, "USE_AVS");
-      if (File.Exists(AVSPLG) == false) File.Create(AVSPLG).Close();
+      if (File.Exists(AVSPLG) == false) 
+        File.Create(AVSPLG).Close();
 
       //LogoSelector
       //  SystemDirにあるLogoSelectorを取得。複数ある場合の優先順位は、

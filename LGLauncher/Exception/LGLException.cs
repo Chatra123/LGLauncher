@@ -33,19 +33,19 @@ namespace LGLauncher
         if (InfoList == null) return base.ToString();
 
         var sb = new StringBuilder();
-
-        sb.AppendLine();
-        sb.AppendLine();
-        sb.AppendLine("  /  info  /  ");
+        sb.AppendLine(base.ToString());
+        sb.AppendLine("/▽  info  ▽/");
         foreach (var info in InfoList)
-          sb.AppendLine("        " + info.ToString());
+          sb.AppendLine("    " + info.ToString());
 
-        return base.ToString() + sb.ToString();
+        return sb.ToString();
       }
       catch
       {
         return base.ToString();
       }
     }
+
+
   }
 }

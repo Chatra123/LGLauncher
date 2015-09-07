@@ -27,7 +27,7 @@ namespace LGLauncher
     public static void RunInfoAvs(string avsPath)
     {
       if (File.Exists(PathList.AVS2X) == false)
-        throw new LGLException();
+        throw new LGLException("avs2pipemod does not exist");
 
       var psi = new ProcessStartInfo();
       psi.FileName = PathList.AVS2X;

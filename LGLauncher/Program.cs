@@ -554,6 +554,7 @@ namespace LGLauncher
     public new string ToString()
     {
       var sb = new StringBuilder();
+      sb.AppendLine("  App Command Line");
       sb.AppendLine("    No      = " + No);
       sb.AppendLine("    TsPath  = " + TsPath);
       sb.AppendLine("    D2vPath = " + D2vPath);
