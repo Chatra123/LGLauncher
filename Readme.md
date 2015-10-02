@@ -7,21 +7,24 @@
 
 ------------------------------------------------------------------
 ### 必要なソフト
-* AviSynth  (32bit)  
-    d2v, DGDecode.dllが読み込める
+* AviSynth  [32bit]  
     
-* LogoGuillo.exe  
+* LogoGuillo.exe  [32bit or 64bit] 
     ロゴデータ、パラメーターファイル
     
-* avs2pipemod.exe (32bit)
+* avs2pipemod.exe  [32bit]
 
 
 
 ------------------------------------------------------------------
 ### 使用前の準備
-1. logoGuillo.exe、avs2pipemod.exeをLSystemフォルダに入れる。
+1. logoGuillo.exe、  
+   avs2pipemod.exe、  
+   DGDecode.dll  
+   をLSystemフォルダに入れる。
 
-2. LogoSelector.txtの"[LogoDir]"をlgdファイルのあるフォルダに変更する。
+2. LogoSelector.exe を実行し設定ファイルを生成。  
+   LogoSelector.txtの"[LogoDir]"をlgdファイルのあるフォルダに設定する。
 
 
 
@@ -94,11 +97,11 @@ LogoSelecterに渡すプログラム名
  2: Normal  
  1: BelorNormal  
  0: Low  
--1: Parent  
+-1: Auto by Windows
 
 
     iLogoGuillo_MultipleRun  1  
-Windows内でのLogoGuilloの同時実行数、確実な制御はできません。０以下ならバッチ作成まで実行します。
+Windows内でのLogoGuilloの同時実行数、確実な制御はできません。
 
 
     bUseTSDir_asChapDir  1  
@@ -111,7 +114,8 @@ bUseTSDir_asChapDir = 0  にしてください。
 
 
     sFrameDir_Path  "C:\FrameDir"  
-フレームファイルを出力するフォルダを指定します。
+フレームファイルを出力するフォルダを指定します。  
+出力名は TsName.ts.frame.txtです。
 
 
     iDeleteWorkItem  1  
@@ -125,18 +129,19 @@ bUseTSDir_asChapDir = 0  にしてください。
 ------------------------------------------------------------------
 ### LogoSelector
 
-* LSystemフォルダにある実行ファイル又はスクリプトを取得します。  
+* LSystemフォルダにあるLogoSelector.exe又は、LogoSelector.vbs、LogoSelector.jsを実行します。  
     複数ある場合の優先順位は、  
     （高）　.exe  .vbs  .js　（低）
 
+
 * LogoSelector.exe  
     引数に "チャンネル名"  "番組名"  "tsパス"を渡します。  
-    返り値の１行目にロゴデータのパス、２行目にパラメーターのパスを返してください。  
+    返り値の１行目にロゴデータ、２行目にパラメーターのフルパスを返してください。  
 
 
 * LogoSelector.vbs　＆　LogoSelector.js  
     cscriptの引数に"スクリプトパス"  "チャンネル名"  "番組名"  "tsパス"を渡します。  
-    返り値の１行目にロゴデータのパス、２行目にパラメーターのパスを返してください。
+    返り値の１行目にロゴデータ、２行目にパラメーターのフルパスを返してください。
 
 
     
@@ -147,26 +152,30 @@ bUseTSDir_asChapDir = 0  にしてください。
 ２９秒以下の本編を除去してから作成しています。
 処理を変更する場合はフレームファイルを取得してチャプターを作成してください。
 
-* フレームファイルの出力名は TsName.ts.partframe.txt。  
-引数に -No -1または -lastがあると TsName.ts.frame.txtになります。  
-文字コード　Shift-JIS
 
+* フレームファイルのファイル名は*.ts.partframe.txt、最終ファイルは*.ts.frame.txt。
+  文字コード　shift-jis
+
+  
 * 作業ファイルのパスが２５５文字を超えると正常に動きません。深いフォルダにおかないでください。
+
 
 * LSystemフォルダにSystemIdleMonitor.exeがあれば、ＣＰＵ使用率が６０％以下になるまで待機し、  
  x264、ffmpegが実行されていないことを確認してからLogoGuilloを実行します。
 
 
-* 実行間隔による差
+* LogoGuillo実行間隔による差
     * フレーム認識  
-        実行間隔が短いと真っ白なシーンや映像後半でずれやすくなる。
+        - 実行間隔が短いと真っ白なシーンや映像後半でずれやすくなる。  
+        - 5min to 1minはＣＭが本編として組み込まれる量が多くなっていく。
+        
     * 処理時間の増加  
 
 |  実行間隔  |  処理時間  |
 |:----------:|:----------:|
 |    60 min  |    1.0 倍  |
 |    20      |    1.1     |
-|    10      |    1.4     |
+|    10      |    1.1     |
 |     5      |    1.4     |
 |     3      |    1.4     |
 |     1      |    2.0     |
@@ -197,27 +206,25 @@ AviSynthのファイル読込時にシステム側で使用します。
     - ２時間番組を
         - １０分ごとに処理したときは　　５５０ＭＢ  
         - 　１分ごとに処理したときは　　　　５ＧＢ  
-    必要に応じてiDeleteWorkItemの設定をしてください。
+    必要に応じてiDeleteWorkItemの設定を変更してください。
 
 
 
-    
+
 ------------------------------------------------------------------
 ### 謝辞
 このソフトウェアを動作させるには、
 
-* LogoGuillo
 * avs2pipemod
-
-* LSmash-Works
 * DGDecode
-* AviSynth
+* LogoGuillo
+* LSmash-Works
 
 が必要です。各作者にお礼申し上げます。
 
 
-    
-    
+
+
 ------------------------------------------------------------------
 ### ライセンス
     GPL v3

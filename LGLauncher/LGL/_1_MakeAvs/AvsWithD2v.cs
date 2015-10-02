@@ -16,8 +16,17 @@ namespace LGLauncher
     public override void Make()
     {
       //ファイルチェック
-      if (File.Exists(PathList.D2vPath) == false) throw new LGLException("D2vPath not exist");
+      //D2vPath
+      if (File.Exists(PathList.D2vPath) == false) 
+        throw new LGLException("D2vPath not exist");
 
+      //dll
+      var D2v_dll = Path.Combine(PathList.LSystemDir, "DGDecode.dll");
+      if (File.Exists(D2v_dll) == false) 
+        throw new LGLException("DGDecode.dll not exist");
+
+
+      //Avs作成処理
       //フォーマットを整える
       string formatD2vPath = FormatD2v();
 

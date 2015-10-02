@@ -9,11 +9,13 @@ namespace LGLauncher
 {
   internal abstract class AbstractAvsMaker
   {
-    public abstract string AvsPath { get; protected set; }
-    public abstract int[] TrimFrame { get; protected set; }           //EditFrameに渡す値
-    public abstract int[] TrimFrame_m1 { get; protected set; }        //TimeShiftSrtに渡す値
+
+    public abstract string AvsPath { get; protected set; }            //作成したAVSのパス
+    public abstract int[] TrimFrame { get; protected set; }           //今回のトリム用フレーム数
+    public abstract int[] TrimFrame_m1 { get; protected set; }        //前回のトリム用フレーム数
 
     public abstract void Make();
+
   }
 
   internal static class MakeAvsCommon
@@ -27,7 +29,7 @@ namespace LGLauncher
     public static void RunInfoAvs(string avsPath)
     {
       if (File.Exists(PathList.AVS2X) == false)
-        throw new LGLException();
+        throw new LGLException("avs2pipemod does not exist");
 
       var psi = new ProcessStartInfo();
       psi.FileName = PathList.AVS2X;
@@ -38,8 +40,9 @@ namespace LGLauncher
       prc.StartInfo = psi;
 
       //実行
-      if (prc.Start() == false) throw new LGLException();
-      prc.WaitForExit(20 * 1000);      //目測だと３秒程はかかる
+      if (prc.Start() == false) 
+        throw new LGLException();
+      prc.WaitForExit(20 * 1000);      //３秒程はかかる
     }
 
     #endregion RunInfoAvs
@@ -110,7 +113,7 @@ namespace LGLauncher
       //ファイル検索
       var files = Directory.GetFiles(PathList.LWorkDir, nameKey);
       if (files.Count() != 1)
-        throw new LGLException();                          //無い or 多い
+        throw new LGLException();                          // 0 or 多い
 
       //正規表現パターン
       //TsShortName.p1.d2v_0__2736.avs

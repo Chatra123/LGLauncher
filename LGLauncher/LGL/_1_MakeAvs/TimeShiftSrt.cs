@@ -38,7 +38,7 @@ namespace LGLauncher
 
       //読込み
       var srtText = FileR.ReadAllLines(PathList.SrtPath, TextEnc.UTF8_bom);
-      if (srtText == null) throw new LGLException();
+      if (srtText == null) throw new LGLException("srt read file error");
       else if (srtText.Count <= 3) return "";                                  //まだテキストが書き込まれてない
 
       //

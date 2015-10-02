@@ -155,7 +155,7 @@ namespace LGLauncher
     /// <param name="NLines">読み込む最大行数</param>
     /// <returns>
     /// 読み込んだテキスト、０～Ｎ行
-    /// NLinesに満たない場合は読み込めた分だけ返す
+    /// NLinesに満たない場合は読み込めただけ返す
     /// </returns>
     public List<string> ReadNLines(int NLines)
     {

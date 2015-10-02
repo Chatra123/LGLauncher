@@ -19,7 +19,7 @@ namespace LGLauncher
     {
       //引数チェック
       if (File.Exists(avsPath) == false)
-        throw new LGLException();           //avsがなければ終了
+        throw new LGLException("formatted avs does not exist");           //avsがなければ終了
 
       //srtをavsと同じ名前にリネーム
       if (File.Exists(srtPath))
@@ -29,7 +29,8 @@ namespace LGLauncher
 
         try
         {
-          if (File.Exists(newSrtPath)) File.Delete(newSrtPath);
+          if (File.Exists(newSrtPath)) 
+            File.Delete(newSrtPath);
           File.Move(srtPath, newSrtPath);
         }
         catch { }
@@ -52,13 +53,13 @@ namespace LGLauncher
       string paramPath = logoAndParam[1];
 
       if (File.Exists(logoPath) == false)
-        throw new LGLException("LogoPath is not exist");
+        throw new LGLException("LogoPath does not exist");
 
-      if (File.Exists(paramPath) == false) 
-        throw new LGLException("ParamPath is not exist");
+      if (File.Exists(paramPath) == false)
+        throw new LGLException("ParamPath does not exist");
 
-      if (File.Exists(PathList.LogoGuillo) == false) 
-        throw new LGLException("LogoGuillo is not exist");
+      if (File.Exists(PathList.LogoGuillo) == false)
+        throw new LGLException("LogoGuillo does not exist");
 
       //#LOGOG_PATH#
       string LOGOG_PATH = @"..\..\LSystem\LogoGuillo.exe";
@@ -119,7 +120,7 @@ namespace LGLauncher
     {
       //ファイルチェック
       if (File.Exists(PathList.LogoSelector) == false)
-        throw new LGLException("LogoSelector is not exist");
+        throw new LGLException("LogoSelector does not exist");
 
       //パス、引数
       string exepath = "", arg = "";

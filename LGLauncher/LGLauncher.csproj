@@ -43,18 +43,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Exception\LGLException.cs" />
-    <Compile Include="MainProcess\_1_PreProcess\AvsWithLwi.cs" />
-    <Compile Include="MainProcess\_1_PreProcess\AvsCommon.cs" />
+    <Compile Include="LGL\Utility\ProhibitFileMove.cs" />
+    <Compile Include="LGL\_2_Launch\LogoGuillo.cs" />
+    <Compile Include="LGL\_2_Launch\SystemChecker.cs" />
+    <Compile Include="LGL\Utility\DeleteWorkItem.cs" />
+    <Compile Include="LGL\_1_MakeAvs\AvsWithLwi.cs" />
+    <Compile Include="LGL\_1_MakeAvs\AvsCommon.cs" />
     <Compile Include="Text\XmlRW.cs" />
     <Compile Include="Exception\ExceptionInfo.cs" />
     <Compile Include="Text\FileRW.cs" />
     <Compile Include="Text\Log.cs" />
-    <Compile Include="Text\Setting.cs" />
-    <Compile Include="MainProcess\_1_PreProcess\AvsWithD2v.cs" />
-    <Compile Include="MainProcess\_1_PreProcess\TimeShiftSrt.cs" />
-    <Compile Include="MainProcess\_1_PreProcess\BatLogoGuillo.cs" />
-    <Compile Include="MainProcess\_2_PostProcess\EditFrame_main.cs" />
-    <Compile Include="MainProcess\_2_PostProcess\EditFrame_sub.cs" />
+    <Compile Include="LGL\PathList.cs" />
+    <Compile Include="LGL\_1_MakeAvs\AvsWithD2v.cs" />
+    <Compile Include="LGL\_1_MakeAvs\TimeShiftSrt.cs" />
+    <Compile Include="LGL\_1_MakeAvs\BatLogoGuillo.cs" />
+    <Compile Include="LGL\_3_EditFrame\EditFrame_main.cs" />
+    <Compile Include="LGL\_3_EditFrame\EditFrame_sub.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

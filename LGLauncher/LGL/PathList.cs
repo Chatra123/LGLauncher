@@ -58,7 +58,7 @@ namespace LGLauncher
 
       XmlRW.Save(xmlpath, file);                 //古いバージョンのファイルなら新たに追加された項目がxmlに加わる。
 
-      //優先度
+      //自プロセス優先度
       if (file.iPriority == 0)
         Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
       else if (file.iPriority == 1)
@@ -88,51 +88,43 @@ namespace LGLauncher
 
     //    D2v
     public static string D2vPath { get; private set; }
-
     public static string D2vDir { get; private set; }
     public static string D2vName { get; private set; }
 
     //    Lwi
     public static string LwiPath { get; private set; }
-
     public static string LwiDir { get; private set; }
     public static string LwiName { get; private set; }
 
     //    LwiFooter
     public static string LwiFooterPath { get; private set; }
-
     public static string LwiFooterDir { get; private set; }
     public static string LwiFooterName { get; private set; }
 
     //    Srt
     public static string SrtPath { get; private set; }
-
     public static string SrtDir { get; private set; }
     public static string SrtName { get; private set; }
 
     //Work item
     //    AppPath
     public static string AppPath { get; private set; }
-
     public static string AppDir { get; private set; }
     public static string AppName { get; private set; }
 
     //    LSystemDir
     public static string LSystemDir { get; private set; }
-
     public static string LTopWorkDir { get; private set; }
     public static string LWorkDir { get; private set; }
 
     //    WorkPath
     public static string WorkPath { get; private set; }
-
     public static string WorkName { get; private set; }
     public static string WorkPath_m1 { get; private set; }
     public static string WorkName_m1 { get; private set; }
 
     //LogoGuillo
     public static int LogoGuillo_MultipleRun { get; private set; }
-
     public static string LogoGuillo { get; private set; }
     public static string AVS2X { get; private set; }
     public static string AVSPLG { get; private set; }
@@ -140,7 +132,6 @@ namespace LGLauncher
 
     //App setting
     public static int No { get; private set; }
-
     public static bool Mode_D2v { get; private set; }
     public static bool Mode_IsLast { get; private set; }
 
@@ -159,17 +150,21 @@ namespace LGLauncher
       CopyFromCommandLine(cmdline);
 
       Make_InputPath(setting);
+
       Make_WorkDir(setting);
 
       Make_LogoGuillo(setting);
+
       Make_MiscPath(setting);
 
       //ファイルチェック
-      //パス作成直後でなく、WorkDir作成後に行う。
+      //　D2vPath作成直後でなく、Make_WorkDir()後に行う。
+      //　エラーログを個別のWorkDirに作成するため。
+      //　Make_WorkDir()前だとLTopWorkDirにエラーログが作成される。
       if (Mode_D2v == true && File.Exists(PathList.D2vPath) == false)
-        throw new LGLException("D2vPath not exist");
+        throw new LGLException("D2vPath dose not exist");
       if (Mode_D2v == false && File.Exists(PathList.LwiPath) == false)
-        throw new LGLException("LwiPath not exist");
+        throw new LGLException("LwiPath dose not exist");
     }
 
     /// <summary>
@@ -188,10 +183,12 @@ namespace LGLauncher
 
       //エラーチェック
       if (No == 0) throw new LGLException();
-      else if (No < -1) throw new LGLException();
-      //ファイル  Ts
+      else if (No <= -2) throw new LGLException();
+      //ファイル 
+      //Ts
       if (File.Exists(TsPath) == false) throw new LGLException();
-      //コマンドラインから値が設定されているときのみ  D2v  Lwi
+      //D2v  Lwi
+      //  コマンドラインで値が設定されているならチェック
       //  srtは削除される可能性があるのでチェックしない
       if (D2vPath != null && File.Exists(D2vPath) == false) throw new LGLException();
       if (LwiPath != null && File.Exists(LwiPath) == false) throw new LGLException();
@@ -248,8 +245,12 @@ namespace LGLauncher
       //LTopWorkDir、LSystemDir作成
       LTopWorkDir = Path.Combine(AppDir, "LWork");
       LSystemDir = Path.Combine(AppDir, "LSystem");
-      if (Directory.Exists(LTopWorkDir) == false) Directory.CreateDirectory(LTopWorkDir);
-      if (Directory.Exists(LSystemDir) == false) Directory.CreateDirectory(LSystemDir);
+
+      if (Directory.Exists(LTopWorkDir) == false) 
+        Directory.CreateDirectory(LTopWorkDir);
+
+      if (Directory.Exists(LSystemDir) == false)
+        Directory.CreateDirectory(LSystemDir);
 
       //
       //WorkDir
@@ -263,7 +264,8 @@ namespace LGLauncher
 
       workDirName = timecode_ID + "_" + TsShortName + "_" + MD5;
       LWorkDir = Path.Combine(LTopWorkDir, workDirName);
-      if (Directory.Exists(LWorkDir) == false) Directory.CreateDirectory(PathList.LWorkDir);
+      if (Directory.Exists(LWorkDir) == false) 
+        Directory.CreateDirectory(PathList.LWorkDir);
 
       //WorkPath
       WorkName = (1 <= No) ? TsShortName + ".p" + No : TsShortName + ".all";
@@ -279,17 +281,22 @@ namespace LGLauncher
     {
       LogoGuillo_MultipleRun = setting.iLogoGuillo_MultipleRun;
 
+      //LogoGuillo
       LogoGuillo = Path.Combine(LSystemDir, "logoGuillo.exe");
-      if (File.Exists(LogoGuillo) == false) Log.WriteLine("File.Exists(LogoGuillo) == false");     //無くても継続
+      if (File.Exists(LogoGuillo) == false)
+        throw new LGLException("LogoGuillo does not exist");
 
       //avs2pipemod
       var avs2pipemod = Path.Combine(LSystemDir, "avs2pipemod.exe");
       AVS2X = avs2pipemod;
-      if (File.Exists(AVS2X) == false) Log.WriteLine("File.Exists(AVS2X) == false");
+      if (File.Exists(AVS2X) == false)
+        throw new LGLException("avs2pipemod does not exist");
+
 
       //USE_AVS    LTopWorkDirに作成
       AVSPLG = Path.Combine(LTopWorkDir, "USE_AVS");
-      if (File.Exists(AVSPLG) == false) File.Create(AVSPLG).Close();
+      if (File.Exists(AVSPLG) == false) 
+        File.Create(AVSPLG).Close();
 
       //LogoSelector
       //  SystemDirにあるLogoSelectorを取得。複数ある場合の優先順位は、
@@ -318,7 +325,6 @@ namespace LGLauncher
 
       Mode_IsLast |= (No == -1);            //引数で指定されてる or No == -1
 
-      //delete work item
       Mode_DeleteWorkItem = setting.iDeleteWorkItem;
     }
 
@@ -338,5 +344,5 @@ namespace LGLauncher
     }
   }
 
-  #endregion PathList
+  #endregion
 }
