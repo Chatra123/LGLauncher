@@ -8,9 +8,9 @@ namespace LGLauncher
 {
   internal class AvsWithLwi : AbstractAvsMaker
   {
-    public override string AvsPath { get; protected set; }
-    public override int[] TrimFrame { get; protected set; }
-    public override int[] TrimFrame_m1 { get; protected set; }
+    public override string AvsPath { get; protected set; }            //作成したAVSのパス
+    public override int[] TrimFrame { get; protected set; }           //今回のトリム用フレーム数
+    public override int[] TrimFrame_m1 { get; protected set; }        //前回のトリム用フレーム数
 
     /// <summary>
     /// Trim付きavs作成
@@ -20,16 +20,20 @@ namespace LGLauncher
     {
       //ファイルチェック
       //LwiPath
-      if (File.Exists(PathList.LwiPath) == false) throw new LGLException("LwiPath not exist");
+      if (File.Exists(PathList.LwiPath) == false) 
+        throw new LGLException("LwiPath dose not exist");
 
-      //LSMASHSource.dll
-      var LSmashDll = Path.Combine(PathList.LSystemDir, "LSMASHSource.dll");
-      if (File.Exists(LSmashDll) == false) throw new LGLException("LSMASHSource.dll not exist");
+      //dll
+      var Lwi_dll = Path.Combine(PathList.LSystemDir, "LSMASHSource.dll");
+      if (File.Exists(Lwi_dll) == false) 
+        throw new LGLException("LSMASHSource.dll dose not exist");
 
-      //LwiPath == TsPath + ".lwi"だと処理できない。
+      //lwiファイル名が LwiPath == TsPath + ".lwi"だと処理できない。
       if ((PathList.LwiPath).ToLower() == (PathList.TsPath + ".lwi").ToLower())
-        throw new LGLException();
+        throw new LGLException("lwi name is incorrect");
 
+
+      //Avs作成処理
       //フォーマットを整える
       string formatLwiPath = FormatLwi();
 
@@ -85,8 +89,6 @@ namespace LGLauncher
         //最低行数チェック
         if (readBuff.Count < 500)
         {
-          //reader.Close();
-          //writer.Close();
           throw new LGLException("lwi text is less than 500 lines");
         }
         //フォーマットの簡易チェック
@@ -96,8 +98,6 @@ namespace LGLauncher
         matchHeader &= Regex.IsMatch(readBuff[2], @"<LibavReaderIndex=.*>");
         if (matchHeader == false)
         {
-          //reader.Close();
-          //writer.Close();
           throw new LGLException("lwi format error");
         }
 
@@ -136,8 +136,6 @@ namespace LGLauncher
         }
         else
         {
-          //reader.Close();
-          //writer.Close();
           throw new LGLException();
         }
 
@@ -162,16 +160,12 @@ namespace LGLauncher
           var footer_text = Create_footer(writeBuff);
           if (footer_text == null)
           {
-            //reader.Close();
-            //writer.Close();
             throw new LGLException();
           }
 
           //書込み
           writer.WriteText(writeBuff);
           writer.WriteText(footer_text);
-          //reader.Close();
-          //writer.Close();
         }
 
         return outlwiPath;

@@ -3,22 +3,20 @@ using System.Linq;
 
 namespace LGLauncher
 {
-  static partial class EditFrame
+  static class EditFrame_sub
   {
-    #region ConvertToTvtPlayChap
-
     /// <summary>
     /// TvtPlayチャプター形式に変換
     /// </summary>
     /// <param name="frameList">元になるフレームリスト</param>
     /// <returns>
-    ///   チャプター形式の文字列
-    ///   変換失敗　→　null
+    ///   成功　→　チャプター形式の文字列
+    ///   失敗　→　null
     /// </returns>
     public static string ConvertToTvtPlayChap(List<int> frameList)
     {
       //フレーム数を100msec単位の時間に変換
-      //    300[frame]  ->  300 / 29.97 * 10  ->  100[100msec]
+      //    300[frame]  ==>  300 / 29.97 * 10  ==>  100[100msec]
       var timeList = frameList.Select((frame) => { return (int)((1.0 * frame / 29.970) * 10.0); }).ToList();
 
       //intへの変換で丸められる。同じ値が続いていたら＋１
@@ -32,7 +30,8 @@ namespace LGLauncher
       var chapText = new List<string>() { "c-" };
       for (int i = 0; i < timeList.Count; i++)
       {
-        int time = timeList[i];    //100ms単位
+        int time = timeList[i];        //100msec単位
+
         // 開始直後のＣＭスキップ用
         // 　最初のメインが２秒より後にあるなら追加、  1.6倍速だと14dix-でスキップしなので 20dix-挿入
         if (i == 0 && 20 < time)
@@ -40,11 +39,11 @@ namespace LGLauncher
 
         // スキップチャプター
         if (i % 2 == 0)
-          chapText.Add("" + time + "dox-");                //even  cm out
+          chapText.Add("" + time + "dox-");                //even    cm out
         else
-          chapText.Add("" + time + "dix-");                //odd   cm in
+          chapText.Add("" + time + "dix-");                //odd     cm in
       }
-      chapText.Add("0eox-c");          //閉じる
+      chapText.Add("0eox-c");                              //閉じる
 
       //１行にする
       string oneliner = "";
@@ -94,18 +93,14 @@ namespace LGLauncher
     //1.6        20dix-
     //
 
-    #endregion ConvertToTvtPlayChap
-
-    #region FlatOut
-
     /// <summary>
     /// 短いＭａｉｎをつぶす
     /// </summary>
     /// <param name="frameList">元になるフレームリスト</param>
     /// <param name="miniMain_sec">指定秒数以下のＭａｉｎをつぶす</param>
     /// <returns>
-    ///   変換後のフレームリスト
-    ///   変換失敗　→　null
+    ///   成功　→　変換後のフレームリスト
+    ///   失敗　→　null
     /// </returns>
     public static List<int> FlatOut_Main(List<int> frameList, double miniMain_sec)
     {
@@ -117,9 +112,9 @@ namespace LGLauncher
       var newList = new List<int>();
       for (int i = 0; i < frameList.Count; i += 2)
       {
-        double mainLength_sec = 1.0 * (frameList[i + 1] - frameList[i]) / 29.970;
+        double mainLength = 1.0 * (frameList[i + 1] - frameList[i]) / 29.970;
 
-        if (miniMain_sec < mainLength_sec)
+        if (miniMain_sec < mainLength)
         {
           newList.Add(frameList[i]);
           newList.Add(frameList[i + 1]);
@@ -129,14 +124,15 @@ namespace LGLauncher
       return newList;
     }
 
+
     /// <summary>
     /// 短いＣＭをつぶす
     /// </summary>
     /// <param name="frameList">元になるフレームリスト</param>
     /// <param name="miniMain_sec">指定秒数以下のＣＭをつぶす</param>
     /// <returns>
-    ///   変換後のフレームリスト
-    ///   変換失敗　→　null
+    ///   成功　→　変換後のフレームリスト
+    ///   失敗　→　null
     /// </returns>
     /// <remarks>開始直後のCMはつぶさない。</remarks>
     public static List<int> FlatOut_CM__(List<int> frameList, double miniCM_sec)
@@ -149,12 +145,15 @@ namespace LGLauncher
       var newList = new List<int>();
 
       //
-      //newListの最後のフレーム数とframeListのフレーム数を比較
-      //cmLengthが短ければ newList[last]を次の本編終わり frameList[i+1]に置換する
-      //　　　　　長ければ newListに本編 frameList[i], frameList[i+1]をいれる
-      //開始直後のCMが短いのは無視する。
-
+      //”newListの末尾のフレーム数”と”frameList[i]のフレーム数”の差がcmLength
       //
+      //cmLengthが短ければ newList[last]を次の本編終端のframeList[i+1]にする
+      //　　　　　長ければ newListに本編 frameList[i], frameList[i+1]をいれる
+      //
+      //ただし、開始直後のＣＭは無視する。
+      //多くの場合、開始直後に数秒のＣＭがあるがこれを本編にいれることはしない。
+      //
+
       //最初のmainを入れる
       newList.Add(frameList[0]);
       newList.Add(frameList[1]);
@@ -162,12 +161,17 @@ namespace LGLauncher
       for (int i = 2; i < frameList.Count; i += 2)
       {
         double cmLength = 1.0 * (frameList[i] - newList[newList.Count - 1]) / 29.970;
+
         if (cmLength < miniCM_sec)
         {
+          //短
+          //ＣＭを無視し本編内とする。本編終端を入れ替える
           newList[newList.Count - 1] = frameList[i + 1];
         }
         else
         {
+          //長
+          //ＣＭを採用し通常の本編＆本編終端をいれる
           newList.Add(frameList[i]);
           newList.Add(frameList[i + 1]);
         }
@@ -176,6 +180,5 @@ namespace LGLauncher
       return newList;
     }
 
-    #endregion FlatOut
   }
 }

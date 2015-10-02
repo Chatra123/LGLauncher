@@ -4,7 +4,8 @@ using System.Text;
 namespace LGLauncher
 {
   /*
-   * 想定できる例外はLGLExceptionを発生させてtry{}catch{}で捕まえる。
+   * エラー処理に例外を使う
+   * 想定できるエラーはLGLExceptionを発生させてtry{}catch{}で捕まえる。
    * 録画中にダイアログを表示したくないので、 Windowsのエラーダイアログは表示させない。
    *
    *
@@ -37,6 +38,7 @@ namespace LGLauncher
         sb.AppendLine("/▽  info  ▽/");
         foreach (var info in InfoList)
           sb.AppendLine("    " + info.ToString());
+        sb.AppendLine("    →←");
 
         return sb.ToString();
       }
