@@ -1,7 +1,7 @@
 ﻿
 ## LGLauncher
 
-作成中の d2v, srtファイルを元にLogoGuilloを実行します。
+作成中の d2v, lwi, srtファイルを元にLogoGuilloを実行します。
 
 
 
@@ -18,158 +18,213 @@
 
 ------------------------------------------------------------------
 ### 使用前の準備
-1. logoGuillo.exe、  
-   avs2pipemod.exe、  
-   DGDecode.dll  
-   をLSystemフォルダに入れる。
+1. LSystemフォルダに  
+   logoGuillo.exe  
+   avs2pipemod.exe  
+   を入れる。
 
 2. LogoSelector.exe を実行し設定ファイルを生成。  
-   LogoSelector.txtの"[LogoDir]"をlgdファイルのあるフォルダに設定する。
+   LogoSelector.txtの"[LogoDir]"にlgd,paramファイルのあるフォルダを設定する。
 
 
 
 ------------------------------------------------------------------
-### 使い方
+### 使い方　　コマンドライン
+
 LGLauncher.exe  -No 1  -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
+
+
+２回目以降、 -No を増やします。
+LGLauncher.exe  -No 2  -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
 
 
 
 ------------------------------------------------------------------
 ### 引数
-大文字、小文字の違いは無視されます。
 
-    -no 1  
+
+    -No 1
 -noを増やすことで前回からの増加分を処理する。  
--1 なら全体を処理します。必ず作成完了したd2vを指定してください。  
+-1 なら全体を処理します。
+
+    -AutoNo
+-noを作業フォルダ内のファイルから決定します。
+
+    -last
+最後の処理であることを示します。  
 
 
-    -ts "C:\video.ts"  
+    -ts "C:\video.ts"
 tsファイルのパス  
 tsファイルのパスを元に各ファイルパスを作成します。  
 "C:\video.ts.pp.d2v"  
 "C:\video.ts.pp.lwi"  
 "C:\video.ts.pp.lwifooter"  
-"C:\video.srt"  
+"C:\video.ts.srt"  
 tsと同じフォルダに d2v, lwi, srtをおいてください。  
 
 
-    -d2v "D:\rec\video.ts.d2v"  
+    -ch "abc"
+    -channel "abc"
+LogoSelecterに渡すチャンネル名  
+
+    -program "defgh"
+LogoSelecterに渡すプログラム名  
+
+
+    
+------------------------------------------------------------------
+### 引数２
+
+    -d2v "D:\rec\video.ts.d2v"
 d2vファイルパスの個別指定
 
 
-    -lwi "D:\rec\video.ts.lwi"  
+    -lwi "D:\rec\video.ts.lwi"
 lwiファイルパスの個別指定
 
 
-    -srt "D:\rec\video.srt"  
+    -srt "D:\rec\video.ts.srt"
 srtファイルパスの個別指定
 
+    -SequenceName  abc123
+作業フォルダ名の一部に使用します。  
+-AutoNoを使用し、pfAdapter処理全体を再実行する場合には必要です。  
+それ以外では無くてもかまいません。  
 
-    -ch "abc"  
-    -channel "abc"  
-LogoSelecterに渡すチャンネル名  
-
-    -program "defgh"  
-LogoSelecterに渡すプログラム名  
-
-    -last  
-フレームファイルの出力名が TsName.ts.frame.txtになる。  
-通常の出力名は TsName.ts.partframe.txtです。  
-
-
-
+    
+    
 
 ------------------------------------------------------------------
 ### 設定
 
     bEnable  1  
-1: 有効  
-0: 無効
-
-
-    bPrefer_d2v  1  
-1: d2vで処理  
-0: lwiで処理  
+有効 、無効
 
 
     iPriority  -1  
 プロセス優先度を指定。LogoGuilloに継承されます。  
- 2: Normal  
- 1: BelorNormal  
- 0: Low  
--1: Auto by Windows
+優先度は下げるのみです。指定優先度よりすでに低い場合は処理しません。  
+ 2:  Normal  
+ 1:  BelorNormal  
+ 0:  Low  
+-1:  Auto by Windows  
 
 
-    iLogoGuillo_MultipleRun  1  
-Windows内でのLogoGuilloの同時実行数、確実な制御はできません。
+    sAvs_iPlugin  lwi  
+d2v:  d2vで処理  
+lwi:  lwiで処理  
 
 
-    bUseTSDir_asChapDir  1  
-Tvtplay用チャプターファイルをtsファイルのフォルダに作成します。
+    sLogoDetector  LogoGuillo  
+JLS          :  Join_Logo_Scpで処理  
+Join_Logo_Scp:  Join_Logo_Scpで処理  
+LG           :  LogoGuilloで処理  
+LogoGuillo   :  LogoGuilloで処理  
 
 
-    sChapDir_Path  "C:\ChapDir"  
-Tvtplay用チャプターファイルを作成するフォルダを指定します。  
-bUseTSDir_asChapDir = 0  にしてください。  
+    iDetector_MultipleRun  1  
+Windows内での LogoGuilloの同時実行数
 
 
-    sFrameDir_Path  "C:\FrameDir"  
-フレームファイルを出力するフォルダを指定します。  
-出力名は TsName.ts.frame.txtです。
+    bOut_tvtp  1  
+Tvtplay用チャプターファイルを出力する。  
 
 
-    iDeleteWorkItem  1  
+    bOut_nero  1  
+Nero形式のチャプターファイルを出力する。  
+
+
+    bOut_frame  0  
+２９秒以下の本編、ＣＭを除去したフレームファイルを出力する。  
+
+
+    bOut_rawframe  0  
+編集前のフレームファイルを出力する。  
+
+
+    bOut_tvtp_toTsDir  1  
+Tvtplay用チャプターファイルをＴＳファイルのフォルダに作成します。  
+
+
+    bOut_misc_toTsDir  1  
+Nero、フレームファイルをＴＳファイルのフォルダに作成します。  
+
+
+    sChapDir_Path  "C:\tvtp_Dir"  
+Tvtplay用チャプターファイルを出力するフォルダを指定します。  
+bOut_tvtp_toTsDir = 0  にしてください。  
+
+
+    sDirPath_misc  "C:\frame_and_nero_Dir"  
+Nero、フレームファイルを出力するフォルダを指定します。  
+bOut_misc_toTsDir = 0  にしてください。  
+
+
+    iDeleteWorkItem  2  
 2: 古い作業ファイル削除　＆　使い終わったファイル削除  
 1: 古い作業ファイル削除  
 0: 削除しない  
 
 
 
-
 ------------------------------------------------------------------
-### LogoSelector
-
-* LSystemフォルダにあるLogoSelector.exe又は、LogoSelector.vbs、LogoSelector.jsを実行します。  
-    複数ある場合の優先順位は、  
-    （高）　.exe  .vbs  .js　（低）
+### LSystemフォルダ
+　フォルダ以下に各バイナリファイルを置いてください。  
+　子フォルダ内も自動的に検索します。
 
 
-* LogoSelector.exe  
-    引数に "チャンネル名"  "番組名"  "tsパス"を渡します。  
-    返り値の１行目にロゴデータ、２行目にパラメーターのフルパスを返してください。  
+##### AVS Input Plugin  
+DGDecode.dll  
+LSMASHSource.dll  
 
 
-* LogoSelector.vbs　＆　LogoSelector.js  
-    cscriptの引数に"スクリプトパス"  "チャンネル名"  "番組名"  "tsパス"を渡します。  
-    返り値の１行目にロゴデータ、２行目にパラメーターのフルパスを返してください。
+##### 必ず必要  
+avs2pipemod.exe  
+LogoSelector.exe  
 
 
-    
-    
+##### あれば使用
+SystemIdleMonitor.exe  
+
+
+##### LogoGuilloを使用する場合  
+logoGuillo.exe  
+
+
+##### join_logo_scpを使用する場合  
+avsinp.aui  
+chapter_exe.exe  
+logoframe.exe  
+join_logo_scp.exe  
+JL__標準.txt  
+JL_標準_Recording.txt  
+
+
+
 ------------------------------------------------------------------
 ### メモ
-* Tvtplay用のチャプターはフレームファイルから２９秒以下のＣＭ、
-２９秒以下の本編を除去してから作成しています。
-処理を変更する場合はフレームファイルを取得してチャプターを作成してください。
+* Tvtp、Neroチャプターは２９秒以下の本編、ＣＭを除去してから作成しています。
 
-
-* フレームファイルのファイル名は*.ts.partframe.txt、最終ファイルは*.ts.frame.txt。
-  文字コード　shift-jis
+* 文字コード
+ * Tvtp             UTF-8 bom
+ * Nero, Frame      Shift-JIS
 
   
 * 作業ファイルのパスが２５５文字を超えると正常に動きません。深いフォルダにおかないでください。
 
 
-* LSystemフォルダにSystemIdleMonitor.exeがあれば、ＣＰＵ使用率が６０％以下になるまで待機し、  
- x264、ffmpegが実行されていないことを確認してからLogoGuilloを実行します。
+* LSystemフォルダにSystemIdleMonitor.exeがあれば、ＣＰＵ使用率が６０％以下になるまで待機
+してからLogoGuilloを実行します。
 
 
 * LogoGuillo実行間隔による差
     * フレーム認識  
         - 実行間隔が短いと真っ白なシーンや映像後半でずれやすくなる。  
         - 5min to 1minはＣＭが本編として組み込まれる量が多くなっていく。
+        - 10minならほぼ差が出ない。
         
-    * 処理時間の増加  
+    * 処理時間の増加率  
 
 |  実行間隔  |  処理時間  |
 |:----------:|:----------:|
@@ -182,14 +237,25 @@ bUseTSDir_asChapDir = 0  にしてください。
 
 
 
+------------------------------------------------------------------
+### LogoSelector
+
+* LSystemフォルダにあるLogoSelector.exe又は、LogoSelector.vbs、LogoSelector.jsを実行します。  
+
+
+* LogoSelector.exe  
+    引数に "チャンネル名"  "番組名"  "tsパス"を渡します。  
+    返り値の１行目にロゴデータ、２行目にパラメーターのフルパスを返してください。  
+
+
+* LogoSelector.vbs　＆　LogoSelector.js  
+    cscriptの引数に"スクリプトパス"  "チャンネル名"  "番組名"  "tsパス"を渡します。  
+    返り値の１行目にロゴデータ、２行目にパラメーターのフルパスを返してください。
+
+    
 
 ------------------------------------------------------------------
 ### lwi
-
-- lwiで処理するには
-    - 設定ファイルのbPrefer_d2vを0にする。
-    - LSystemフィルダにLSMASHSource.dllを入れる。
-
 
 - d2vよりも２倍程速く処理できます。
 
@@ -207,42 +273,66 @@ AviSynthのファイル読込時にシステム側で使用します。
         - １０分ごとに処理したときは　　５５０ＭＢ  
         - 　１分ごとに処理したときは　　　　５ＧＢ  
     必要に応じてiDeleteWorkItemの設定を変更してください。
+    
+    
+    
+------------------------------------------------------------------
+### join_logo_scp
+
+- LSystemフォルダに以下のファイルを入れてください。子フォルダでもかまいません。
+  - avsinp.aui
+  - chapter_exe.exe
+  - JL_標準.txt
+  - JL_標準_Recording.txt
+  - join_logo_scp.exe
+  - logoframe.exe
+
+- chpater_exe.exeは同梱のものでなくてもかまいません。安定して動く方を使用してください。  
+  テスト環境では終了時にエラーが発生したので、終了処理を変更しただけです。
+  
+- JL_標準_Recording.txtは JL__標準.txtから必要なさそうな項目をコメントアウトしただで、  
+  それ以外はJL__標準.txtと同じです。
 
 
-
-
+  
 ------------------------------------------------------------------
 ### 謝辞
 このソフトウェアを動作させるには、
 
 * avs2pipemod
+* avsinp.aui
+* chapter_exe
 * DGDecode
+* join_logo_scp
 * LogoGuillo
 * LSmash-Works
 
 が必要です。各作者にお礼申し上げます。
 
 
+  
+------------------------------------------------------------------
+### 使用ライブラリ
+
+    Mono.Options  
+    Authors:  
+        Jonathan Pryor <jpryor@novell.com>  
+        Federico Di Gregorio <fog@initd.org>  
+        Rolf Bjarne Kvinge <rolf@xamarin.com>  
+    Copyright (C) 2008 Novell (http://www.novell.com)  
+    Copyright (C) 2009 Federico Di Gregorio.  
+    Copyright (C) 2012 Xamarin Inc (http://www.xamarin.com)  
+  
 
 
 ------------------------------------------------------------------
 ### ライセンス
     GPL v3
     Copyright (C) 2014  CHATRA
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program. If not, see [http://www.gnu.org/licenses/].
+    http://www.gnu.org/licenses/
+    
+    
+  
 
 
-
-
+ 

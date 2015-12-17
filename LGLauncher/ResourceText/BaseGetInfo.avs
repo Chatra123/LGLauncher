@@ -3,15 +3,16 @@ SetMemoryMax(16)
 SetWorkingDir("#AvsWorkDir#")
 
 
-#d2v#  LoadPlugin("..\..\LSystem\DGDecode.dll")
+LoadPlugin("#InputPlugin#")
+#  d2v
 #d2v#  DGDecode_MPEG2Source("#D2vName#")
 
-#lwi#  LoadPlugin("..\..\LSystem\LSMASHSource.dll")
+
+#  Lwi
 #lwi#  tspath = "#TsPath#"
 #lwi#  LWLibavVideoSource(tspath, cache=true, stream_index=-1, threads=0, repeat=true)
 
 AssumeFPS(30000, 1001, true) 
-
 
 
 filename   = "#InfoName#"

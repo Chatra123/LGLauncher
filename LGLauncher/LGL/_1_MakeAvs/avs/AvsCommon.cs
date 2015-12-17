@@ -7,12 +7,14 @@ using System.Threading;
 
 namespace LGLauncher
 {
+  using OctNov.IO;
+
   internal abstract class AbstractAvsMaker
   {
 
     public abstract string AvsPath { get; protected set; }            //作成したAVSのパス
     public abstract int[] TrimFrame { get; protected set; }           //今回のトリム用フレーム数
-    public abstract int[] TrimFrame_m1 { get; protected set; }        //前回のトリム用フレーム数
+    public abstract int[] TrimFrame_m1 { get; protected set; }        //前回のトリム用フレーム数  minus 1
 
     public abstract void Make();
 
@@ -20,6 +22,7 @@ namespace LGLauncher
 
   internal static class MakeAvsCommon
   {
+
     #region RunInfoAvs
 
     /// <summary>
@@ -28,11 +31,8 @@ namespace LGLauncher
     /// <param name="avsPath">実行するavsパス</param>
     public static void RunInfoAvs(string avsPath)
     {
-      if (File.Exists(PathList.AVS2X) == false)
-        throw new LGLException("avs2pipemod does not exist");
-
       var psi = new ProcessStartInfo();
-      psi.FileName = PathList.AVS2X;
+      psi.FileName = PathList.avs2pipemod;
       psi.Arguments = " -info \"" + avsPath + "\"";
       psi.CreateNoWindow = true;
       psi.UseShellExecute = false;
@@ -40,12 +40,13 @@ namespace LGLauncher
       prc.StartInfo = psi;
 
       //実行
-      if (prc.Start() == false) 
+      if (prc.Start() == false)
         throw new LGLException();
-      prc.WaitForExit(20 * 1000);      //３秒程はかかる
+      prc.WaitForExit(100 * 1000);      //３秒程はかかる
     }
 
     #endregion RunInfoAvs
+
 
     #region GetAvsInfo
 
@@ -87,18 +88,31 @@ namespace LGLauncher
 
       //数値に変換
       double frame, fps, time;
-      bool canParse = true;
-
-      canParse &= double.TryParse(infoText[0], out frame);
-      canParse &= double.TryParse(infoText[1], out fps);
-      canParse &= double.TryParse(infoText[2], out time);
-      if (canParse == false)
+      try
+      {
+        frame = double.Parse(infoText[0]);
+        fps = double.Parse(infoText[1]);
+        time = double.Parse(infoText[2]);
+        return new double[] { frame, fps, time };
+      }
+      catch
+      {
         throw new LGLException();
+      }
 
-      return new double[] { frame, fps, time };
+      //bool canParse = true;
+
+      //canParse &= double.TryParse(infoText[0], out frame);
+      //canParse &= double.TryParse(infoText[1], out fps);
+      //canParse &= double.TryParse(infoText[2], out time);
+      //if (canParse == false)
+      //  throw new LGLException();
+
+      //return new double[] { frame, fps, time };
     }
 
     #endregion GetAvsInfo
+
 
     #region GetTrimFrame_fromName
 
@@ -130,20 +144,29 @@ namespace LGLauncher
         string sbegin = match.Groups["begin"].Value;
         string send = match.Groups["end"].Value;
         int ibegin, iend;
-        bool canParse = true;
+        //bool canParse = true;
 
-        canParse &= int.TryParse(sbegin, out ibegin);
-        canParse &= int.TryParse(send, out iend);
-        if (canParse == false)
-          throw new LGLException();
-
-        return new int[] { ibegin, iend };
+        //canParse &= int.TryParse(sbegin, out ibegin);
+        //canParse &= int.TryParse(send, out iend);
+        //if (canParse == false)
+        //  throw new LGLException();
+        try
+        {
+          ibegin = int.Parse(sbegin);
+          iend = int.Parse(send);
+          return new int[] { ibegin, iend };
+        }
+        catch
+        {
+          throw new LGLException("filename parse error. can't get begin end no");
+        }
       }
       else
         return null;
     }
 
     #endregion GetTrimFrame_fromName
+
 
     #region GetTrimFrame
 
@@ -157,12 +180,12 @@ namespace LGLauncher
     {
       int beginFrame = 0, endFrame = 0;
 
-      if (PathList.No == 1)
+      if (PathList.PartNo == 1)
       {
         beginFrame = 0;
         endFrame = totalframe - 1;
       }
-      else if (2 <= PathList.No)
+      else if (2 <= PathList.PartNo)
       {
         if (trimFrame_m1 == null)
           throw new LGLException();
@@ -170,7 +193,7 @@ namespace LGLauncher
         beginFrame = trimFrame_m1[1] + 1;                  //前回の終端フレーム数＋１
         endFrame = totalframe - 1;
       }
-      else if (PathList.No == -1)
+      else if (PathList.PartALL)
       {
         beginFrame = 0;
         endFrame = totalframe - 1;
@@ -180,5 +203,56 @@ namespace LGLauncher
     }
 
     #endregion GetTrimFrame
+
+
+    #region CreateTrimAvs
+
+    /// <summary>
+    /// トリムつきAVS作成  共通部
+    /// </summary>
+    /// <param name="trimBeginEnd">トリムする開始、終了フレーム数</param>
+    /// <returns>作成したavsパス</returns
+    public static List<string> CreateTrimAvs(int[] trimBeginEnd)
+    {
+      int beginFrame = trimBeginEnd[0];
+      int endFrame = trimBeginEnd[1];
+
+      //リソース読込み
+      var avsText = FileR.ReadFromResource("LGLauncher.ResourceText.BaseTrimAvs.avs");
+
+      //AVS書き換え
+      for (int i = 0; i < avsText.Count; i++)
+      {
+        var line = avsText[i];
+
+        //current dir
+        line = Regex.Replace(line, "#AvsWorkDir#", PathList.LWorkDir, RegexOptions.IgnoreCase);
+
+        //Detector
+        if (PathList.Detector == LogoDetector.Join_Logo_Scp)
+        {
+          line = Regex.Replace(line, "#Join_Logo_Scp#", "", RegexOptions.IgnoreCase);
+        }
+        else
+        {
+          line = Regex.Replace(line, "#LogoGuillo#", "", RegexOptions.IgnoreCase);
+        }
+
+        //Trim
+        if (1 <= PathList.PartNo)
+        {
+          line = Regex.Replace(line, "#EnableTrim#", "", RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#BeginFrame#", "" + beginFrame, RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#EndFrame#", "" + endFrame, RegexOptions.IgnoreCase);
+        }
+        avsText[i] = line;
+      }
+
+      return avsText;
+
+    }
+
+    #endregion CreateTrimAvs
+
   }
 }

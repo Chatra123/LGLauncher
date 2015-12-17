@@ -6,11 +6,13 @@ using System.Threading;
 
 namespace LGLauncher
 {
+  using OctNov.IO;
+
   internal class AvsWithLwi : AbstractAvsMaker
   {
     public override string AvsPath { get; protected set; }            //作成したAVSのパス
     public override int[] TrimFrame { get; protected set; }           //今回のトリム用フレーム数
-    public override int[] TrimFrame_m1 { get; protected set; }        //前回のトリム用フレーム数
+    public override int[] TrimFrame_m1 { get; protected set; }        //前回のトリム用フレーム数  minus 1
 
     /// <summary>
     /// Trim付きavs作成
@@ -20,12 +22,12 @@ namespace LGLauncher
     {
       //ファイルチェック
       //LwiPath
-      if (File.Exists(PathList.LwiPath) == false) 
+      if (File.Exists(PathList.LwiPath) == false)
         throw new LGLException("LwiPath dose not exist");
 
       //dll
-      var Lwi_dll = Path.Combine(PathList.LSystemDir, "LSMASHSource.dll");
-      if (File.Exists(Lwi_dll) == false) 
+      //var Lwi_dll = Path.Combine(PathList.LSystemDir, "LSMASHSource.dll");
+      if (File.Exists(PathList.LSMASHSource_dll) == false)
         throw new LGLException("LSMASHSource.dll dose not exist");
 
       //lwiファイル名が LwiPath == TsPath + ".lwi"だと処理できない。
@@ -50,7 +52,7 @@ namespace LGLauncher
       int totalframe = (int)avsInfo[0];
 
       //前回のトリム用フレーム数取得
-      this.TrimFrame_m1 = (2 <= PathList.No)
+      this.TrimFrame_m1 = (2 <= PathList.PartNo)
                               ? MakeAvsCommon.GetTrimFrame_fromName(PathList.WorkName_m1 + ".lwi_*__*.avs")
                               : null;
 
@@ -59,7 +61,10 @@ namespace LGLauncher
 
       //Trim付きavs作成
       this.AvsPath = CreateTrimAvs_lwi(TrimFrame);
+
     }
+
+
 
     #region FormatLwi
 
@@ -69,7 +74,17 @@ namespace LGLauncher
     /// <returns>フォーマット済みlwiのパス</returns>
     private string FormatLwi()
     {
+      //lwiの３，４行目
+      //
+      //<ActiveVideoStreamIndex>+0000000000</ActiveVideoStreamIndex>
+      //<ActiveAudioStreamIndex>+0000000001</ActiveAudioStreamIndex>
+      //
+      //は読込みの途中でCreateLwiによって書き換えられる可能性が極わずかにあるが考慮しない。
+      //書き換えの途中で読込み、不正なファイルになってもLSMASHSource.dllによって再作成されるだけ。
+      //問題にはならないはず。
+
       /*
+       *                       lwiのファイルサイズ
        * ts  60min  5.68 GB    lwi  40.3 MB  535,345 line
        *      1min                   6.7 MB    8,922 line
        *      1sec                   0.1 MB      150 line
@@ -81,91 +96,101 @@ namespace LGLauncher
 
       var writeBuff = new List<string>();
       var readBuff = new List<string>();
-      readBuff = reader.ReadNLines(500);         //５００行ずつ読込む
 
       try
       {
-        //
-        //最低行数チェック
-        if (readBuff.Count < 500)
+        //最初の５００行だけ
+        readBuff = reader.ReadNLines(500);
+
+        //チェック
         {
-          throw new LGLException("lwi text is less than 500 lines");
-        }
-        //フォーマットの簡易チェック
-        bool matchHeader = true;
-        matchHeader &= Regex.IsMatch(readBuff[0], @"<LibavReaderIndexFile=\d+>");
-        matchHeader &= Regex.IsMatch(readBuff[1], @"<InputFilePath>.*</InputFilePath>");
-        matchHeader &= Regex.IsMatch(readBuff[2], @"<LibavReaderIndex=.*>");
-        if (matchHeader == false)
-        {
-          throw new LGLException("lwi format error");
+          //最低行数
+          if (readBuff.Count < 500)
+          {
+            throw new LGLException("lwi text is less than 500 lines");
+          }
+          //フォーマットの簡易チェック
+          bool matchHeader = true;
+          matchHeader &= Regex.IsMatch(readBuff[0], @"<LibavReaderIndexFile=\d+>");
+          matchHeader &= Regex.IsMatch(readBuff[1], @"<InputFilePath>.*</InputFilePath>");
+          matchHeader &= Regex.IsMatch(readBuff[2], @"<LibavReaderIndex=.*>");
+          if (matchHeader == false)
+          {
+            throw new LGLException("lwi format error");
+          }
         }
 
-        //
         //読込みループ
         writeBuff = readBuff;
-        while (true)
         {
-          readBuff = reader.ReadNLines(500);
+          while (true)
+          {
+            readBuff = reader.ReadNLines(500);       //５００行ずつ読込む
 
-          if (readBuff.Count() == 500)
-          {
-            writer.WriteText(writeBuff);           //write file
-            writeBuff = readBuff;                  //copy reference
-            readBuff = new List<string>();         //initialize buff
+            if (readBuff.Count() == 500)
+            {
+              writer.WriteText(writeBuff);           //write file
+              writeBuff = readBuff;                  //copy reference
+              readBuff = new List<string>();         //initialize buff
+            }
+            else
+            {
+              //reach EOF
+              writeBuff.AddRange(readBuff);
+              break;
+            }
           }
-          else
-          {
-            //reach EOF
-            writeBuff.AddRange(readBuff);
-            break;
-          }
+          reader.Close();
         }
 
         //
         //lwiファイル終端
         //　最後の"index=..."行以降を削除
-        //  PathList.No = -1 でも切り捨てる
-        string pattern = @"Index=\d+,Type=\d+,Codec=\d+,";
-        var matchLine = writeBuff.LastOrDefault(line => Regex.Match(line, pattern).Success);
+        //  PathList.PartALL でも末尾は切り捨て
+        {
+          string pattern = @"Index=\d+,Type=\d+,Codec=\d+,";
+          var matchLine = writeBuff.LastOrDefault(line => Regex.Match(line, pattern).Success);
 
-        if (matchLine != null)
-        {
-          int matchIdx = writeBuff.LastIndexOf(matchLine);
-          writeBuff.RemoveRange(matchIdx, writeBuff.Count - matchIdx);
-        }
-        else
-        {
-          throw new LGLException();
+          if (matchLine != null)
+          {
+            int matchIdx = writeBuff.LastIndexOf(matchLine);
+            writeBuff.RemoveRange(matchIdx, writeBuff.Count - matchIdx);
+          }
+          else
+          {
+            throw new LGLException();
+          }
         }
 
         //
         //lwiファイル作成
-        var footer_bin = ReadFile_footer();         //footerファイル読込み
-
-        if (footer_bin != null)
         {
-          //footer読込成功
-          //lwiの残り書込み
-          writer.WriteText(writeBuff);
-          //reader.Close();
-          writer.Close();
+          var footer_bin = ReadFile_footer();         //footerファイル読込み
 
-          //footerをバイナリーモードで書込み
-          FileW.AppendBytes(outlwiPath, footer_bin);
-        }
-        else
-        {
-          //失敗、footer作成
-          var footer_text = Create_footer(writeBuff);
-          if (footer_text == null)
+          if (footer_bin != null)
           {
-            throw new LGLException();
-          }
+            //footer読込成功
+            //lwiの残り書込み
+            writer.WriteText(writeBuff);
+            writer.Close();
 
-          //書込み
-          writer.WriteText(writeBuff);
-          writer.WriteText(footer_text);
+            //footerをバイナリーモードで書込み
+            FileW.AppendBytes(outlwiPath, footer_bin);
+          }
+          else
+          {
+            //失敗、footer作成
+            var footer_text = Create_footer(writeBuff);
+            if (footer_text == null)
+            {
+              throw new LGLException();
+            }
+
+            //書込み
+            writer.WriteText(writeBuff);
+            writer.WriteText(footer_text);
+            writer.Close();
+          }
         }
 
         return outlwiPath;
@@ -176,6 +201,7 @@ namespace LGLauncher
         writer.Close();
       }
     }//func
+
 
     /// <summary>
     /// footerファイル読込    binaryモードで読み込む
@@ -190,7 +216,7 @@ namespace LGLauncher
     /// </remarks>
     private byte[] ReadFile_footer()
     {
-      const string tag = "</LibavReaderIndexFile>\n";
+      const string Tag = "</LibavReaderIndexFile>\n";
       byte[] footer = null;
 
       //footerは数秒間隔でファイル全体が更新されるので、
@@ -204,15 +230,16 @@ namespace LGLauncher
 
         if (footer != null)
         {
-          //テキスト末尾の"</LibavReaderIndexFile>\n"を確認
+          //テキスト末尾の Tagを確認
           var footer_ascii = System.Text.Encoding.ASCII.GetString(footer);
-          bool havetag = footer_ascii.IndexOf(tag) == (footer_ascii.Length - tag.Length);
-          if (havetag) break;                              //チェックＯＫ
-          else footer = null;
+          bool hasTag = footer_ascii.IndexOf(Tag) == (footer_ascii.Length - Tag.Length);
+          if (hasTag)
+            break;                     //チェックＯＫ
+          else
+            footer = null;             //チェック失敗、リトライ
         }
 
-        //チェック失敗
-        Thread.Sleep(500);
+        Thread.Sleep(1000);
       }
 
       return footer;
@@ -278,6 +305,7 @@ namespace LGLauncher
 
     #endregion FormatLwi
 
+
     #region CreateInfoAvs_lwi
 
     /// <summary>
@@ -295,12 +323,15 @@ namespace LGLauncher
       for (int i = 0; i < avsText.Count; i++)
       {
         var line = avsText[i];
+
         line = Regex.Replace(line, "#AvsWorkDir#", PathList.LWorkDir, RegexOptions.IgnoreCase);
+        line = Regex.Replace(line, "#InputPlugin#", PathList.LSMASHSource_dll, RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#SystemDir#", PathList.LSystemDir, RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#lwi#", "", RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#TsPath#", PathList.TsPath, RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#LwiName#", lwiName, RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#InfoName#", PathList.WorkName + ".lwiinfo.txt", RegexOptions.IgnoreCase);
+
         avsText[i] = line;
       }
 
@@ -318,45 +349,41 @@ namespace LGLauncher
 
     #endregion CreateInfoAvs_lwi
 
+
     #region CreateTrimAvs_lwi
 
     /// <summary>
     /// トリムつきAVS作成
     /// </summary>
-    /// <param name="trimBeginEnd">トリムする開始、終了フレーム数</param>
-    /// <returns>作成したAVSのパス</returns>
     private string CreateTrimAvs_lwi(int[] trimBeginEnd)
     {
       int beginFrame = trimBeginEnd[0];
       int endFrame = trimBeginEnd[1];
 
-      //リソース読込み
-      var avsText = FileR.ReadFromResource("LGLauncher.ResourceText.BaseTrimAvs.avs");
+      //トリムつきAVS作成  共通部
+      var avsText = MakeAvsCommon.CreateTrimAvs(trimBeginEnd);
 
-      //AVS書き換え
+      //lwi部分　書き換え
       for (int i = 0; i < avsText.Count; i++)
       {
         var line = avsText[i];
-        line = Regex.Replace(line, "#AvsWorkDir#", PathList.LWorkDir, RegexOptions.IgnoreCase);
-        line = Regex.Replace(line, "#SystemDir#", PathList.LSystemDir, RegexOptions.IgnoreCase);
+
+        line = Regex.Replace(line, "#InputPlugin#", PathList.LSMASHSource_dll, RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#lwi#", "", RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#TsPath#", PathList.TsPath, RegexOptions.IgnoreCase);
 
-        if (1 <= PathList.No)
-        {
-          line = Regex.Replace(line, "#EnableTrim#", "", RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#BeginFrame#", "" + beginFrame, RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#EndFrame#", "" + endFrame, RegexOptions.IgnoreCase);
-        }
         avsText[i] = line;
       }
 
+
       //長さチェック
-      //　30frame以下だとlogoGuilloでavs2pipemodがエラーで落ちる。
+      //　30frame以下だとlogoGuilloのavs2pipemodがエラーで落ちる。
       //　120frame以下ならno frame errorと表示されて終了する。
-      //　ここでは150frame以上に設定する。
+      //　150frame以上に設定する。
       int avslen = endFrame - beginFrame;
-      if (150 <= avslen)     //5sec以上か?
+
+      //5sec以上か？
+      if (150 <= avslen)
       {
         //avs書込み
         string outAvsPath = PathList.WorkPath + ".lwi_" + beginFrame + "__" + endFrame + ".avs";
@@ -367,16 +394,17 @@ namespace LGLauncher
       else
       {
         //ビデオの長さが短い
-        //　次回処理のGetTrimFrame()のために*.avsを作成しておく。
-        //  前回の終了フレームとしてbeginFrameを参照してもらう。
+        //　次回処理のGetTrimFrame()のために *.avs を作成しておく。
+        //  ”前回の終端フレーム数”として *.avs のファイル名が使用される。
         string outAvsPath = PathList.WorkPath + ".lwi_" + beginFrame + "__" + beginFrame + ".avs";
         File.WriteAllLines(outAvsPath, avsText, TextEnc.Shift_JIS);
 
-        throw new LGLException();
+        throw new LGLException("short video length.  -lt 150frame");
       }
     }
 
     #endregion CreateTrimAvs_lwi
+
 
     #region Set & Back lwi
 
@@ -390,9 +418,22 @@ namespace LGLauncher
       string srcPath = PathList.WorkPath + ".lwi";
       string dstPath = PathList.TsPath + ".lwi";
 
-      if (File.Exists(dstPath)) File.Delete(dstPath);      //すでにTsDirにlwiファイルがある。
-      File.Move(srcPath, dstPath);
-      lock_lwi = new FileStream(dstPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);   //ファイルロック
+      try
+      {
+        //すでにTsDirにlwiファイルがあるなら削除
+        if (File.Exists(dstPath)) File.Delete(dstPath);
+        Thread.Sleep(500);
+
+        File.Move(srcPath, dstPath);
+        Thread.Sleep(500);
+
+        lock_lwi = new FileStream(dstPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);   //ファイルロック
+      }
+      catch
+      {
+        //ファイルがロックされてる
+        throw new LGLException("lwi file is locked. cant delete or cant move.");
+      }
 
       return;
     }
@@ -406,12 +447,25 @@ namespace LGLauncher
       string dstPath = PathList.WorkPath + ".lwi";
       if (File.Exists(srcPath) == false) return;           //TsDirにlwiファイルがない
 
-      if (lock_lwi != null) lock_lwi.Close();              //ファイルロック解除
-      File.Move(srcPath, dstPath);
+      try
+      {
+        if (lock_lwi != null) lock_lwi.Close();            //ファイルロック解除
+        Thread.Sleep(500);
+
+        File.Move(srcPath, dstPath);
+      }
+      catch
+      {
+        //ファイルがロックされてる
+        throw new LGLException("lwi file is locked. cant move back.");
+      }
 
       return;
     }
 
     #endregion Set & Back lwi
+
+
+
   }
 }

@@ -43,22 +43,32 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Exception\LGLException.cs" />
-    <Compile Include="LGL\Utility\ProhibitFileMove.cs" />
-    <Compile Include="LGL\_2_Launch\LogoGuillo.cs" />
-    <Compile Include="LGL\_2_Launch\SystemChecker.cs" />
-    <Compile Include="LGL\Utility\DeleteWorkItem.cs" />
-    <Compile Include="LGL\_1_MakeAvs\AvsWithLwi.cs" />
-    <Compile Include="LGL\_1_MakeAvs\AvsCommon.cs" />
-    <Compile Include="Text\XmlRW.cs" />
+    <Compile Include="LGL\Misc\ProhibitFileMove.cs" />
+    <Compile Include="LGL\_1_MakeAvs\bat\Bat_Join_Logo_Scp.cs" />
+    <Compile Include="LGL\_1_MakeAvs\bat\LogoSelector.cs" />
+    <Compile Include="LGL\_2_Launch\BatLuncher.cs" />
+    <Compile Include="LGL\_2_Launch\WaitForSystemIdle.cs" />
+    <Compile Include="LGL\Misc\DeleteWorkItem.cs" />
+    <Compile Include="LGL\_1_MakeAvs\avs\AvsWithLwi.cs" />
+    <Compile Include="LGL\_1_MakeAvs\avs\AvsCommon.cs" />
+    <Compile Include="LGL\_3_EditFrame\JLS\Concat_logoframe.cs" />
+    <Compile Include="LGL\_3_EditFrame\JLS\Concat_Scpos.cs" />
+    <Compile Include="LGL\_3_EditFrame\JLS\Convert_JLS.cs" />
+    <Compile Include="LGL\_3_EditFrame\EditFrame_core\EditFrame_Convert.cs" />
+    <Compile Include="LGL\_3_EditFrame\EditFrame_core\EditFrame_OutChap.cs" />
+    <Compile Include="Setting\Mono.Options\Options.cs" />
+    <Compile Include="Setting\Mono.Options\Options_icase.cs" />
+    <Compile Include="Setting\Setting_CmdLine.cs" />
+    <Compile Include="Setting\Setting_File.cs" />
+    <Compile Include="Setting\XmlRW.cs" />
     <Compile Include="Exception\ExceptionInfo.cs" />
     <Compile Include="Text\FileRW.cs" />
     <Compile Include="Text\Log.cs" />
-    <Compile Include="LGL\PathList.cs" />
-    <Compile Include="LGL\_1_MakeAvs\AvsWithD2v.cs" />
+    <Compile Include="Setting\PathList.cs" />
+    <Compile Include="LGL\_1_MakeAvs\avs\AvsWithD2v.cs" />
     <Compile Include="LGL\_1_MakeAvs\TimeShiftSrt.cs" />
-    <Compile Include="LGL\_1_MakeAvs\BatLogoGuillo.cs" />
-    <Compile Include="LGL\_3_EditFrame\EditFrame_main.cs" />
-    <Compile Include="LGL\_3_EditFrame\EditFrame_sub.cs" />
+    <Compile Include="LGL\_1_MakeAvs\bat\Bat_LogoGuillo.cs" />
+    <Compile Include="LGL\_3_EditFrame\Tweaker.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -66,10 +76,13 @@
     <None Include="App.config" />
     <EmbeddedResource Include="ResourceText\BaseLogoGuillo.bat" />
     <EmbeddedResource Include="ResourceText\BaseTrimAvs.avs" />
+    <EmbeddedResource Include="ResourceText\BaseJoin_Logo_Scp_Rec.bat" />
+    <EmbeddedResource Include="ResourceText\BaseJoin_Logo_Scp_Last.bat" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ResourceText\BaseGetInfo.avs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

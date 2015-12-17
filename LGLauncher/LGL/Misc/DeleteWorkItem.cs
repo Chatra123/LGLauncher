@@ -15,16 +15,23 @@ namespace LGLauncher
   static class DeleteWorkItem
   {
     /// <summary>
-    /// 分割処理の初回ならLWorkDir内のファイル削除
+    /// 処理の初回ならLWorkDir内のファイル削除
     /// </summary>
     public static void Clean_Beforehand()
     {
       //LWorkDir
-      if (PathList.No == 1)
+      if (PathList.PartNo == 1)
       {
-        Delete_file(0.0, PathList.LWorkDir, "*.p?*.*");    //ワイルドカード指定可
+        Delete_file(0.0, PathList.LWorkDir, "*.p?*.*");                                //ワイルドカード指定可
+        Delete_file(0.0, PathList.LWorkDir, PathList.TsShortName + ".frame.cat.txt");  //前回までの合成フレーム
+      }
+      else if (PathList.PartALL)
+      {
+        Delete_file(0.0, PathList.LWorkDir, "*.all.*");
+        Delete_file(0.0, PathList.LWorkDir, PathList.TsShortName + ".frame.cat.txt");
       }
     }
+
 
     /// <summary>
     /// 終了処理でのファイル削除
@@ -32,48 +39,61 @@ namespace LGLauncher
     public static void Clean_Lastly()
     {
       //使い終わったファイルを削除？
-      if (2 <= PathList.Mode_DeleteWorkItem)
+      if (3 <= PathList.Mode_DeleteWorkItem)
       {
         //LWorkDir
-        //  IsLast　→　全ての作業ファイル削除
-        if (PathList.Mode_IsLast)
+        //  IsLast 　　　　　→　　全ての作業ファイル削除
+        if (PathList.IsLastPart)
         {
-          Delete_file(0.0, PathList.LWorkDir, "_" + PathList.TsShortName + "*");
           Delete_file(0.0, PathList.LWorkDir, PathList.TsShortName + "*");
+          Delete_file(0.0, PathList.LWorkDir, "_" + PathList.TsShortName + "*.sys.*");
         }
-        //  通常　→　１つ前の作業ファイル削除
-        else if (2 <= PathList.No)
-          Delete_file(0.0, PathList.LWorkDir, PathList.WorkName_m1 + "*", "catframe.txt");
+        //  2 <= PartNo  　　→　　１つ前の作業ファイル削除
+        else if (2 <= PathList.PartNo)
+        {
+          //今回作成したTsName.p3.lwi_20000__30000.avsは、
+          //次回のLGLauncherが使用するので削除しない。
+          //ひとつ前の作業ファイルを削除。
+          Delete_file(0.0, PathList.LWorkDir, PathList.WorkName_m1 + "*");
+        }
+      }
+
+      //ファイルサイズが大きい lwi, d2v, srt削除
+      if (2 <= PathList.Mode_DeleteWorkItem)
+      {
+        Delete_file(0.0, PathList.LWorkDir, PathList.TsShortName + "*.lwi");
+        Delete_file(0.0, PathList.LWorkDir, PathList.TsShortName + "*.d2v");
+        Delete_file(0.0, PathList.LWorkDir, PathList.TsShortName + "*.srt");
       }
 
       //古いファイル削除？
       if (1 <= PathList.Mode_DeleteWorkItem)
       {
-        if (PathList.No == 1 || PathList.No == -1)
+        if (PathList.PartNo == 1 || PathList.PartALL)
         {
-          const double ndaysBefore = 2.0;
-          //LTopWorkDir
-          //サブフォルダ内も対象
-          Delete_file(ndaysBefore, PathList.LTopWorkDir, "*.all.*");
-          Delete_file(ndaysBefore, PathList.LTopWorkDir, "*.p?*.*");
-          Delete_file(ndaysBefore, PathList.LTopWorkDir, "*.sys.*");
+          const double nDaysBefore = 2.0;
+          //LTopWorkDir         サブフォルダ内も対象
+          Delete_file(nDaysBefore, PathList.LTopWorkDir, "*.all.*");
+          Delete_file(nDaysBefore, PathList.LTopWorkDir, "*.p?*.*");
+          Delete_file(nDaysBefore, PathList.LTopWorkDir, "*.sys.*");
           Delete_emptydir(PathList.LTopWorkDir);
 
           //Windows Temp
-          Delete_file(ndaysBefore, Path.GetTempPath(), "logoGuillo_*.avs");
-          Delete_file(ndaysBefore, Path.GetTempPath(), "logoGuillo_*.txt");
-          Delete_file(ndaysBefore, Path.GetTempPath(), "DGI_pf.tmp*");
+          Delete_file(nDaysBefore, Path.GetTempPath(), "logoGuillo_*.avs");
+          Delete_file(nDaysBefore, Path.GetTempPath(), "logoGuillo_*.txt");
+          Delete_file(nDaysBefore, Path.GetTempPath(), "DGI_pf_tmp_*_*");
         }
       }
     }
+
 
     /// <summary>
     /// 削除処理の実行部
     /// </summary>
     /// <param name="nDaysBefore">Ｎ日前のファイルを削除対象にする</param>
     /// <param name="directory">ファイルを探すフォルダ。　サブフォルダ内も対象</param>
-    /// <param name="searchKey">ファイル名に含まれる文字。ワイルドカード可*</param>
-    /// <param name="ignoreKey">除外するファイルに含まれる文字。ワイルドカード不可×</param>
+    /// <param name="searchKey">ファイル名に含まれる文字。ワイルドカード可 * </param>
+    /// <param name="ignoreKey">除外するファイルに含まれる文字。ワイルドカード不可 × </param>
     private static void Delete_file(double nDaysBefore, string directory, string searchKey, string ignoreKey = null)
     {
       if (Directory.Exists(directory) == false) return;
@@ -107,6 +127,7 @@ namespace LGLauncher
     {
       if (Directory.Exists(parent_directory) == false) return;
 
+
       var dirInfo = new DirectoryInfo(parent_directory);
       var dirs = dirInfo.GetDirectories("*", SearchOption.AllDirectories);
 
@@ -123,8 +144,9 @@ namespace LGLauncher
         }
       }
     }
+
+
+
+
   }
-
-
-
 }
