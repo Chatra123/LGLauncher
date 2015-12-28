@@ -53,7 +53,7 @@ namespace LGLauncher
 
 
         //フレーム検出
-        //   return  avsの開始、終了フレーム数
+        //   trimFrame:  avsの開始、終了フレーム数
         int[] trimFrame = DetectFrame();
 
 
@@ -69,6 +69,7 @@ namespace LGLauncher
       }
       catch (LGLException e)
       {
+        DeleteWorkItem.Clean_OnError();
         Log.WriteLine();
         Log.WriteLine(CmdLine_ToString);
         Log.WriteLine();

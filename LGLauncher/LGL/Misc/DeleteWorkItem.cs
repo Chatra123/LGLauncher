@@ -34,6 +34,31 @@ namespace LGLauncher
 
 
     /// <summary>
+    /// 例外発生時のファイル削除
+    /// </summary>
+    /// <remarks>
+    /// エラーで処理できなかった場合に、
+    /// 次回の処理が動作するようにする。
+    /// *.p3.frame.cat.txt 削除
+    /// *.p3.lwi_36000__54000.avs 削除
+    /// 
+    /// partNo自動検出でないなら、
+    /// *.p3.lwi_36000__36000.avs を作成して対処する。　未実装
+    /// </remarks>
+    public static void Clean_OnError()
+    {
+      //partNo自動検出なら次も同じpartNoになるように、
+      //*.p3.frame.cat.txt 削除
+      Delete_file(0.0, PathList.LWorkDir, PathList.WorkName + ".frame.cat.txt");
+
+      //*.p3.lwi_36000__54000.avs 削除
+      Delete_file(0.0, PathList.LWorkDir, PathList.WorkName + ".d2v_*__*.avs");
+      Delete_file(0.0, PathList.LWorkDir, PathList.WorkName + ".lwi_*__*.avs");
+
+    }
+
+
+    /// <summary>
     /// 終了処理でのファイル削除
     /// </summary>
     public static void Clean_Lastly()
@@ -73,6 +98,7 @@ namespace LGLauncher
         {
           const double nDaysBefore = 2.0;
           //LTopWorkDir         サブフォルダ内も対象
+          Delete_file(nDaysBefore, PathList.LTopWorkDir, "*.frame.cat.txt*");
           Delete_file(nDaysBefore, PathList.LTopWorkDir, "*.all.*");
           Delete_file(nDaysBefore, PathList.LTopWorkDir, "*.p?*.*");
           Delete_file(nDaysBefore, PathList.LTopWorkDir, "*.sys.*");

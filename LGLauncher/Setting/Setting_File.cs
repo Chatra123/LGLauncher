@@ -31,7 +31,7 @@ namespace LGLauncher
     //enable chapter
     public int bOut_tvtp = 1;
     public int bOut_nero = 1;
-    public int bOut_frame = 0;
+    public int bOut_frame = 1;
     public int bOut_rawframe = 0;
     public int bOut_tvtp_toTsDir = 1;
     public int bOut_misc_toTsDir = 1;

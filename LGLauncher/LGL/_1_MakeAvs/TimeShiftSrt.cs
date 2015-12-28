@@ -60,7 +60,7 @@ namespace LGLauncher
 
       //確実に書き込まれている行数までを取り出す。
       int idx_lastValidLine = idx_LastTimeline - 2;
-      if (idx_lastValidLine < 0) throw new LGLException();                      //srt形式でない or テキストが４行以下
+      if (idx_lastValidLine < 0) throw new LGLException("srt format error");   //srt形式でない or テキストが４行以下
       var formatText = (PathList.IsLastPart)
                             ? srtText : srtText.GetRange(0, idx_lastValidLine + 1);
 
@@ -73,7 +73,7 @@ namespace LGLauncher
       if (2 <= PathList.PartNo)
       {
         if (trimFrame_m1 == null
-              && 2 <= trimFrame_m1.Count()) throw new LGLException();
+              || trimFrame_m1.Count() != 2) throw new LGLException("trimFrame_m1 is invalid");
 
         //前回までの総時間
         //   trimFrame_m1[0]  前回のTrim開始フレーム

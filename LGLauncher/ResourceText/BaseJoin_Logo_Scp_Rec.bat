@@ -22,11 +22,15 @@ set begin=%hour%	%min_%	%sec_%	%msec%0
 	               -o  "#SCPosPath#"         ^
 		           -m  100  -s 15
 )
+if not %ERRORLEVEL%  == 0 (
+    exit %ERRORLEVEL%
+)
 echo ERRORLEVEL = %ERRORLEVEL%
 echo ----------------------------------------------------------------------
 echo .
 ::  pause
 ::  exit
+
 
 
 (
@@ -35,11 +39,15 @@ echo .
 				   -logo  "#LogoPath#"       ^
 				   -oa    "#LogoFrameText#"
 )
+if not %ERRORLEVEL%  == 0 (
+    exit %ERRORLEVEL%
+)
 echo ERRORLEVEL = %ERRORLEVEL%
 echo ----------------------------------------------------------------------
 echo .
 ::  pause
 ::  exit
+
 
 
 (
@@ -54,6 +62,7 @@ echo ----------------------------------------------------------------------
 echo .
 ::  pause
 ::  exit
+
 
 
 ::end time

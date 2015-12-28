@@ -7,6 +7,7 @@
 
 ------------------------------------------------------------------
 ### 必要なソフト
+
 * AviSynth  [32bit]  
     
 * LogoGuillo.exe  [32bit or 64bit] 
@@ -18,6 +19,7 @@
 
 ------------------------------------------------------------------
 ### 使用前の準備
+
 1. LSystemフォルダに  
    logoGuillo.exe  
    avs2pipemod.exe  
@@ -34,7 +36,7 @@
 LGLauncher.exe  -No 1  -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
 
 
-２回目以降、 -No を増やします。
+２回目以降、 -No を増やします。  
 LGLauncher.exe  -No 2  -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
 
 
@@ -51,7 +53,7 @@ LGLauncher.exe  -No 2  -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
 -noを作業フォルダ内のファイルから決定します。
 
     -last
-最後の処理であることを示します。  
+最後の処理であることを明示します。  
 
 
     -ts "C:\video.ts"
@@ -135,7 +137,7 @@ Tvtplay用チャプターファイルを出力する。
 Nero形式のチャプターファイルを出力する。  
 
 
-    bOut_frame  0  
+    bOut_frame  1  
 ２９秒以下の本編、ＣＭを除去したフレームファイルを出力する。  
 
 
@@ -162,7 +164,8 @@ bOut_misc_toTsDir = 0  にしてください。
 
 
     iDeleteWorkItem  2  
-2: 古い作業ファイル削除　＆　使い終わったファイル削除  
+3: 古い作業ファイル削除　＆　使い終わったファイル削除  
+2: 古い作業ファイル削除　＆　サイズの大きいファイル削除  
 1: 古い作業ファイル削除  
 0: 削除しない  
 
@@ -174,31 +177,31 @@ bOut_misc_toTsDir = 0  にしてください。
 　子フォルダ内も自動的に検索します。
 
 
-##### AVS Input Plugin  
-DGDecode.dll  
-LSMASHSource.dll  
+##### 必要  AVS Input Plugin  
+    DGDecode.dll  
+    LSMASHSource.dll  
 
 
-##### 必ず必要  
-avs2pipemod.exe  
-LogoSelector.exe  
+##### 必要  
+    avs2pipemod.exe  
+    LogoSelector.exe  
 
 
 ##### あれば使用
-SystemIdleMonitor.exe  
+    SystemIdleMonitor.exe  
 
 
 ##### LogoGuilloを使用する場合  
-logoGuillo.exe  
+    logoGuillo.exe  
 
 
 ##### join_logo_scpを使用する場合  
-avsinp.aui  
-chapter_exe.exe  
-logoframe.exe  
-join_logo_scp.exe  
-JL__標準.txt  
-JL_標準_Recording.txt  
+    avsinp.aui  
+    chapter_exe.exe  
+    logoframe.exe  
+    join_logo_scp.exe  
+    JL__標準.txt  
+    JL_標準_Recording.txt  
 
 
 
@@ -207,8 +210,8 @@ JL_標準_Recording.txt
 * Tvtp、Neroチャプターは２９秒以下の本編、ＣＭを除去してから作成しています。
 
 * 文字コード
- * Tvtp             UTF-8 bom
- * Nero, Frame      Shift-JIS
+ * Tvtp用チャプター             UTF-8 bom
+ * Nero, Frameファイル          Shift-JIS
 
   
 * 作業ファイルのパスが２５５文字を超えると正常に動きません。深いフォルダにおかないでください。
@@ -272,12 +275,17 @@ AviSynthのファイル読込時にシステム側で使用します。
     - ２時間番組を
         - １０分ごとに処理したときは　　５５０ＭＢ  
         - 　１分ごとに処理したときは　　　　５ＧＢ  
-    必要に応じてiDeleteWorkItemの設定を変更してください。
+    必要に応じてiDeleteWorkItemの設定をしてください。
     
     
     
 ------------------------------------------------------------------
 ### join_logo_scp
+
+- 設定ファイルで  
+ ``` sAvs_iPluginに lwi ```  
+ ``` sLogoDetectorに  JLS ```  
+ を設定する。
 
 - LSystemフォルダに以下のファイルを入れてください。子フォルダでもかまいません。
   - avsinp.aui
@@ -287,11 +295,12 @@ AviSynthのファイル読込時にシステム側で使用します。
   - join_logo_scp.exe
   - logoframe.exe
 
-- chpater_exe.exeは同梱のものでなくてもかまいません。安定して動く方を使用してください。  
-  テスト環境では終了時にエラーが発生したので、終了処理を変更しただけです。
+
+- chpater_exe.exeは同梱のものでなくてもかまいません。安定して動くものを使用してください。  
+  テスト環境では終了時にエラーが発生したので、同梱のchpater_exeは終了処理を変更しただけです。
   
-- JL_標準_Recording.txtは JL__標準.txtから必要なさそうな項目をコメントアウトしただで、  
-  それ以外はJL__標準.txtと同じです。
+- JL_標準_Recording.txtは JL_標準.txtから必要なさそうな項目をコメントアウトしただけで、  
+  それ以外はJL_標準.txtと同じです。
 
 
   

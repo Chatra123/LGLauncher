@@ -25,7 +25,7 @@ namespace LGLauncher
       {
         lock_ts = new FileStream(PathList.TsPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
       }
-      catch { throw new LGLException(); }
+      catch { throw new LGLException("cant lock ts file"); }
 
       //d2v
       if (PathList.Avs_iPlugin == PluginType.D2v)
@@ -33,7 +33,7 @@ namespace LGLauncher
         {
           lock_d2v = new FileStream(PathList.D2vPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         }
-        catch { throw new LGLException(); }
+        catch { throw new LGLException("cant lock d2v file"); }
 
       //lwi
       if (PathList.Avs_iPlugin == PluginType.Lwi)
@@ -44,7 +44,7 @@ namespace LGLauncher
           if (File.Exists(PathList.LwiFooterPath))  //lwifooterファイルが無い場合もある
             lock_lwifooter = new FileStream(PathList.LwiFooterPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         }
-        catch { throw new LGLException(); }
+        catch { throw new LGLException("cant lock lwi file"); }
 
       //srt
       try
@@ -59,7 +59,7 @@ namespace LGLauncher
             lock_srt = new FileStream(PathList.SrtPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         }
       }
-      catch { throw new LGLException(); }
+      catch { /* do nothing */ } //エラーがでても無視
     }
   }
 

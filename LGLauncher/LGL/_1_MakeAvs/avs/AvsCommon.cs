@@ -41,8 +41,9 @@ namespace LGLauncher
 
       //実行
       if (prc.Start() == false)
-        throw new LGLException();
-      prc.WaitForExit(100 * 1000);      //３秒程はかかる
+        throw new LGLException("avsinfo launch error");
+
+      prc.WaitForExit(120 * 1000);      //３秒程はかかる。
     }
 
     #endregion RunInfoAvs
@@ -84,7 +85,7 @@ namespace LGLauncher
       }
 
       if (infoText == null || infoText.Count < 4)
-        throw new LGLException();
+        throw new LGLException("avsinfo is invalid");
 
       //数値に変換
       double frame, fps, time;
@@ -97,18 +98,9 @@ namespace LGLauncher
       }
       catch
       {
-        throw new LGLException();
+        throw new LGLException("avsinfo parse error");
       }
 
-      //bool canParse = true;
-
-      //canParse &= double.TryParse(infoText[0], out frame);
-      //canParse &= double.TryParse(infoText[1], out fps);
-      //canParse &= double.TryParse(infoText[2], out time);
-      //if (canParse == false)
-      //  throw new LGLException();
-
-      //return new double[] { frame, fps, time };
     }
 
     #endregion GetAvsInfo
@@ -127,7 +119,7 @@ namespace LGLauncher
       //ファイル検索
       var files = Directory.GetFiles(PathList.LWorkDir, nameKey);
       if (files.Count() != 1)
-        throw new LGLException();                          // 0 or 多い
+        throw new LGLException("avs files.Count() != 1. could'nt specify previous trim range.");                          // 0 or 多い
 
       //正規表現パターン
       //TsShortName.p1.d2v_0__2736.avs
@@ -144,12 +136,7 @@ namespace LGLauncher
         string sbegin = match.Groups["begin"].Value;
         string send = match.Groups["end"].Value;
         int ibegin, iend;
-        //bool canParse = true;
 
-        //canParse &= int.TryParse(sbegin, out ibegin);
-        //canParse &= int.TryParse(send, out iend);
-        //if (canParse == false)
-        //  throw new LGLException();
         try
         {
           ibegin = int.Parse(sbegin);
@@ -158,7 +145,7 @@ namespace LGLauncher
         }
         catch
         {
-          throw new LGLException("filename parse error. can't get begin end no");
+          throw new LGLException("filename parse error. ccould'nt specify previous trim range.");
         }
       }
       else
@@ -174,7 +161,7 @@ namespace LGLauncher
     /// トリム用フレーム数取得
     /// </summary>
     /// <param name="totalframe">総フレーム数</param>
-    /// <param name="prvframe_getfrom">前回のフレーム数を取得するファイル名。ワイルドカード指定可</param>
+    /// <param name="trimFrame_m1">前回のフレーム数を取得するファイル名。ワイルドカード指定可</param>
     /// <returns>トリム開始、終了フレーム数</returns>
     public static int[] GetTrimFrame(int totalframe, int[] trimFrame_m1)
     {
@@ -188,7 +175,7 @@ namespace LGLauncher
       else if (2 <= PathList.PartNo)
       {
         if (trimFrame_m1 == null)
-          throw new LGLException();
+          throw new LGLException("previous trim frame is null");
 
         beginFrame = trimFrame_m1[1] + 1;                  //前回の終端フレーム数＋１
         endFrame = totalframe - 1;

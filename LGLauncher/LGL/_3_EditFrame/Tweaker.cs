@@ -13,6 +13,12 @@ namespace LGLauncher.EditFrame
     /// <summary>
     /// 結合フレームリストを作成
     /// </summary>
+    /// <remarks>
+    ///  Join_Logo_Scp
+    ///     生成された *.p1.jls.result.avs を *.p1.frame.txtに変換してから、読込み。
+    ///  LogoGuillo
+    ///     生成された *.p1.frame.txt 読込み。
+    /// </remarks>
     public static List<int> ConcatFrame(int[] trimFrame)
     {
       List<int> concat = null;
@@ -26,7 +32,7 @@ namespace LGLauncher.EditFrame
           // *.jls.result.avs  -->  *.p1.frame.txt  &  List<int>
           EditFrame.JLS.Convert_JLS.ResultAvs_to_FrameFile(false);
           // フレームテキスト合成
-          concat = Concat_OldFrame(trimFrame);
+          concat = Concat_withOldFrame(trimFrame);
 
 
           //scpos, logoframe合成
@@ -61,7 +67,7 @@ namespace LGLauncher.EditFrame
         //LogoGuillo
         //part & all
         //フレームテキスト合成
-        concat = Concat_OldFrame(trimFrame);
+        concat = Concat_withOldFrame(trimFrame);
       }
 
       return concat;
@@ -72,7 +78,7 @@ namespace LGLauncher.EditFrame
     /// <summary>
     /// 前回までのフレームリストと新たなリストをつなげる。
     /// </summary>
-    private static List<int> Concat_OldFrame(int[] trimFrame)
+    private static List<int> Concat_withOldFrame(int[] trimFrame)
     {
       //avsの開始、終了フレーム番号
       //　オフセット用

@@ -16,8 +16,40 @@ namespace LGLauncher
     /// </summary>
     public static void Launch(string batPath)
     {
+      try
+      {
+        //１回目
+        Launch_Detector_one(batPath);
+        //成功
+        return;
+      }
+      catch (LGLException e)
+      {
+        //失敗
+        //avs2pipemode等でエラーが発生したら、
+        //ログに書き込んで再トライ
+        Log.WriteLine();
+        Log.WriteLine(e.ToString());
+        Log.WriteLine();
+        Log.WriteLine("retry detector");
+      }
+
+      //２回目
+      //ここで発生する LGLExceptionは呼び出し元でキャッチ
+      //エラーとして処理する。
+      Launch_Detector_one(batPath);
+
+    }
+
+
+
+    /// <summary>
+    /// LogoDetector実行
+    /// </summary>
+    private static void Launch_Detector_one(string batPath)
+    {
       if (File.Exists(batPath) == false)
-        throw new LGLException();
+        throw new LGLException("not exist detector bat");
 
       var prc = new Process();
       prc.StartInfo.FileName = batPath;
@@ -58,14 +90,17 @@ namespace LGLauncher
         }
       }
 
-
     }
-
     //logoGuillo_v210_r1  readme_v210.txt
     // ◎終了コード
     // 0：正常終了
     //-9：ロゴ未検出
     //-1：何らかのエラー
+
+
+
+
+
   }
 
 }

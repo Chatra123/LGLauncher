@@ -158,7 +158,7 @@ namespace LGLauncher
           }
           else
           {
-            throw new LGLException();
+            throw new LGLException("cant find Index= line in the lwi");
           }
         }
 
@@ -183,7 +183,7 @@ namespace LGLauncher
             var footer_text = Create_footer(writeBuff);
             if (footer_text == null)
             {
-              throw new LGLException();
+              throw new LGLException("fail to create footer_text");
             }
 
             //書込み
@@ -272,11 +272,11 @@ namespace LGLauncher
           Format = m.Groups[3].ToString();
         }
         else
-          throw new LGLException();
+          throw new LGLException("invalid regex match count");
       }
       else
       {
-        throw new LGLException();
+        throw new LGLException("regex not match");
       }
 
       //footerの置換

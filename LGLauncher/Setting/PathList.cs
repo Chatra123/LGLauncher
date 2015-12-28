@@ -185,22 +185,36 @@ namespace LGLauncher
       SequenceName = SequenceName ?? "";
 
       //エラーチェック
-      if (PartNo <= -2) throw new LGLException("No. is less than equal -2");
-      if (AutoDetectPartNo == false && PartNo == 0) throw new LGLException("No. is equal 0");
+      if (PartNo <= -2) 
+        throw new LGLException("No. is less than equal -2");
+      if (AutoDetectPartNo == false && PartNo == 0) 
+        throw new LGLException("No. is equal 0");
 
-      //ファイル 
-      //Ts
-      if (File.Exists(TsPath) == false) throw new LGLException("ts does not exist");
+      //Ts file
+      if (File.Exists(TsPath) == false)
+        throw new LGLException("ts does not exist");
+
       //D2v  Lwi
       //  コマンドラインで設定されているならチェック
       //  srtは削除される可能性があるのでチェックしない
-      if (D2vPath != null && File.Exists(D2vPath) == false) throw new LGLException("d2v does not exist");
-      if (LwiPath != null && File.Exists(LwiPath) == false) throw new LGLException("lwi does not exist");
+      if (D2vPath != null && File.Exists(D2vPath) == false)
+        throw new LGLException("d2v does not exist");
+
+      if (LwiPath != null && File.Exists(LwiPath) == false)
+        throw new LGLException("lwi does not exist");
+
       //拡張子
-      if (TsPath != null && Path.GetExtension(TsPath).ToLower() != ".ts") throw new LGLException();
-      if (D2vPath != null && Path.GetExtension(D2vPath).ToLower() != ".d2v") throw new LGLException();
-      if (LwiPath != null && Path.GetExtension(LwiPath).ToLower() != ".lwi") throw new LGLException();
-      if (SrtPath != null && Path.GetExtension(SrtPath).ToLower() != ".srt") throw new LGLException();
+      if (TsPath != null && Path.GetExtension(TsPath).ToLower() != ".ts") 
+        throw new LGLException("TsPath is invalide extension");
+
+      if (D2vPath != null && Path.GetExtension(D2vPath).ToLower() != ".d2v")
+        throw new LGLException("D2vPath is invalide extension");
+
+      if (LwiPath != null && Path.GetExtension(LwiPath).ToLower() != ".lwi")
+        throw new LGLException("LwiPath is invalide extension");
+
+      if (SrtPath != null && Path.GetExtension(SrtPath).ToLower() != ".srt")
+        throw new LGLException("SrtPath is invalide extension");
     }
 
 
