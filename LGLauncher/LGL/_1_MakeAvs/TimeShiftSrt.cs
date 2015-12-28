@@ -6,21 +6,22 @@ using System.Text.RegularExpressions;
 
 namespace LGLauncher
 {
+  using OctNov.IO;
+
   internal static class TimeShiftSrt
   {
     /// <summary>
     /// TimeShiftSrtファイルを作成
     /// </summary>
     /// <returns>作成したsrtファイルのパス</returns>
-    ///
-    static public string Make(int[] trimFrame_m1)
+    public static string Make(int[] trimFrame_m1)
     {
       //ファイルチェック
       //　srtは削除されている可能性がある。
       if (File.Exists(PathList.SrtPath) == false) return "";
 
-      //  partNo == -1ならsrtファイルをコピーしてreturn
-      if (PathList.No == -1)
+      //  PartALLならsrtファイルをコピーしてreturn
+      if (PathList.PartALL)
       {
         string copyDstPath = Path.Combine(PathList.LWorkDir, PathList.SrtName);
 
@@ -59,8 +60,8 @@ namespace LGLauncher
 
       //確実に書き込まれている行数までを取り出す。
       int idx_lastValidLine = idx_LastTimeline - 2;
-      if (idx_lastValidLine < 0) throw new LGLException();                      //srt形式でない or テキストが４行以下
-      var formatText = (PathList.Mode_IsLast)
+      if (idx_lastValidLine < 0) throw new LGLException("srt format error");   //srt形式でない or テキストが４行以下
+      var formatText = (PathList.IsLastPart)
                             ? srtText : srtText.GetRange(0, idx_lastValidLine + 1);
 
       //
@@ -69,10 +70,10 @@ namespace LGLauncher
       //時間をシフトさせて開始を０秒からにする
       var shiftText = formatText;
 
-      if (2 <= PathList.No)
+      if (2 <= PathList.PartNo)
       {
         if (trimFrame_m1 == null
-              && 2 <= trimFrame_m1.Count()) throw new LGLException();
+              || trimFrame_m1.Count() != 2) throw new LGLException("trimFrame_m1 is invalid");
 
         //前回までの総時間
         //   trimFrame_m1[0]  前回のTrim開始フレーム
@@ -132,7 +133,7 @@ namespace LGLauncher
           //シフトして、０秒以上か？
           string shifted_timecode;
           bool canShift = Shift_Timecode(srtText[line1], shift_sec, out shifted_timecode);
-          if (canShift == false) continue;                  //０秒以下になったのでとばす
+          if (canShift == false) continue;                  //０秒以下  or  変換失敗　でスキップ
 
           //２つ目のタイムコードを探す
           int line_2ndTimecode = -1;
@@ -169,8 +170,8 @@ namespace LGLauncher
       return shiftText;
     }
 
-    //DateTimeコンストラクター用のダミー値、任意の値でいい
-    private static readonly int year_ = DateTime.Now.Year,
+    //DateTimeコンストラクター用のダミー値、０以外の任意の値。
+    private readonly static int year_ = DateTime.Now.Year,
                                 month = DateTime.Now.Month,
                                 day__ = DateTime.Now.Day;
 
@@ -193,19 +194,29 @@ namespace LGLauncher
       var TimecodeToDateTime = new Func<string, DateTime>(
         (timecode) =>
         {
-          string sHour, sMin_, sSec_, sMs__;
-          int iHour, iMin_, iSec_, iMs__;
+          string sHour, sMin_, sSec_, sMsec;
+          int iHour, iMin_, iSec_, iMsec;
           sHour = timecode.Substring(0, 2);
           sMin_ = timecode.Substring(3, 2);
           sSec_ = timecode.Substring(6, 2);
-          sMs__ = timecode.Substring(9, 3);
+          sMsec = timecode.Substring(9, 3);
 
-          if (int.TryParse(sHour, out iHour) == false) return new DateTime();
-          if (int.TryParse(sMin_, out iMin_) == false) return new DateTime();
-          if (int.TryParse(sSec_, out iSec_) == false) return new DateTime();
-          if (int.TryParse(sMs__, out iMs__) == false) return new DateTime();
-
-          return new DateTime(year_, month, day__, iHour, iMin_, iSec_, iMs__);
+          //if (int.TryParse(sHour, out iHour) == false) return new DateTime();
+          //if (int.TryParse(sMin_, out iMin_) == false) return new DateTime();
+          //if (int.TryParse(sSec_, out iSec_) == false) return new DateTime();
+          //if (int.TryParse(sMs__, out iMs__) == false) return new DateTime();
+          try
+          {
+            iHour = int.Parse(sHour);
+            iMin_ = int.Parse(sMin_);
+            iSec_ = int.Parse(sSec_);
+            iMsec = int.Parse(sMsec);
+            return new DateTime(year_, month, day__, iHour, iMin_, iSec_, iMsec);
+          }
+          catch
+          {
+            return new DateTime();
+          }
         });
 
       shifted_timecode = "";
@@ -220,37 +231,39 @@ namespace LGLauncher
       if (timeBegin == new DateTime()
             || timeEnd__ == new DateTime()) return false;            //変換失敗
 
-      var timeB_shift = timeBegin.AddSeconds(-1 * shift_sec);
-      var timeE_shift = timeEnd__.AddSeconds(-1 * shift_sec);
+      var timeBegin_shift = timeBegin.AddSeconds(-1 * shift_sec);
+      var timeEnd___shift = timeEnd__.AddSeconds(-1 * shift_sec);
 
       var timeZero = new DateTime(year_, month, day__, 0, 0, 0, 0);
-      var spanB = (timeB_shift - timeZero).TotalSeconds;             //０ to timeB_shiftまでのスパン
-      var spanE = (timeE_shift - timeZero).TotalSeconds;             //マイナスなら０秒前
+      var spanBegin = (timeBegin_shift - timeZero).TotalSeconds;     //０ to timeB_shiftまでのスパン
+      var spanEnd__ = (timeEnd___shift - timeZero).TotalSeconds;     //    マイナスなら00:00:00より前
+
 
       //０秒以上ならtimecode_Shiftを作成
-      if (spanB <= 0 && 0 < spanE)
+      if (spanBegin <= 0 && 0 < spanEnd__)
       {
-        //開始時間が０以下
+        //開始時間が00:00:00以下
         shifted_timecode = "00:00:00,000"
                           + " --> "
-                          + timeE_shift.ToString("HH:mm:ss,fff");
+                          + timeEnd___shift.ToString("HH:mm:ss,fff");
         return true;
       }
-      else if (0 < spanB && 0 < spanE)
+      else if (0 < spanBegin && 0 < spanEnd__)
       {
-        //両方０より大きい
-        shifted_timecode = timeB_shift.ToString("HH:mm:ss,fff")
+        //両方00:00:00より大きい
+        shifted_timecode = timeBegin_shift.ToString("HH:mm:ss,fff")
                           + " --> "
-                          + timeE_shift.ToString("HH:mm:ss,fff");
+                          + timeEnd___shift.ToString("HH:mm:ss,fff");
         return true;
       }
       else
       {
-        //両方０以下
+        //両方00:00:00以下
         return false;
       }
     }
 
     #endregion Shift_SrtText
+
   }//class
 }

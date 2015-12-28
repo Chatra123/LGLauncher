@@ -3,11 +3,13 @@ using System.Text.RegularExpressions;
 
 namespace LGLauncher
 {
+  using OctNov.IO;
+
   internal class AvsWithD2v : AbstractAvsMaker
   {
     public override string AvsPath { get; protected set; }            //作成したAVSのパス
     public override int[] TrimFrame { get; protected set; }           //今回のトリム用フレーム数
-    public override int[] TrimFrame_m1 { get; protected set; }        //前回のトリム用フレーム数
+    public override int[] TrimFrame_m1 { get; protected set; }        //前回のトリム用フレーム数  minus 1
 
     /// <summary>
     /// Trim付きavs作成
@@ -17,12 +19,11 @@ namespace LGLauncher
     {
       //ファイルチェック
       //D2vPath
-      if (File.Exists(PathList.D2vPath) == false) 
+      if (File.Exists(PathList.D2vPath) == false)
         throw new LGLException("D2vPath not exist");
 
       //dll
-      var D2v_dll = Path.Combine(PathList.LSystemDir, "DGDecode.dll");
-      if (File.Exists(D2v_dll) == false) 
+      if (File.Exists(PathList.DGDecode_dll) == false)
         throw new LGLException("DGDecode.dll not exist");
 
 
@@ -41,7 +42,7 @@ namespace LGLauncher
       int totalframe = (int)avsInfo[0];
 
       //前回のトリム用フレーム数取得
-      this.TrimFrame_m1 = (2 <= PathList.No)
+      this.TrimFrame_m1 = (2 <= PathList.PartNo)
                               ? MakeAvsCommon.GetTrimFrame_fromName(PathList.WorkName_m1 + ".d2v_*__*.avs")
                               : null;
 
@@ -50,7 +51,9 @@ namespace LGLauncher
 
       //Trim付きavs作成
       this.AvsPath = CreateTrimAvs_d2v(formatD2vPath, TrimFrame);
+
     }
+
 
     #region FormatD2v
 
@@ -73,6 +76,7 @@ namespace LGLauncher
       }
       if (isMatch == false) throw new LGLException("d2v format error");        //d2vファイルでない
 
+
       //FINISHEDがあるか？
       bool isFinished = false, haveFF = false;
       for (int idx = readText.Count - 1; readText.Count - 5 < idx; idx--)      //末尾から走査
@@ -83,12 +87,14 @@ namespace LGLauncher
       }
       isFinished &= haveFF;
 
-      if (PathList.Mode_IsLast && isFinished == false)
-        throw new LGLException("d2v format is not finished");
+      //if (PathList.Mode_IsLast && isFinished == false)
+      //  throw new LGLException("d2v format is not finished");
+
 
       //終端のフォーマットを整える
+      //  isFinishedがなければ末尾は切り捨て
       var formatText = readText;
-      if (1 <= PathList.No)
+      if (isFinished == false)
       {
         //ファイル終端を整える
         formatText = formatText.GetRange(0, formatText.Count - 1);             //最終行は含めない
@@ -109,6 +115,7 @@ namespace LGLauncher
 
     #endregion FormatD2v
 
+
     #region CreateInfoAvs_d2v
 
     /// <summary>
@@ -127,10 +134,13 @@ namespace LGLauncher
       for (int i = 0; i < avsText.Count; i++)
       {
         var line = avsText[i];
+
         line = Regex.Replace(line, "#AvsWorkDir#", PathList.LWorkDir, RegexOptions.IgnoreCase);
+        line = Regex.Replace(line, "#InputPlugin#", PathList.DGDecode_dll, RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#d2v#", "", RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#D2vName#", d2vName, RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#InfoName#", PathList.WorkName + ".d2vinfo.txt", RegexOptions.IgnoreCase);
+
         avsText[i] = line;
       }
 
@@ -148,41 +158,35 @@ namespace LGLauncher
 
     #endregion CreateInfoAvs_d2v
 
+
     #region CreateTrimAvs_d2v
 
     /// <summary>
     /// トリムつきAVS作成
     /// </summary>
-    /// <param name="d2vPath">avs内で読み込むd2vファイルパス</param>
-    /// <param name="trimBeginEnd">トリムする開始、終了フレーム数</param>
-    /// <returns>作成したavsパス</returns
     private string CreateTrimAvs_d2v(string d2vPath, int[] trimBeginEnd)
     {
       int beginFrame = trimBeginEnd[0];
       int endFrame = trimBeginEnd[1];
 
-      //リソース読込み
-      var avsText = FileR.ReadFromResource("LGLauncher.ResourceText.BaseTrimAvs.avs");
+      //トリムつきAVS作成  共通部
+      var avsText = MakeAvsCommon.CreateTrimAvs(trimBeginEnd);
 
-      //AVS書き換え
+      //d2v部分　書き換え
       string d2vName = Path.GetFileName(d2vPath);
       for (int i = 0; i < avsText.Count; i++)
       {
         var line = avsText[i];
-        line = Regex.Replace(line, "#AvsWorkDir#", PathList.LWorkDir, RegexOptions.IgnoreCase);
+
+        line = Regex.Replace(line, "#InputPlugin#", PathList.DGDecode_dll, RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#d2v#", "", RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#D2vName#", d2vName, RegexOptions.IgnoreCase);
-        if (1 <= PathList.No)
-        {
-          line = Regex.Replace(line, "#EnableTrim#", "", RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#BeginFrame#", "" + beginFrame, RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#EndFrame#", "" + endFrame, RegexOptions.IgnoreCase);
-        }
+
         avsText[i] = line;
       }
 
       //長さチェック
-      //　30frame以下だとlogoGuilloでavs2pipemodがエラーで落ちる。
+      //　30frame以下だとlogoGuilloのavs2pipemodがエラーで落ちる。
       //　120frame以下ならno frame errorと表示されて終了する。
       //　150frame以上に設定する。
       int avslen = endFrame - beginFrame;
@@ -199,15 +203,17 @@ namespace LGLauncher
       else
       {
         //ビデオの長さが短い
-        //　次回処理のGetTrimFrame()のために*.avsを作成しておく。
-        //　ここが処理される可能性はないと思う。
+        //　次回処理のGetTrimFrame()のために *.avs を作成しておく。
+        //  ”前回の終端フレーム数”として *.avs のファイル名が使用される。
         string outAvsPath = PathList.WorkPath + ".d2v_" + beginFrame + "__" + beginFrame + ".avs";
         File.WriteAllLines(outAvsPath, avsText, TextEnc.Shift_JIS);
 
-        throw new LGLException("short video length");
+        throw new LGLException("short video length.  -lt 150frame");
       }
     }
 
     #endregion CreateTrimAvs_d2v
+
+    
   }
 }

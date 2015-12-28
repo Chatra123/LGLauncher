@@ -13,7 +13,7 @@ namespace LGLauncher
   /// </summary>
   static class ProhibitFileMove
   {
-    private static FileStream lock_ts, lock_d2v, lock_lwi, lock_lwifooter, lock_srt;             //プロセス終了でロック解放
+    private static FileStream lock_ts, lock_d2v, lock_lwi, lock_lwifooter, lock_srt;     //プロセス終了でロック解放
 
     /// <summary>
     /// ファイルを移動禁止にする。
@@ -25,18 +25,18 @@ namespace LGLauncher
       {
         lock_ts = new FileStream(PathList.TsPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
       }
-      catch { throw new LGLException(); }
+      catch { throw new LGLException("cant lock ts file"); }
 
       //d2v
-      if (PathList.Mode_D2v == true)
+      if (PathList.Avs_iPlugin == PluginType.D2v)
         try
         {
           lock_d2v = new FileStream(PathList.D2vPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         }
-        catch { throw new LGLException(); }
+        catch { throw new LGLException("cant lock d2v file"); }
 
       //lwi
-      if (PathList.Mode_D2v == false)
+      if (PathList.Avs_iPlugin == PluginType.Lwi)
         try
         {
           lock_lwi = new FileStream(PathList.LwiPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
@@ -44,13 +44,13 @@ namespace LGLauncher
           if (File.Exists(PathList.LwiFooterPath))  //lwifooterファイルが無い場合もある
             lock_lwifooter = new FileStream(PathList.LwiFooterPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         }
-        catch { throw new LGLException(); }
+        catch { throw new LGLException("cant lock lwi file"); }
 
       //srt
       try
       {
-        //srtファイルはすでに削除されている場合がある。
-        //また、テキストが書き込まれてないとCaption2Ass_PCR_pfによって削除される可能性がある。
+        //srtファイルはすでに削除されている可能性がある。
+        //　テキストが書き込まれて無いとCaption2Ass_PCR_pfによって削除される。
         if (File.Exists(PathList.SrtPath))
         {
           var filesize = new FileInfo(PathList.SrtPath).Length;
@@ -59,7 +59,7 @@ namespace LGLauncher
             lock_srt = new FileStream(PathList.SrtPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         }
       }
-      catch { throw new LGLException(); }
+      catch { /* do nothing */ } //エラーがでても無視
     }
   }
 

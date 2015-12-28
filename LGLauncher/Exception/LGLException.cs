@@ -36,15 +36,16 @@ namespace LGLauncher
         var sb = new StringBuilder();
         sb.AppendLine(base.ToString());
         sb.AppendLine("/▽  info  ▽/");
+
         foreach (var info in InfoList)
           sb.AppendLine("    " + info.ToString());
-        sb.AppendLine("    →←");
+        sb.AppendLine("/△  info  △/");
 
         return sb.ToString();
       }
       catch
       {
-        return base.ToString();
+        return " aggregate error :"+base.ToString();
       }
     }
 
