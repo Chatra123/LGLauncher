@@ -31,6 +31,10 @@ namespace LGLauncher
   /// <summary>
   /// パス一覧　＆　アプリ設定
   /// </summary>
+  /// <remarks>
+  /// 各ファイルパス、バイナリパス、アプリ設定をここで処理する。
+  /// ファイル確認も行う
+  /// </remarks>
   internal static class PathList
   {
 
@@ -75,11 +79,11 @@ namespace LGLauncher
     public static string LWorkDir { get; private set; }
 
     //    WorkPath                                           //example
-    public static string WorkPath { get; private set; }　　  //  C:\EpgDataCap_Bon\Write\Write_PF\LGLauncher\LWork\010101_ショップジ_0a1b308c1\ショップジ.p3
+    public static string WorkPath { get; private set; }　　  //  C:\EDCB\Write\Write_PF\LGLauncher\LWork\010101_ショップジ_0a1b308c1\ショップジ.p3
     public static string WorkName { get; private set; }      //  ショップジ.p3
-    //    previous work item      minus 1
-    public static string WorkPath_m1 { get; private set; }   //  C:\EpgDataCap_Bon\Write\Write_PF\LGLauncher\LWork\010101_ショップジ_0a1b308c1\ショップジ.p2
-    public static string WorkName_m1 { get; private set; }   //  ショップジ.p2
+    //    previous work path
+    public static string WorkPath_prv1 { get; private set; } //  C:\EDCB\Write\Write_PF\LGLauncher\LWork\010101_ショップジ_0a1b308c1\ショップジ.p2
+    public static string WorkName_prv1 { get; private set; } //  ショップジ.p2
 
 
     //PartNo
@@ -120,19 +124,23 @@ namespace LGLauncher
     public static string JL_Cmd_Standard { get; private set; }
 
     //  [  Chapter  ]
-    //out chap
+    //edit chapter
+    public static double Regard_NsecCM_AsMain { get; private set; }
+    public static double Regard_NsecMain_AsCM { get; private set; }
+
+    //enable output chap file
     public static bool Out_tvtp { get; private set; }
-    public static bool Out_nero { get; private set; }
+    public static bool Out_ogm { get; private set; }
     public static bool Out_frame { get; private set; }
     public static bool Out_rawframe { get; private set; }
 
-    //out chap directory
+    //output chap directory
     public static bool Out_tvtp_toTsDir { get; private set; }
     public static bool Out_misc_toTsDir { get; private set; }
     public static string DirPath_tvtp { get; private set; }
     public static string DirPath_misc { get; private set; }
 
-    //delete mode
+    //  [  Delete Work item  ]
     public static int Mode_DeleteWorkItem { get; private set; }
 
 
@@ -144,17 +152,17 @@ namespace LGLauncher
       // CommandLine
       Copy_FromCommandLine(cmdline);
 
-      // ts  d2v  lwi  srt
+      // input ts
       Make_InputPath(setting);
 
       // work dir
       Make_WorkDir_and_DetectPartNo();
 
-      // SystemFile
+      // system binary file
       Make_SystemFile(setting);
 
-      // misc
-      Make_OutChap_misc(setting);
+      // chapter and misc
+      Make_Chap_and_Misc(setting);
 
       // check file existance
       Log_and_ErrorCheck();
@@ -185,17 +193,19 @@ namespace LGLauncher
       SequenceName = SequenceName ?? "";
 
       //エラーチェック
-      if (PartNo <= -2) 
-        throw new LGLException("No. is less than equal -2");
-      if (AutoDetectPartNo == false && PartNo == 0) 
-        throw new LGLException("No. is equal 0");
+      //PartNo
+      if (PartNo <= -2)
+        throw new LGLException("PartNo is less than equal -2");
+      if (AutoDetectPartNo == false && PartNo == 0)
+        throw new LGLException("PartNo is equal 0");
 
-      //Ts file
+      //ファイルチェック
+      //Ts
       if (File.Exists(TsPath) == false)
         throw new LGLException("ts does not exist");
 
       //D2v  Lwi
-      //  コマンドラインで設定されているならチェック
+      //  コマンドラインで指定されているときだけチェック
       //  srtは削除される可能性があるのでチェックしない
       if (D2vPath != null && File.Exists(D2vPath) == false)
         throw new LGLException("d2v does not exist");
@@ -203,8 +213,8 @@ namespace LGLauncher
       if (LwiPath != null && File.Exists(LwiPath) == false)
         throw new LGLException("lwi does not exist");
 
-      //拡張子
-      if (TsPath != null && Path.GetExtension(TsPath).ToLower() != ".ts") 
+      //拡張子チェック
+      if (TsPath != null && Path.GetExtension(TsPath).ToLower() != ".ts")
         throw new LGLException("TsPath is invalide extension");
 
       if (D2vPath != null && Path.GetExtension(D2vPath).ToLower() != ".d2v")
@@ -249,7 +259,6 @@ namespace LGLauncher
 
       //SrtPath
       SrtPath = SrtPath ?? Path.Combine(TsDir, TsName + ".srt");
-      //SrtPath = SrtPath ?? Path.Combine(TsDir, TsNameWithoutExt + ".srt");
       SrtDir = Path.GetDirectoryName(SrtPath);
       SrtName = Path.GetFileName(SrtPath);
 
@@ -357,8 +366,8 @@ namespace LGLauncher
       //WorkPath
       WorkName = (1 <= PartNo) ? TsShortName + ".p" + PartNo : TsShortName + ".all";
       WorkPath = Path.Combine(LWorkDir, WorkName);
-      WorkName_m1 = TsShortName + ".p" + (PartNo - 1);
-      WorkPath_m1 = Path.Combine(LWorkDir, WorkName_m1);
+      WorkName_prv1 = TsShortName + ".p" + (PartNo - 1);
+      WorkPath_prv1 = Path.Combine(LWorkDir, WorkName_prv1);
     }
 
 
@@ -469,15 +478,21 @@ namespace LGLauncher
     /// <summary>
     /// チャプター出力の設定
     /// </summary>
-    private static void Make_OutChap_misc(Setting_File setting)
+    private static void Make_Chap_and_Misc(Setting_File setting)
     {
+      //edit chapter
+      Regard_NsecCM_AsMain = setting.dRegard_NsecCM_AsMain;
+      Regard_NsecMain_AsCM = setting.dRegard_NsecMain_AsCM;
+      Regard_NsecCM_AsMain = 0 < Regard_NsecCM_AsMain ? Regard_NsecCM_AsMain : 0;
+      Regard_NsecMain_AsCM = 0 < Regard_NsecMain_AsCM ? Regard_NsecMain_AsCM : 0;
+
       //output chapter
       Out_tvtp = 0 < setting.bOut_tvtp;
-      Out_nero = 0 < setting.bOut_nero;
+      Out_ogm = 0 < setting.bOut_ogm;
       Out_frame = 0 < setting.bOut_frame;
       Out_rawframe = 0 < setting.bOut_rawframe;
 
-      //chap directory
+      //chapter directory
       Out_tvtp_toTsDir = 0 < setting.bOut_tvtp_toTsDir;
       Out_misc_toTsDir = 0 < setting.bOut_misc_toTsDir;
       DirPath_tvtp = setting.sDirPath_tvtp;
@@ -498,13 +513,14 @@ namespace LGLauncher
     {
       //log
       Log.WriteLine("  No  = 【    " + PathList.PartNo + "    】");
-      if (PathList.PartALL || PathList.PartNo == 1)
-        Log.WriteLine("        " + PathList.TsPath);
       Log.WriteLine("            IsLast :  " + IsLastPart);
-      Log.WriteLine("    AvsInputPlugin :  " + Avs_iPlugin.ToString());
-      Log.WriteLine("      LogoDetector :  " + Detector.ToString());
-      Log.WriteLine();
-
+      if (PathList.PartALL || PathList.PartNo == 1)
+      {
+        Log.WriteLine("        " + PathList.TsPath);
+        Log.WriteLine("    AvsInputPlugin :  " + Avs_iPlugin.ToString());
+        Log.WriteLine("      LogoDetector :  " + Detector.ToString());
+        Log.WriteLine();
+      }
 
       // error check
       if (Avs_iPlugin == PluginType.D2v)

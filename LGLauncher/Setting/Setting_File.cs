@@ -28,19 +28,24 @@ namespace LGLauncher
     public int iDetector_MultipleRun = 1;
     public string space_1 = "";
 
-    //enable chapter
-    public int bOut_tvtp = 1;
-    public int bOut_nero = 1;
-    public int bOut_frame = 1;
-    public int bOut_rawframe = 0;
-    public int bOut_tvtp_toTsDir = 1;
-    public int bOut_misc_toTsDir = 1;
+    //edit chapter
+    public double dRegard_NsecCM_AsMain = 14.0;
+    public double dRegard_NsecMain_AsCM = 29.0;
     public string space_2 = "";
 
-    //chapter directory
-    public string sDirPath_tvtp = @"   C:\tvtp_Dir                ";
-    public string sDirPath_misc = @"   C:\frame_and_nero_Dir      ";
+    //output chapter
+    public int bOut_tvtp = 1;
+    public int bOut_ogm = 1;
+    public int bOut_frame = 1;
+    public int bOut_rawframe = 0;
     public string space_3 = "";
+
+    //chapter directory
+    public int bOut_tvtp_toTsDir = 1;
+    public int bOut_misc_toTsDir = 1;
+    public string sDirPath_tvtp = @"   C:\tvtp_Dir               ";
+    public string sDirPath_misc = @"   C:\ogm_and_frame_Dir      ";
+    public string space_4 = "";
 
     public int iDeleteWorkItem = 2;
 
@@ -90,22 +95,22 @@ namespace LGLauncher
     {
       var self = Process.GetCurrentProcess().PriorityClass;
 
-      //優先度は下げるのみ。
+      //優先度は下げるのみ、
       //優先度を上げることはしない。
-      if (ipriority == 2)  // ==2  normal
+      if (ipriority == 2)              // == 2  normal
       {
         //do nothing
       }
-      if (ipriority == 1   // == 1 BelowNormal
+      if (ipriority == 1               // == 1  BelowNormal
         && self != ProcessPriorityClass.Idle)
       {
         Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.BelowNormal;
       }
-      else if (ipriority == 0)  // == 0 Idle
+      else if (ipriority == 0)         // == 0  Idle
       {
         Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
       }
-      else if (ipriority == -1)  // == 1 Auto by Windows
+      else if (ipriority == -1)        // == -1  Auto by Windows
       {
         //do nothing
         //depend on windows setting

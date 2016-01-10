@@ -89,11 +89,9 @@ lwiファイルパスの個別指定
     -srt "D:\rec\video.ts.srt"
 srtファイルパスの個別指定
 
-    -SequenceName  abc123
+    -SequenceName  abcdef
 作業フォルダ名の一部に使用します。  
--AutoNoを使用し、pfAdapter処理全体を再実行する場合には必要です。  
-それ以外では無くてもかまいません。  
-
+基本的には無くても問題ありません。
     
     
 
@@ -129,16 +127,26 @@ LogoGuillo   :  LogoGuilloで処理
 Windows内での LogoGuilloの同時実行数
 
 
+#####  チャプター出力設定
+
+    dRegard_NsecCM_AsMain  14.0
+１４．０秒以下のＣＭ部を除去 
+    
+    
+    dRegard_NsecMain_AsCM  29.0
+２９．０秒以下の本編部を除去 
+    
+
     bOut_tvtp  1  
 Tvtplay用チャプターファイルを出力する。  
 
 
-    bOut_nero  1  
-Nero形式のチャプターファイルを出力する。  
+    bOut_ogm  1  
+Ogm形式のチャプターファイルを出力する。  
 
 
     bOut_frame  1  
-２９秒以下の本編、ＣＭを除去したフレームファイルを出力する。  
+短い本編、ＣＭを除去したフレームファイルを出力する。  
 
 
     bOut_rawframe  0  
@@ -150,7 +158,7 @@ Tvtplay用チャプターファイルをＴＳファイルのフォルダに作�
 
 
     bOut_misc_toTsDir  1  
-Nero、フレームファイルをＴＳファイルのフォルダに作成します。  
+Ogm chapter、フレームファイルをＴＳファイルのフォルダに作成します。  
 
 
     sChapDir_Path  "C:\tvtp_Dir"  
@@ -158,8 +166,8 @@ Tvtplay用チャプターファイルを出力するフォルダを指定しま�
 bOut_tvtp_toTsDir = 0  にしてください。  
 
 
-    sDirPath_misc  "C:\frame_and_nero_Dir"  
-Nero、フレームファイルを出力するフォルダを指定します。  
+    sDirPath_misc  "C:\ogm_and_frame_Dir"  
+Ogm chapter、フレームファイルを出力するフォルダを指定します。  
 bOut_misc_toTsDir = 0  にしてください。  
 
 
@@ -187,7 +195,7 @@ bOut_misc_toTsDir = 0  にしてください。
     LogoSelector.exe  
 
 
-##### あれば使用
+##### ファイルがあれば使用
     SystemIdleMonitor.exe  
 
 
@@ -207,11 +215,11 @@ bOut_misc_toTsDir = 0  にしてください。
 
 ------------------------------------------------------------------
 ### メモ
-* Tvtp、Neroチャプターは２９秒以下の本編、ＣＭを除去してから作成しています。
+* Tvtp、Ogg chapterは２９秒以下の本編、１４秒以下のＣＭを除去してから作成しています。
 
 * 文字コード
- * Tvtp用チャプター             UTF-8 bom
- * Nero, Frameファイル          Shift-JIS
+ * Tvtp chapter                  UTF-8 bom
+ * Ogm chapter, Frame text       Shift-JIS
 
   
 * 作業ファイルのパスが２５５文字を超えると正常に動きません。深いフォルダにおかないでください。
@@ -223,7 +231,6 @@ bOut_misc_toTsDir = 0  にしてください。
 
 * LogoGuillo実行間隔による差
     * フレーム認識  
-        - 実行間隔が短いと真っ白なシーンや映像後半でずれやすくなる。  
         - 5min to 1minはＣＭが本編として組み込まれる量が多くなっていく。
         - 10minならほぼ差が出ない。
         

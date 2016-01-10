@@ -1,4 +1,23 @@
-﻿using System.Collections.Generic;
+﻿/*
+ * AvsWithD2v, AvsWithLwiの動作
+ * 
+ * 
+ * ・作成途中の d2v, Lwi　を読み込む。 
+ * 
+ * ・フォーマットを整えてd2vとして使用できる形にする。 
+ *   　d2v  --> 最終行を削除
+ *   　lwi  --> 最後のindex= 以降を削除 
+ *   
+ * ・d2vを使用してavsを作成し、フレーム数を取得
+ * 
+ * ・取得フレーム数までをTrim()したavsを作成して完成
+ *  
+ * 
+ */
+
+
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -11,8 +30,7 @@ namespace LGLauncher
   internal class AvsWithLwi : AbstractAvsMaker
   {
     public override string AvsPath { get; protected set; }            //作成したAVSのパス
-    public override int[] TrimFrame { get; protected set; }           //今回のトリム用フレーム数
-    public override int[] TrimFrame_m1 { get; protected set; }        //前回のトリム用フレーム数  minus 1
+    public override int[] TrimFrame { get; protected set; }           //トリム用フレーム数
 
     /// <summary>
     /// Trim付きavs作成
@@ -26,7 +44,6 @@ namespace LGLauncher
         throw new LGLException("LwiPath dose not exist");
 
       //dll
-      //var Lwi_dll = Path.Combine(PathList.LSystemDir, "LSMASHSource.dll");
       if (File.Exists(PathList.LSMASHSource_dll) == false)
         throw new LGLException("LSMASHSource.dll dose not exist");
 
@@ -43,21 +60,27 @@ namespace LGLauncher
       string infoAvsPath = CreateInfoAvs_lwi();
 
       //avs実行
-      SetLwi();
-      MakeAvsCommon.RunInfoAvs(infoAvsPath);
-      BackLwi();
+      try
+      {
+        SetLwi();
+        MakeAvsCommon.RunInfoAvs(infoAvsPath);
+      }
+      finally
+      {
+        BackLwi();
+      }
 
       //フレーム数取得
       var avsInfo = MakeAvsCommon.GetAvsInfo(PathList.WorkName + ".lwiinfo.txt");
       int totalframe = (int)avsInfo[0];
 
-      //前回のトリム用フレーム数取得
-      this.TrimFrame_m1 = (2 <= PathList.PartNo)
-                              ? MakeAvsCommon.GetTrimFrame_fromName(PathList.WorkName_m1 + ".lwi_*__*.avs")
-                              : null;
+      //前回のトリム用フレーム数取得    previous 1
+      int[] TrimFrame_prv1 = (2 <= PathList.PartNo)
+                                 ? MakeAvsCommon.GetTrimFrame_fromAvsName(PathList.WorkName_prv1 + ".lwi_*__*.avs")
+                                : null;
 
-      //トリム用フレーム数取得
-      this.TrimFrame = MakeAvsCommon.GetTrimFrame(totalframe, TrimFrame_m1);
+      //トリム用フレーム計算
+      this.TrimFrame = MakeAvsCommon.CalcTrimFrame(totalframe, TrimFrame_prv1);
 
       //Trim付きavs作成
       this.AvsPath = CreateTrimAvs_lwi(TrimFrame);
@@ -79,7 +102,7 @@ namespace LGLauncher
       //<ActiveVideoStreamIndex>+0000000000</ActiveVideoStreamIndex>
       //<ActiveAudioStreamIndex>+0000000001</ActiveAudioStreamIndex>
       //
-      //は読込みの途中でCreateLwiによって書き換えられる可能性が極わずかにあるが考慮しない。
+      //はindex作成中のCreateLwiによって随時書き換えられる可能性が極わずかにあるが考慮しない。
       //書き換えの途中で読込み、不正なファイルになってもLSMASHSource.dllによって再作成されるだけ。
       //問題にはならないはず。
 
@@ -355,19 +378,19 @@ namespace LGLauncher
     /// <summary>
     /// トリムつきAVS作成
     /// </summary>
-    private string CreateTrimAvs_lwi(int[] trimBeginEnd)
+    private string CreateTrimAvs_lwi(int[] trimFrame)
     {
-      int beginFrame = trimBeginEnd[0];
-      int endFrame = trimBeginEnd[1];
+      int beginFrame = trimFrame[0];
+      int endFrame = trimFrame[1];
 
-      //トリムつきAVS作成  共通部
-      var avsText = MakeAvsCommon.CreateTrimAvs(trimBeginEnd);
+      //トリムつきAVS作成
+      //avs共通部分
+      var avsText = MakeAvsCommon.CreateTrimAvs(trimFrame);
 
-      //lwi部分　書き換え
+      //lwi部分
       for (int i = 0; i < avsText.Count; i++)
       {
         var line = avsText[i];
-
         line = Regex.Replace(line, "#InputPlugin#", PathList.LSMASHSource_dll, RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#lwi#", "", RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#TsPath#", PathList.TsPath, RegexOptions.IgnoreCase);
@@ -375,15 +398,14 @@ namespace LGLauncher
         avsText[i] = line;
       }
 
-
       //長さチェック
-      //　30frame以下だとlogoGuilloのavs2pipemodがエラーで落ちる。
-      //　120frame以下ならno frame errorと表示されて終了する。
+      //　 30frame以下だと logoGuilloの avs2pipemodがエラーで落ちる。
+      //　120frame以下なら no frame errorと表示されて終了する。
       //　150frame以上に設定する。
       int avslen = endFrame - beginFrame;
 
       //5sec以上か？
-      if (150 <= avslen)
+      if (30 * 5 <= avslen)
       {
         //avs書込み
         string outAvsPath = PathList.WorkPath + ".lwi_" + beginFrame + "__" + endFrame + ".avs";
@@ -393,13 +415,7 @@ namespace LGLauncher
       }
       else
       {
-        //ビデオの長さが短い
-        //　次回処理のGetTrimFrame()のために *.avs を作成しておく。
-        //  ”前回の終端フレーム数”として *.avs のファイル名が使用される。
-        string outAvsPath = PathList.WorkPath + ".lwi_" + beginFrame + "__" + beginFrame + ".avs";
-        File.WriteAllLines(outAvsPath, avsText, TextEnc.Shift_JIS);
-
-        throw new LGLException("short video length.  -lt 150frame");
+        throw new LGLException("short video length.  -lt 150 frame");
       }
     }
 
@@ -432,7 +448,7 @@ namespace LGLauncher
       catch
       {
         //ファイルがロックされてる
-        throw new LGLException("lwi file is locked. cant delete or cant move.");
+        throw new LGLException("lwi file is locked. could'nt delete or move.");
       }
 
       return;
@@ -453,11 +469,12 @@ namespace LGLauncher
         Thread.Sleep(500);
 
         File.Move(srcPath, dstPath);
+        Thread.Sleep(500);
       }
       catch
       {
         //ファイルがロックされてる
-        throw new LGLException("lwi file is locked. cant move back.");
+        throw new LGLException("lwi file is locked. could'nt move back.");
       }
 
       return;
