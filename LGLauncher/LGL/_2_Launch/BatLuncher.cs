@@ -14,30 +14,43 @@ namespace LGLauncher
     /// <summary>
     /// LogoDetector実行
     /// </summary>
-    public static void Launch(string batPath)
+    public static void Launch(string batPath, int timeout_ms = -1)
     {
+      ////デバッグ用
+      //// 1/x の確立で例外を発生させる
+      //if (PathList.IsLastPart == false)
+      //  if (DateTime.Now.Second % 4 == 0)
+      //  {
+      //    throw new LGLException("fake error:  Launch_Detector1");
+      //  }
+
+      //if (PathList.PartALL == false)
+      //  if (PathList.IsLastPart && 0 < timeout_ms)
+      //  {
+      //    throw new LGLException("fake error:  Launch_Detector2");
+      //  }
+
+
       try
       {
-        //１回目
-        Launch_Detector_one(batPath);
+        Launch_Detector(batPath, timeout_ms);
+
         //成功
         return;
       }
       catch (LGLException e)
       {
         //失敗
-        //avs2pipemode等でエラーが発生したら、
-        //ログに書き込んで再トライ
+        //エラーが発生したら、ログに書き込んでリトライ
         Log.WriteLine();
-        Log.WriteLine(e.ToString());
-        Log.WriteLine();
-        Log.WriteLine("retry detector");
+        Log.WriteLine(e.Message);
+        Log.WriteLine("Retry detector");
       }
 
-      //２回目
+      //リトライ
       //ここで発生する LGLExceptionは呼び出し元でキャッチ
       //エラーとして処理する。
-      Launch_Detector_one(batPath);
+      Launch_Detector(batPath, timeout_ms);
 
     }
 
@@ -46,7 +59,7 @@ namespace LGLauncher
     /// <summary>
     /// LogoDetector実行
     /// </summary>
-    private static void Launch_Detector_one(string batPath)
+    private static void Launch_Detector(string batPath, int timeout_ms)
     {
       if (File.Exists(batPath) == false)
         throw new LGLException("not exist detector bat");
@@ -56,7 +69,13 @@ namespace LGLauncher
       prc.StartInfo.CreateNoWindow = true;
       prc.StartInfo.UseShellExecute = false;
       prc.Start();
-      prc.WaitForExit();
+      prc.WaitForExit(timeout_ms);
+
+
+      if (prc.HasExited == false)
+      {
+        throw new LGLException("bat timeout");
+      }
 
       //正常終了
       if (prc.ExitCode == 0)
@@ -76,12 +95,12 @@ namespace LGLauncher
         if (prc.ExitCode == -9)
         {
           //ロゴ未検出
-          throw new LGLException("★ ExitCode = " + prc.ExitCode + " :  ロゴ未検出");
+          Log.WriteLine("★ ExitCode = " + prc.ExitCode + " :  ロゴ未検出");
         }
         else if (prc.ExitCode == -1)
         {
           //何らかのエラー
-          throw new LGLException("★ ExitCode = " + prc.ExitCode + " :  エラー");
+          Log.WriteLine("★ ExitCode = " + prc.ExitCode + " :  エラー");
         }
         else
         {
