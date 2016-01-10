@@ -41,7 +41,7 @@ namespace LGLauncher
         {
           lock_lwi = new FileStream(PathList.LwiPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
-          if (File.Exists(PathList.LwiFooterPath))  //lwifooterファイルが無い場合もある
+          if (File.Exists(PathList.LwiFooterPath))  //lwifooterファイルが無いときもある
             lock_lwifooter = new FileStream(PathList.LwiFooterPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         }
         catch { throw new LGLException("cant lock lwi file"); }
