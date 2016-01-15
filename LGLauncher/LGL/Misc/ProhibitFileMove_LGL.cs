@@ -11,7 +11,7 @@ namespace LGLauncher
   /// <summary>
   /// ファイルの移動禁止
   /// </summary>
-  static class ProhibitFileMove
+  static class ProhibitFileMove_LGL
   {
     private static FileStream lock_ts, lock_d2v, lock_lwi, lock_lwifooter, lock_srt;     //プロセス終了でロック解放
 
