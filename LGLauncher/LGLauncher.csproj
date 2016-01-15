@@ -43,7 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Exception\LGLException.cs" />
-    <Compile Include="LGL\Misc\ProhibitFileMove.cs" />
+    <Compile Include="LGL\Misc\ProhibitFileMove_LGL.cs" />
     <Compile Include="LGL\_1_MakeAvs\bat\Bat_Join_Logo_Scp.cs" />
     <Compile Include="LGL\_1_MakeAvs\bat\LogoSelector.cs" />
     <Compile Include="LGL\_2_Launch\BatLuncher.cs" />
