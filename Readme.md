@@ -98,11 +98,11 @@ srtファイルパスの個別指定
 ------------------------------------------------------------------
 ### 設定
 
-    bEnable  1  
+    Enable  1  
 有効 、無効
 
 
-    iPriority  -1  
+    Priority  -1  
 プロセス優先度を指定。LogoGuilloに継承されます。  
 優先度は下げるのみです。指定優先度よりすでに低い場合は処理しません。  
  2:  Normal  
@@ -111,67 +111,67 @@ srtファイルパスの個別指定
 -1:  Auto by Windows  
 
 
-    sAvs_iPlugin  lwi  
+    Avs_iPlugin  lwi  
 d2v:  d2vで処理  
 lwi:  lwiで処理  
 
 
-    sLogoDetector  LogoGuillo  
+    LogoDetector  LogoGuillo  
 JLS          :  Join_Logo_Scpで処理  
 Join_Logo_Scp:  Join_Logo_Scpで処理  
 LG           :  LogoGuilloで処理  
 LogoGuillo   :  LogoGuilloで処理  
 
 
-    iDetector_MultipleRun  1  
+    Detector_MultipleRun  1  
 Windows内での LogoGuilloの同時実行数
 
 
 #####  チャプター出力設定
 
-    dRegard_NsecCM_AsMain  14.0
+    Regard_NsecCM_AsMain  14.0
 １４．０秒以下のＣＭ部を除去 
     
     
-    dRegard_NsecMain_AsCM  29.0
+    Regard_NsecMain_AsCM  29.0
 ２９．０秒以下の本編部を除去 
     
 
-    bOut_tvtp  1  
+    Out_tvtp  1  
 Tvtplay用チャプターファイルを出力する。  
 
 
-    bOut_ogm  1  
+    Out_ogm  1  
 Ogm形式のチャプターファイルを出力する。  
 
 
-    bOut_frame  1  
+    Out_frame  1  
 短い本編、ＣＭを除去したフレームファイルを出力する。  
 
 
-    bOut_rawframe  0  
+    Out_rawframe  0  
 編集前のフレームファイルを出力する。  
 
 
-    bOut_tvtp_toTsDir  1  
+    Out_tvtp_toTsDir  1  
 Tvtplay用チャプターファイルをＴＳファイルのフォルダに作成します。  
 
 
-    bOut_misc_toTsDir  1  
+    Out_misc_toTsDir  1  
 Ogm chapter、フレームファイルをＴＳファイルのフォルダに作成します。  
 
 
-    sChapDir_Path  "C:\tvtp_Dir"  
+    ChapDir_Path  "C:\tvtp_Dir"  
 Tvtplay用チャプターファイルを出力するフォルダを指定します。  
-bOut_tvtp_toTsDir = 0  にしてください。  
+Out_tvtp_toTsDir = 0  にしてください。  
 
 
-    sDirPath_misc  "C:\ogm_and_frame_Dir"  
+    DirPath_misc  "C:\ogm_and_frame_Dir"  
 Ogm chapter、フレームファイルを出力するフォルダを指定します。  
-bOut_misc_toTsDir = 0  にしてください。  
+Out_misc_toTsDir = 0  にしてください。  
 
 
-    iDeleteWorkItem  2  
+    DeleteWorkItem  2  
 3: 古い作業ファイル削除　＆　使い終わったファイル削除  
 2: 古い作業ファイル削除　＆　サイズの大きいファイル削除  
 1: 古い作業ファイル削除  
