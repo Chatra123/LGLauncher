@@ -100,7 +100,7 @@ namespace LGLauncher
         else if (prc.ExitCode == -1)
         {
           //何らかのエラー
-          Log.WriteLine("★ ExitCode = " + prc.ExitCode + " :  エラー");
+          throw new LGLException("★ ExitCode = " + prc.ExitCode + " :  エラー");
         }
         else
         {

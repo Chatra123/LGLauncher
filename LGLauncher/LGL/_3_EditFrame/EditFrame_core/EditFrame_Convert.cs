@@ -230,15 +230,14 @@ namespace LGLauncher.EditFrame
       {
         int time = timeList[i];        //100msec単位
 
-
         if (i == 0 && time != 0)
-          chapText.Add("0dix-" + time + "dox-");           // 開始直後のＣＭスキップ用
+          chapText.Add("0dix-" + time + "dox-");             //開始直後のＣＭスキップ用
         else if (i % 2 == 0)
-          chapText.Add("" + time + "dox-");                //even    cm out
+          chapText.Add("" + time + "dox-");                 //even    cm out
         else
-          chapText.Add("" + time + "dix-");                //odd     cm in
+          chapText.Add("" + time + "dix-");                 //odd     cm in
       }
-      chapText.Add("0eox-c");                              //close
+      chapText.Add("0eox-c");                               //close
 
       //１行にする
       // List<string>  →  string
@@ -281,56 +280,8 @@ namespace LGLauncher.EditFrame
     //チャプタースキップする[=1]かどうか
     // スキップチャプター(名前が"ix"または"ox"で始まるもの)の間をスキップします。
     //
-    //
-    //開始直後の1.0 - 1.3 秒目はスキップが機能しない
-    //
-    ////public static string To_TvtPlayChap(List<int> frameList)
-    ////{
-    ////  フレーム数を100msec単位の時間に変換
-    ////      300[frame]  ==>  300 / 29.97 * 10  ==>  100[100msec]
-    ////  var timeList = frameList.Select((frame) => { return (int)((1.0 * frame / 29.970) * 10.0); }).ToList();
 
-    ////  intへの変換で丸められている。同じ値が続いたら＋１
-    ////  for (int i = 1; i < timeList.Count; i++)
-    ////  {
-    ////    if (timeList[i - 1] == timeList[i])
-    ////      timeList[i]++;
-    ////  }
-
-    ////  convert
-    ////  var chapText = new List<string>() { "c-" };
-    ////  for (int i = 0; i < timeList.Count; i++)
-    ////  {
-    ////    int time = timeList[i];        //100msec単位
-
-    ////     開始直後のＣＭスキップ用
-    ////      最初のスキップが、
-    ////                   1.0 - 1.3 秒の間にあると機能しない
-    ////       1.6倍速だと 1.0 - 1.8 秒の間にあると機能しない
-    ////       5.0秒以下なら 0dix- 挿入
-    ////    if (i == 0 && 50 < time)
-    ////      chapText.Add("0dix-");
-
-    ////     スキップチャプター
-    ////    if (i % 2 == 0)
-    ////      chapText.Add("" + time + "dox-");                //even    cm out
-    ////    else
-    ////      chapText.Add("" + time + "dix-");                //odd     cm in
-    ////  }
-    ////  chapText.Add("0eox-c");                              //close
-
-    ////  １行にする
-    ////   List<string>  →  string
-    ////  string oneliner = "";
-    ////  foreach (var text in chapText)
-    ////    oneliner += text;
-
-    ////  return oneliner;
-    ////}
-
-
-
-
+    
 
 
     /*
