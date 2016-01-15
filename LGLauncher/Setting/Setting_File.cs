@@ -65,7 +65,7 @@ namespace LGLauncher
     public static Setting_File LoadFile(string xmlpath = null)
     {
       //デフォルト名を使用
-      if (xmlpath == null)
+      if (string.IsNullOrEmpty(xmlpath))
       {
         xmlpath = Default_XmlPath;
 
