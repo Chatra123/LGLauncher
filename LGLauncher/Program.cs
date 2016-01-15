@@ -25,13 +25,6 @@ namespace LGLauncher
       //                                   };
       //args = testArgs.ToArray();
 
-      //var testArgs = new List<string>() { "-autono", "-last" , "-ts",
-      //                                    @"E:\TS_PFDebug\ラーメン大好き小泉さん2016新春SP【女子高生がラーメンを食べまくるドラマ】  東海テレビ011  01月04日23時30分.ts",
-      //                                    "-ch", "東海テレビ", "-program", "program",
-      //                                    "-sequencename", "pfA233740427248"
-      //};
-      //args = testArgs.ToArray();
-
 
       //例外を捕捉する
       AppDomain.CurrentDomain.UnhandledException += ExceptionInfo.OnUnhandledException;
@@ -51,13 +44,13 @@ namespace LGLauncher
 
           //設定ファイル
           var setting = Setting_File.LoadFile();
-          if (setting.bEnable <= 0) return;
+          if (setting.Enable <= 0) return;
           if (args.Count() == 0) return;                   //”引数無し”なら設定ファイル作成後に終了
 
           //パス作成
           PathList.MakePath(cmdline, setting);
 
-          ProhibitFileMove.Lock();
+          ProhibitFileMove_LGL.Lock();
           DeleteWorkItem.Clean_Beforehand();
         }
 

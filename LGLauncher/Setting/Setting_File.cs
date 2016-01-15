@@ -17,37 +17,37 @@ namespace LGLauncher
   [Serializable]
   public class Setting_File
   {
-    public int bEnable = 1;
-    public int iPriority = -1;
+    public int Enable = 1;
+    public int Priority = -1;
     public string memo1 = "  set sAvs_iPlugin     d2v            or  lwi         ";
     public string memo2 = "  set sLogoDetector    Join_Logo_Scp  or  LogoGuillo  ";
     public string memo3 = "                       JLS            or  LG          ";
     public string memo4 = "  cannot set d2v with Join_Logo_Scp                   ";
-    public string sAvs_iPlugin = "  lwi         ";
-    public string sLogoDetector = "  LogoGuillo  ";
-    public int iDetector_MultipleRun = 1;
+    public string Avs_iPlugin = "  lwi         ";
+    public string LogoDetector = "  LogoGuillo  ";
+    public int Detector_MultipleRun = 1;
     public string space_1 = "";
 
     //edit chapter
-    public double dRegard_NsecCM_AsMain = 14.0;
-    public double dRegard_NsecMain_AsCM = 29.0;
+    public double Regard_NsecCM_AsMain = 14.0;
+    public double Regard_NsecMain_AsCM = 29.0;
     public string space_2 = "";
 
     //output chapter
-    public int bOut_tvtp = 1;
-    public int bOut_ogm = 1;
-    public int bOut_frame = 1;
-    public int bOut_rawframe = 0;
+    public int Out_tvtp = 1;
+    public int Out_ogm = 1;
+    public int Out_frame = 1;
+    public int Out_rawframe = 0;
     public string space_3 = "";
 
     //chapter directory
-    public int bOut_tvtp_toTsDir = 1;
-    public int bOut_misc_toTsDir = 1;
-    public string sDirPath_tvtp = @"   C:\tvtp_Dir               ";
-    public string sDirPath_misc = @"   C:\ogm_and_frame_Dir      ";
+    public int Out_tvtp_toTsDir = 1;
+    public int Out_misc_toTsDir = 1;
+    public string DirPath_tvtp = @"   C:\tvtp_Dir               ";
+    public string DirPath_misc = @"   C:\ogm_and_frame_Dir      ";
     public string space_4 = "";
 
-    public int iDeleteWorkItem = 2;
+    public int DeleteWorkItem = 2;
 
 
     //設定ファイル名
@@ -82,7 +82,7 @@ namespace LGLauncher
       XmlRW.Save(xmlpath, file);                 //古いバージョンのファイルなら新たに追加された項目がxmlに加わる。
 
       //プロセス優先度設定
-      SetPriority(file.iPriority);
+      SetPriority(file.Priority);
 
       return file;
     }

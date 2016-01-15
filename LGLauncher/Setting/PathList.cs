@@ -264,8 +264,8 @@ namespace LGLauncher
 
       //PluginType  LogoDetector
       {
-        string iplugin = setting.sAvs_iPlugin.Trim().ToLower();
-        string detector = setting.sLogoDetector.Trim().ToLower();
+        string iplugin = setting.Avs_iPlugin.Trim().ToLower();
+        string detector = setting.LogoDetector.Trim().ToLower();
 
         bool isD2v = iplugin == "d2v".ToLower();
         bool isLwi = iplugin == "lwi".ToLower();
@@ -437,7 +437,7 @@ namespace LGLauncher
       }
 
 
-      Detector_MultipleRun = setting.iDetector_MultipleRun;
+      Detector_MultipleRun = setting.Detector_MultipleRun;
 
       //Detector
       if (Detector == LogoDetector.Join_Logo_Scp)
@@ -481,26 +481,26 @@ namespace LGLauncher
     private static void Make_Chap_and_Misc(Setting_File setting)
     {
       //edit chapter
-      Regard_NsecCM_AsMain = setting.dRegard_NsecCM_AsMain;
-      Regard_NsecMain_AsCM = setting.dRegard_NsecMain_AsCM;
+      Regard_NsecCM_AsMain = setting.Regard_NsecCM_AsMain;
+      Regard_NsecMain_AsCM = setting.Regard_NsecMain_AsCM;
       Regard_NsecCM_AsMain = 0 < Regard_NsecCM_AsMain ? Regard_NsecCM_AsMain : 0;
       Regard_NsecMain_AsCM = 0 < Regard_NsecMain_AsCM ? Regard_NsecMain_AsCM : 0;
 
       //output chapter
-      Out_tvtp = 0 < setting.bOut_tvtp;
-      Out_ogm = 0 < setting.bOut_ogm;
-      Out_frame = 0 < setting.bOut_frame;
-      Out_rawframe = 0 < setting.bOut_rawframe;
+      Out_tvtp = 0 < setting.Out_tvtp;
+      Out_ogm = 0 < setting.Out_ogm;
+      Out_frame = 0 < setting.Out_frame;
+      Out_rawframe = 0 < setting.Out_rawframe;
 
       //chapter directory
-      Out_tvtp_toTsDir = 0 < setting.bOut_tvtp_toTsDir;
-      Out_misc_toTsDir = 0 < setting.bOut_misc_toTsDir;
-      DirPath_tvtp = setting.sDirPath_tvtp;
-      DirPath_misc = setting.sDirPath_misc;
+      Out_tvtp_toTsDir = 0 < setting.Out_tvtp_toTsDir;
+      Out_misc_toTsDir = 0 < setting.Out_misc_toTsDir;
+      DirPath_tvtp = setting.DirPath_tvtp;
+      DirPath_misc = setting.DirPath_misc;
 
       //misc
       //  delete work item
-      Mode_DeleteWorkItem = setting.iDeleteWorkItem;
+      Mode_DeleteWorkItem = setting.DeleteWorkItem;
     }
 
 
