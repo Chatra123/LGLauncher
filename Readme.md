@@ -10,7 +10,7 @@
 
 * AviSynth  [32bit]  
     
-* LogoGuillo.exe  [32bit or 64bit] 
+* LogoGuillo.exe  [32bit or 64bit]  
     ロゴデータ、パラメーターファイル
     
 * avs2pipemod.exe  [32bit]
@@ -33,16 +33,16 @@
 ------------------------------------------------------------------
 ### 使い方　　コマンドライン
 
-LGLauncher.exe  -No 1  -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
+LGLauncher.exe  -AutoNo         -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
 
 
-２回目以降、 -No を増やします。  
-LGLauncher.exe  -No 2  -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
+最後のみ
+LGLauncher.exe  -AutoNo  -last  -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
 
 
 
 ------------------------------------------------------------------
-### 引数
+### 引数１
 
 
     -No 1
@@ -54,6 +54,8 @@ LGLauncher.exe  -No 2  -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
 
     -last
 最後の処理であることを明示します。  
+-lastがあればOgm chapterを出力し、  
+join_logo_scpならばJL_標準.txtを使い再実行します。  
 
 
     -ts "C:\video.ts"
@@ -96,7 +98,7 @@ srtファイルパスの個別指定
     
 
 ------------------------------------------------------------------
-### 設定
+### 設定１
 
     Enable  1  
 有効 、無効
@@ -127,14 +129,16 @@ LogoGuillo   :  LogoGuilloで処理
 Windows内での LogoGuilloの同時実行数
 
 
-#####  チャプター出力設定
 
-    Regard_NsecCM_AsMain  14.0
-１４．０秒以下のＣＭ部を除去 
-    
-    
-    Regard_NsecMain_AsCM  29.0
-２９．０秒以下の本編部を除去 
+------------------------------------------------------------------
+#####  設定２　チャプター出力
+
+    Regard_NsecCM_AsMain  14.0  
+１４．０秒以下のＣＭ部を除去  
+
+
+    Regard_NsecMain_AsCM  29.0  
+２９．０秒以下の本編部を除去  
     
 
     Out_tvtp  1  
@@ -215,18 +219,19 @@ Out_misc_toTsDir = 0  にしてください。
 
 ------------------------------------------------------------------
 ### メモ
-* Tvtp、Ogg chapterは２９秒以下の本編、１４秒以下のＣＭを除去してから作成しています。
+
+* LSystemフォルダにSystemIdleMonitor.exeがあれば、ＣＰＵ使用率が６０％以下になるまで待機
+してからLogoGuilloを実行します。
+
+
+* Tvtp、Ogg chapter、フレームファイルは短い本編、ＣＭを除去してから作成しています。
 
 * 文字コード
  * Tvtp chapter                  UTF-8 bom
  * Ogm chapter, Frame text       Shift-JIS
 
-  
+ 
 * 作業ファイルのパスが２５５文字を超えると正常に動きません。深いフォルダにおかないでください。
-
-
-* LSystemフォルダにSystemIdleMonitor.exeがあれば、ＣＰＵ使用率が６０％以下になるまで待機
-してからLogoGuilloを実行します。
 
 
 * LogoGuillo実行間隔による差
@@ -290,8 +295,8 @@ AviSynthのファイル読込時にシステム側で使用します。
 ### join_logo_scp
 
 - 設定ファイルで  
- ``` sAvs_iPluginに lwi ```  
- ``` sLogoDetectorに  JLS ```  
+ ``` Avs_iPluginに lwi ```  
+ ``` LogoDetectorに  JLS ```  
  を設定する。
 
 - LSystemフォルダに以下のファイルを入れてください。子フォルダでもかまいません。
@@ -307,7 +312,7 @@ AviSynthのファイル読込時にシステム側で使用します。
   テスト環境では終了時にエラーが発生したので、同梱のchpater_exeは終了処理を変更しただけです。
   
 - JL_標準_Recording.txtは JL_標準.txtから必要なさそうな項目をコメントアウトしただけで、  
-  それ以外はJL_標準.txtと同じです。
+  それ以外は同じです。
 
 
   
@@ -321,7 +326,7 @@ AviSynthのファイル読込時にシステム側で使用します。
 * DGDecode
 * join_logo_scp
 * LogoGuillo
-* LSmash-Works
+* L-SMASH-Works
 
 が必要です。各作者にお礼申し上げます。
 
