@@ -1,4 +1,18 @@
-﻿using System;
+﻿/*
+ * 
+ * ・作成途中の srt　を読み込む。 
+ * 
+ * ・フォーマットを整えてsrtとして使用できる形にする。 
+ * 
+ * ・trimFrame_prv1から前回
+ * 
+ * ・取得フレーム数までをTrim()したavsを作成して完成
+ *  
+ * 
+ */
+
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,7 +28,7 @@ namespace LGLauncher
     /// TimeShiftSrtファイルを作成
     /// </summary>
     /// <returns>作成したsrtファイルのパス</returns>
-    public static string Make(int[] trimFrame_m1)
+    public static string Make(double shiftSec)
     {
       //ファイルチェック
       //　srtは削除されている可能性がある。
@@ -67,20 +81,11 @@ namespace LGLauncher
       //
       //シフト
       //
-      //時間をシフトさせて開始を０秒からにする
+      //タイムコードの開始を０秒からにする
       var shiftText = formatText;
 
       if (2 <= PathList.PartNo)
       {
-        if (trimFrame_m1 == null
-              || trimFrame_m1.Count() != 2) throw new LGLException("trimFrame_m1 is invalid");
-
-        //前回までの総時間
-        //   trimFrame_m1[0]  前回のTrim開始フレーム
-        //   trimFrame_m1[1]　前回のTrim終了フレーム
-        double shiftSec = 1.0 * trimFrame_m1[1] / 29.970;
-
-        //シフト
         shiftText = Shift_SrtText(shiftText, shiftSec);
       }
 

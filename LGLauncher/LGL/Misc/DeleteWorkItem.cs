@@ -34,27 +34,12 @@ namespace LGLauncher
 
 
     /// <summary>
-    /// 例外発生時のファイル削除
+    /// 例外発生時にavsファイル削除
     /// </summary>
-    /// <remarks>
-    /// エラーで処理できなかった場合に、
-    /// 次回の処理が動作するようにする。
-    /// *.p3.frame.cat.txt 削除
-    /// *.p3.lwi_36000__54000.avs 削除
-    /// 
-    /// partNo自動検出でないなら、
-    /// *.p3.lwi_36000__36000.avs を作成して対処する。　未実装
-    /// </remarks>
-    public static void Clean_OnError()
+    public static void CleanAvs_OnError()
     {
-      //partNo自動検出なら次も同じpartNoになるように、
-      //*.p3.frame.cat.txt 削除
-      Delete_file(0.0, PathList.LWorkDir, PathList.WorkName + ".frame.cat.txt");
-
-      //*.p3.lwi_36000__54000.avs 削除
-      Delete_file(0.0, PathList.LWorkDir, PathList.WorkName + ".d2v_*__*.avs");
-      Delete_file(0.0, PathList.LWorkDir, PathList.WorkName + ".lwi_*__*.avs");
-
+      //*.p3.lwi_2000__3000.avs 削除
+      Delete_file(0.0, PathList.LWorkDir, PathList.WorkName + ".*_*__*.avs");
     }
 
 
@@ -79,7 +64,7 @@ namespace LGLauncher
           //今回作成したTsName.p3.lwi_20000__30000.avsは、
           //次回のLGLauncherが使用するので削除しない。
           //ひとつ前の作業ファイルを削除。
-          Delete_file(0.0, PathList.LWorkDir, PathList.WorkName_m1 + "*");
+          Delete_file(0.0, PathList.LWorkDir, PathList.WorkName_prv1 + "*");
         }
       }
 

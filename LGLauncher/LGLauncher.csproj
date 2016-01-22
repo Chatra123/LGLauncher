@@ -43,7 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Exception\LGLException.cs" />
-    <Compile Include="LGL\Misc\ProhibitFileMove.cs" />
+    <Compile Include="LGL\Misc\ProhibitFileMove_LGL.cs" />
     <Compile Include="LGL\_1_MakeAvs\bat\Bat_Join_Logo_Scp.cs" />
     <Compile Include="LGL\_1_MakeAvs\bat\LogoSelector.cs" />
     <Compile Include="LGL\_2_Launch\BatLuncher.cs" />
@@ -68,7 +68,7 @@
     <Compile Include="LGL\_1_MakeAvs\avs\AvsWithD2v.cs" />
     <Compile Include="LGL\_1_MakeAvs\TimeShiftSrt.cs" />
     <Compile Include="LGL\_1_MakeAvs\bat\Bat_LogoGuillo.cs" />
-    <Compile Include="LGL\_3_EditFrame\Tweaker.cs" />
+    <Compile Include="LGL\_3_EditFrame\FrameEditor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

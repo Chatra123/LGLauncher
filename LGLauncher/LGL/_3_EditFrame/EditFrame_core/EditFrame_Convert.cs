@@ -19,7 +19,7 @@ namespace LGLauncher.EditFrame
   {
 
     /// <summary>
-    /// File  →  List<int>
+    /// read Frame File  →  List<int>
     /// </summary>
     /// <param name="framePath">ファイルパス</param>
     /// <returns>
@@ -208,7 +208,7 @@ namespace LGLauncher.EditFrame
     /// </summary>
     /// <param name="frameList">元になるフレームリスト</param>
     /// <returns>
-    ///   成功　→　チャプター形式の文字列
+    ///   成功　→　チャプター形式の string
     ///   失敗　→　null
     /// </returns>
     public static string To_TvtPlayChap(List<int> frameList)
@@ -230,19 +230,14 @@ namespace LGLauncher.EditFrame
       {
         int time = timeList[i];        //100msec単位
 
-        // 開始直後のＣＭスキップ用
-        // 　最初のメインが２秒より後にあるなら追加、 
-        //   1.6倍速だと14dix-でスキップしないので 20dix-挿入
-        if (i == 0 && 20 < time)
-          chapText.Add("20dix-");
-
-        // スキップチャプター
-        if (i % 2 == 0)
-          chapText.Add("" + time + "dox-");                //even    cm out
+        if (i == 0 && time != 0)
+          chapText.Add("0dix-" + time + "dox-");             //開始直後のＣＭスキップ用
+        else if (i % 2 == 0)
+          chapText.Add("" + time + "dox-");                 //even    cm out
         else
-          chapText.Add("" + time + "dix-");                //odd     cm in
+          chapText.Add("" + time + "dix-");                 //odd     cm in
       }
-      chapText.Add("0eox-c");                              //close
+      chapText.Add("0eox-c");                               //close
 
       //１行にする
       // List<string>  →  string
@@ -285,19 +280,12 @@ namespace LGLauncher.EditFrame
     //チャプタースキップする[=1]かどうか
     // スキップチャプター(名前が"ix"または"ox"で始まるもの)の間をスキップします。
     //
-    //
-    //開始直後の０秒目はスキップが機能しない
-    //1.0倍速    14dix-
-    //1.2        16dix-
-    //1.4        18dix-
-    //1.6        20dix-
-    //
 
-
+    
 
 
     /*
-     * Nero Chapter  type1
+     * Ogm Chapter  type1
      * Chapter00=00:00:00.000
      * Chapter00Name=chapter 00
      * Chapter01=00:00:01.935
@@ -306,9 +294,9 @@ namespace LGLauncher.EditFrame
      * Chapter02Name=chapter 02
      */
     /// <summary>
-    /// List<int>　→　Neroチャプター type1
+    /// List<int>　→　Ogmチャプター type1
     /// </summary>
-    public static string To_NeroChap_type1(List<int> chaplist)
+    public static string To_OgmChap_type1(List<int> chaplist)
     {
       var timecodelist = Frame_to_TimeCode(chaplist);
       var chapText = new StringBuilder();
@@ -327,16 +315,16 @@ namespace LGLauncher.EditFrame
 
 
     /*
-    * Nero Chapter  type2
+    * Ogm Chapter  type2
     * 00:00:00.000 chapter 00
     * 00:00:01.935 chapter 01
     * 00:03:08.856 chapter 02
     * 00:10:00.000 chapter 03
     */
     /// <summary>
-    /// List<int>　→　Neroチャプター type2
+    /// List<int>　→　Ogmチャプター type2
     /// </summary>
-    public static string To_NeroChap_type2(List<int> chaplist)
+    public static string To_OgmChap_type2(List<int> chaplist)
     {
       var timecodelist = Frame_to_TimeCode(chaplist);
       var chapText = new StringBuilder();
@@ -354,7 +342,7 @@ namespace LGLauncher.EditFrame
 
 
     /// <summary>
-    /// フレーム　→　タイムコード文字列  00:10:20.345         for NeroChap
+    /// フレーム　→　タイムコード文字列  00:10:20.345         for OgmChap
     /// </summary>
     private static List<string> Frame_to_TimeCode(List<int> framelist)
     {

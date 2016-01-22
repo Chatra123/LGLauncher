@@ -1,52 +1,37 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace LGLauncher
 {
   /*
-   * エラー処理に例外を使う
-   * 想定できるエラーはLGLExceptionを発生させてtry{}catch{}で捕まえる。
-   * 録画中にダイアログを表示したくないので、 Windowsのエラーダイアログは表示させない。
+   * 例外について
+   *   想定できるエラーはLGLExceptionを発生させてtry{}catch{}で捕まえる。
+   *   録画中にダイアログを表示したくないので、 Windowsのエラーダイアログは表示させない。
    *
    *
    * LGLException以外の想定外の例外はOnUnhandledException()で処理する。
-   *    LGLException　　　　　　  通常のログに追記　　　エラーダイアログを出さない
-   *    OnUnhandledException()    専用のerrlogを作成　　エラーダイアログを出す
+   *    LGLException　　　　　　  通常のログに追記　　　エラーダイアログを表示しない
+   *    OnUnhandledException()    専用のerrlogを作成　　エラーダイアログを表示する
    */
 
-  internal class LGLException : Exception
+  internal class LGLException : System.Exception
   {
-    private object[] InfoList;
-
-    public LGLException(Exception innerException)
-      : base(string.Empty, innerException) { }
-
-    public LGLException(params object[] info)
-      : base()
-    {
-      InfoList = info;
-    }
+    public LGLException() { }
+    public LGLException(string message) : base(message) { }
+    public LGLException(string message, System.Exception inner) : base(message, inner) { }
 
     public override string ToString()
     {
-      try
-      {
-        if (InfoList == null) return base.ToString();
+      var text = new StringBuilder();
+      text.AppendLine(base.ToString());
+      text.AppendLine("▽▽  Message  ▽▽");
+      text.AppendLine(base.Message);
+      text.AppendLine("△△  Message  △△");
 
-        var sb = new StringBuilder();
-        sb.AppendLine(base.ToString());
-        sb.AppendLine("/▽  info  ▽/");
-
-        foreach (var info in InfoList)
-          sb.AppendLine("    " + info.ToString());
-        sb.AppendLine("/△  info  △/");
-
-        return sb.ToString();
-      }
-      catch
-      {
-        return " aggregate error :"+base.ToString();
-      }
+      return text.ToString();
     }
 
 

@@ -10,7 +10,7 @@
 
 * AviSynth  [32bit]  
     
-* LogoGuillo.exe  [32bit or 64bit] 
+* LogoGuillo.exe  [32bit or 64bit]  
     ロゴデータ、パラメーターファイル
     
 * avs2pipemod.exe  [32bit]
@@ -33,16 +33,16 @@
 ------------------------------------------------------------------
 ### 使い方　　コマンドライン
 
-LGLauncher.exe  -No 1  -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
+LGLauncher.exe  -AutoNo         -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
 
 
-２回目以降、 -No を増やします。  
-LGLauncher.exe  -No 2  -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
+最後のみ
+LGLauncher.exe  -AutoNo  -last  -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
 
 
 
 ------------------------------------------------------------------
-### 引数
+### 引数１
 
 
     -No 1
@@ -54,6 +54,8 @@ LGLauncher.exe  -No 2  -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
 
     -last
 最後の処理であることを明示します。  
+-lastがあればOgm chapterを出力し、  
+join_logo_scpならばJL_標準.txtを使い再実行します。  
 
 
     -ts "C:\video.ts"
@@ -89,22 +91,20 @@ lwiファイルパスの個別指定
     -srt "D:\rec\video.ts.srt"
 srtファイルパスの個別指定
 
-    -SequenceName  abc123
+    -SequenceName  abcdef
 作業フォルダ名の一部に使用します。  
--AutoNoを使用し、pfAdapter処理全体を再実行する場合には必要です。  
-それ以外では無くてもかまいません。  
-
+基本的には無くても問題ありません。
     
     
 
 ------------------------------------------------------------------
-### 設定
+### 設定１
 
-    bEnable  1  
+    Enable  1  
 有効 、無効
 
 
-    iPriority  -1  
+    Priority  -1  
 プロセス優先度を指定。LogoGuilloに継承されます。  
 優先度は下げるのみです。指定優先度よりすでに低い場合は処理しません。  
  2:  Normal  
@@ -113,57 +113,69 @@ srtファイルパスの個別指定
 -1:  Auto by Windows  
 
 
-    sAvs_iPlugin  lwi  
+    Avs_iPlugin  lwi  
 d2v:  d2vで処理  
 lwi:  lwiで処理  
 
 
-    sLogoDetector  LogoGuillo  
+    LogoDetector  LogoGuillo  
 JLS          :  Join_Logo_Scpで処理  
 Join_Logo_Scp:  Join_Logo_Scpで処理  
 LG           :  LogoGuilloで処理  
 LogoGuillo   :  LogoGuilloで処理  
 
 
-    iDetector_MultipleRun  1  
+    Detector_MultipleRun  1  
 Windows内での LogoGuilloの同時実行数
 
 
-    bOut_tvtp  1  
+
+------------------------------------------------------------------
+#####  設定２　チャプター出力
+
+    Regard_NsecCM_AsMain  14.0  
+１４．０秒以下のＣＭ部を除去  
+
+
+    Regard_NsecMain_AsCM  29.0  
+２９．０秒以下の本編部を除去  
+    
+
+    Out_tvtp  1  
 Tvtplay用チャプターファイルを出力する。  
 
 
-    bOut_nero  1  
-Nero形式のチャプターファイルを出力する。  
+    Out_ogm  1  
+Ogm形式のチャプターファイルを出力する。  
 
 
-    bOut_frame  1  
-２９秒以下の本編、ＣＭを除去したフレームファイルを出力する。  
+    Out_frame  1  
+短い本編、ＣＭを除去したフレームファイルを出力する。  
 
 
-    bOut_rawframe  0  
+    Out_rawframe  0  
 編集前のフレームファイルを出力する。  
 
 
-    bOut_tvtp_toTsDir  1  
+    Out_tvtp_toTsDir  1  
 Tvtplay用チャプターファイルをＴＳファイルのフォルダに作成します。  
 
 
-    bOut_misc_toTsDir  1  
-Nero、フレームファイルをＴＳファイルのフォルダに作成します。  
+    Out_misc_toTsDir  1  
+Ogm chapter、フレームファイルをＴＳファイルのフォルダに作成します。  
 
 
-    sChapDir_Path  "C:\tvtp_Dir"  
+    ChapDir_Path  "C:\tvtp_Dir"  
 Tvtplay用チャプターファイルを出力するフォルダを指定します。  
-bOut_tvtp_toTsDir = 0  にしてください。  
+Out_tvtp_toTsDir = 0  にしてください。  
 
 
-    sDirPath_misc  "C:\frame_and_nero_Dir"  
-Nero、フレームファイルを出力するフォルダを指定します。  
-bOut_misc_toTsDir = 0  にしてください。  
+    DirPath_misc  "C:\ogm_and_frame_Dir"  
+Ogm chapter、フレームファイルを出力するフォルダを指定します。  
+Out_misc_toTsDir = 0  にしてください。  
 
 
-    iDeleteWorkItem  2  
+    DeleteWorkItem  2  
 3: 古い作業ファイル削除　＆　使い終わったファイル削除  
 2: 古い作業ファイル削除　＆　サイズの大きいファイル削除  
 1: 古い作業ファイル削除  
@@ -187,7 +199,7 @@ bOut_misc_toTsDir = 0  にしてください。
     LogoSelector.exe  
 
 
-##### あれば使用
+##### ファイルがあれば使用
     SystemIdleMonitor.exe  
 
 
@@ -207,23 +219,23 @@ bOut_misc_toTsDir = 0  にしてください。
 
 ------------------------------------------------------------------
 ### メモ
-* Tvtp、Neroチャプターは２９秒以下の本編、ＣＭを除去してから作成しています。
-
-* 文字コード
- * Tvtp用チャプター             UTF-8 bom
- * Nero, Frameファイル          Shift-JIS
-
-  
-* 作業ファイルのパスが２５５文字を超えると正常に動きません。深いフォルダにおかないでください。
-
 
 * LSystemフォルダにSystemIdleMonitor.exeがあれば、ＣＰＵ使用率が６０％以下になるまで待機
 してからLogoGuilloを実行します。
 
 
+* Tvtp、Ogg chapter、フレームファイルは短い本編、ＣＭを除去してから作成しています。
+
+* 文字コード
+ * Tvtp chapter                  UTF-8 bom
+ * Ogm chapter, Frame text       Shift-JIS
+
+ 
+* 作業ファイルのパスが２５５文字を超えると正常に動きません。深いフォルダにおかないでください。
+
+
 * LogoGuillo実行間隔による差
     * フレーム認識  
-        - 実行間隔が短いと真っ白なシーンや映像後半でずれやすくなる。  
         - 5min to 1minはＣＭが本編として組み込まれる量が多くなっていく。
         - 10minならほぼ差が出ない。
         
@@ -283,8 +295,8 @@ AviSynthのファイル読込時にシステム側で使用します。
 ### join_logo_scp
 
 - 設定ファイルで  
- ``` sAvs_iPluginに lwi ```  
- ``` sLogoDetectorに  JLS ```  
+ ``` Avs_iPluginに lwi ```  
+ ``` LogoDetectorに  JLS ```  
  を設定する。
 
 - LSystemフォルダに以下のファイルを入れてください。子フォルダでもかまいません。
@@ -300,7 +312,7 @@ AviSynthのファイル読込時にシステム側で使用します。
   テスト環境では終了時にエラーが発生したので、同梱のchpater_exeは終了処理を変更しただけです。
   
 - JL_標準_Recording.txtは JL_標準.txtから必要なさそうな項目をコメントアウトしただけで、  
-  それ以外はJL_標準.txtと同じです。
+  それ以外は同じです。
 
 
   
@@ -314,7 +326,7 @@ AviSynthのファイル読込時にシステム側で使用します。
 * DGDecode
 * join_logo_scp
 * LogoGuillo
-* LSmash-Works
+* L-SMASH-Works
 
 が必要です。各作者にお礼申し上げます。
 
