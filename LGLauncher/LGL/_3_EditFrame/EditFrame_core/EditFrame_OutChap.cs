@@ -112,10 +112,10 @@ namespace LGLauncher.EditFrame
         chaplist.Insert(0, 0);
 
       //最後から１秒前にChap追加
-      //　５分以上、IsLastPartのみ
+      //　３０秒以上、IsLastPartのみ
       if (PathList.IsLastPart)
       {
-        if (30 * 60 * 5 <= endFrame)
+        if (30 * 30 <= endFrame)
           chaplist.Add(endFrame - 30 * 1);
       }
 
