@@ -37,7 +37,7 @@ namespace LGLauncher
 
 
       //
-      // avsでのエラー発生を考慮して一度だけリトライする。
+      // avs2pipeでのエラー発生を考慮して一度だけリトライする。
       //
       for (int retry = 1; retry <= 1; retry++)
       {
@@ -54,14 +54,16 @@ namespace LGLauncher
           throw new LGLException("avsinfo launch error");
 
         //３秒程はかかる
-        prc.WaitForExit(60 * 1000);
+        prc.WaitForExit(120 * 1000);
 
         //正常終了ならreturn
-        if (prc.ExitCode == 0) return;
+        if (prc.HasExited && 
+          prc.ExitCode == 0) return;
 
-        Thread.Sleep(5 * 1000);
+        Thread.Sleep(10 * 1000);
       }
 
+      Log.WriteLine("avsinfo process error");
     }
 
     #endregion RunInfoAvs
@@ -103,7 +105,7 @@ namespace LGLauncher
       }
 
       if (infoText == null || infoText.Count < 4)
-        throw new LGLException("avsinfo is invalid");
+        throw new LGLException("avsinfo file is invalid");
 
       //文字　→　数値
       double frame, fps, time;
