@@ -111,8 +111,23 @@ namespace LGLauncher
       Thread.Sleep(500);
 
       //ファイル取得
-      var dirInfo = new DirectoryInfo(directory);
-      var files = dirInfo.GetFiles(searchKey, SearchOption.AllDirectories);
+      var files = new FileInfo[] { };
+      try
+      {
+        var dirInfo = new DirectoryInfo(directory);
+        files = dirInfo.GetFiles(searchKey, SearchOption.AllDirectories);
+      }
+      catch (System.UnauthorizedAccessException)
+      {
+        /* Java  jre-8u73-windows-i586.exeを実行してインストール用のウィンドウを表示させると、
+         * Tempフォルダにjds262768703.tmpがReadOnlyで作成される。
+         * 
+         * アクセス権限の無いファイルが含まれているフォルダに
+         * files = dirInfo.GetFiles();
+         * を実行すると System.UnauthorizedAccessExceptionが発生する。
+         */
+        return;
+      }
 
       foreach (var onefile in files)
       {
@@ -130,6 +145,7 @@ namespace LGLauncher
       }
     }
 
+
     /// <summary>
     /// 空フォルダ削除
     /// </summary>
@@ -138,9 +154,17 @@ namespace LGLauncher
     {
       if (Directory.Exists(parent_directory) == false) return;
 
-
-      var dirInfo = new DirectoryInfo(parent_directory);
-      var dirs = dirInfo.GetDirectories("*", SearchOption.AllDirectories);
+      //フォルダ取得
+      var dirs = new DirectoryInfo[] { };
+      try
+      {
+        var dirInfo = new DirectoryInfo(parent_directory);
+        dirs = dirInfo.GetDirectories("*", SearchOption.AllDirectories);
+      }
+      catch (System.UnauthorizedAccessException)
+      {
+        return;
+      }
 
       foreach (var onedir in dirs)
       {
