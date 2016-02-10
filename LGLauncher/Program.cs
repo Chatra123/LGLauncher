@@ -10,8 +10,6 @@ using System.Text.RegularExpressions;
 
 namespace LGLauncher
 {
-  using OctNov.Excp;
-
   internal class Program
   {
 
@@ -27,7 +25,7 @@ namespace LGLauncher
 
 
       //例外を捕捉する
-      AppDomain.CurrentDomain.UnhandledException += ExceptionInfo.OnUnhandledException;
+      AppDomain.CurrentDomain.UnhandledException += OctNov.Excp.ExceptionInfo.OnUnhandledException;
 
 
       string CmdLine_ToString = "";　　　　　　　　　　　　//例外発生時のログ用
