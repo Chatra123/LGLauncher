@@ -18,7 +18,6 @@ namespace LGLauncher
   public class Setting_File
   {
     public int Enable = 1;
-    public int Priority = -1;
     public string memo1 = "  set sAvs_iPlugin     d2v            or  lwi         ";
     public string memo2 = "  set sLogoDetector    Join_Logo_Scp  or  LogoGuillo  ";
     public string memo3 = "                       JLS            or  LG          ";
@@ -78,50 +77,10 @@ namespace LGLauncher
       }
 
       var file = XmlRW.Load<Setting_File>(xmlpath);
-
       XmlRW.Save(xmlpath, file);                 //古いバージョンのファイルなら新たに追加された項目がxmlに加わる。
-
-      //プロセス優先度設定
-      SetPriority(file.Priority);
 
       return file;
     }
-
-
-    /// <summary>
-    /// プロセス優先度設定
-    /// </summary>
-    static void SetPriority(int ipriority)
-    {
-      var self = Process.GetCurrentProcess().PriorityClass;
-
-      //優先度は下げるのみ、
-      //優先度を上げることはしない。
-      if (ipriority == 2)              // == 2  normal
-      {
-        //do nothing
-      }
-      if (ipriority == 1               // == 1  BelowNormal
-        && self != ProcessPriorityClass.Idle)
-      {
-        Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.BelowNormal;
-      }
-      else if (ipriority == 0)         // == 0  Idle
-      {
-        Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
-      }
-      else if (ipriority == -1)        // == -1  Auto by Windows
-      {
-        //do nothing
-        //depend on windows setting
-      }
-
-      return;
-    }
-
-
-
-
 
 
   }
