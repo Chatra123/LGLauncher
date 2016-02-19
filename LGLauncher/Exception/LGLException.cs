@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace LGLauncher
 {
   /*
-   * 例外について
+   * ◇例外について
    *   想定できるエラーはLGLExceptionを発生させてtry{}catch{}で捕まえる。
-   *   録画中にダイアログを表示したくないので、 Windowsのエラーダイアログは表示させない。
+   *   録画中にダイアログを表示したくないので、Windowsのエラーダイアログは表示させない。
    *
    *
    * LGLException以外の想定外の例外はOnUnhandledException()で処理する。

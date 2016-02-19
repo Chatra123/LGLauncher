@@ -14,6 +14,7 @@ namespace LGLauncher.EditFrame
    * 
    *     Join_Logo_Scp
    *         *.p1.jls.result.txt  -->  *.p1.frame.txt  -->  List<int>  -->  concat frame file
+   *         
    *     LogoGuillo
    *                                   *.p1.frame.txt  -->  List<int>  -->  concat frame file
    * 
@@ -46,8 +47,8 @@ namespace LGLauncher.EditFrame
           // *.frame.cat.txt合成
           concat = Concat_withOldFrame(trimFrame);
 
-          //scpos.cat, logoframe.cat合成
-          //  作成したcatファイルはIsLastPartで使用する。
+          //cat合成
+          //  catファイルはIsLastPartで使用する。
           {
             JLS.Concat_Scpos.Concat(trimFrame);
             JLS.Concat_logoframe.Concat(trimFrame);
@@ -124,20 +125,17 @@ namespace LGLauncher.EditFrame
 
       //
       //連結 with offset
-      //　　add_FrameListがあれば連結、なければold_CatListのまま
       List<int> new_CatList = old_CatList;                                     // *.p3.frame.cat.txt
       {
-        if (1 <= PathList.PartNo
-          && trimFrame != null)
+        if (1 <= PathList.PartNo && trimFrame != null)
         {
-          //trim avsの開始フレーム
           int beginFrame = trimFrame[0];
-          add_FrameList = add_FrameList.Select((f) => f + beginFrame).ToList();  //beginFrame分増やす
+          add_FrameList = add_FrameList.Select((f) => f + beginFrame).ToList();
         }
 
         new_CatList.AddRange(add_FrameList);
 
-        //連結部の繋ぎ目をけす。　0.5 秒以下のＣＭ除去 
+        //連結部の繋ぎ目をけす。
         new_CatList = EditFrame_Convert.FlatOut_CM__(new_CatList, 0.5);
       }
 

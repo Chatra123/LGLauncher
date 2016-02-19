@@ -134,7 +134,6 @@ namespace LGLauncher
       //srt
       string srtPath;
       {
-        //開始時間をずらす
         double shiftSec = 1.0 * beginFrame / 29.970;
         srtPath = TimeShiftSrt.Make(shiftSec);
       }

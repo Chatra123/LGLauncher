@@ -72,7 +72,7 @@ namespace LGLauncher
         {
           //設定ファイル作成
           var def_Setting = new Setting_File();
-          XmlRW.Save(xmlpath, def_Setting);      //保存
+          XmlRW.Save(xmlpath, def_Setting);
         }
       }
 
