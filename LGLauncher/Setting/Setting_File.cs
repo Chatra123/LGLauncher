@@ -46,7 +46,7 @@ namespace LGLauncher
     public string DirPath_misc = @"   C:\ogm_and_frame_Dir      ";
     public string space_4 = "";
 
-    public int DeleteWorkItem = 2;
+    public int DeleteWorkItem = 3;
 
 
     //設定ファイル名
