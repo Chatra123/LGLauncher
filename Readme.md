@@ -4,6 +4,16 @@
 作成中の d2v, lwi, srtファイルを元にLogoGuilloを実行します。
 
 
+------------------------------------------------------------------
+### 使い方　　コマンドライン
+
+LGLauncher.exe  -AutoNo         -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
+
+
+最後のみ  
+LGLauncher.exe  -AutoNo  -last  -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
+
+
 
 ------------------------------------------------------------------
 ### 必要なソフト
@@ -29,21 +39,8 @@
    LogoSelector.txtの"[LogoDir]"にlgd,paramファイルのあるフォルダを設定する。
 
 
-
-------------------------------------------------------------------
-### 使い方　　コマンドライン
-
-LGLauncher.exe  -AutoNo         -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
-
-
-最後のみ
-LGLauncher.exe  -AutoNo  -last  -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
-
-
-
 ------------------------------------------------------------------
 ### 引数１
-
 
     -No 1
 -noを増やすことで前回からの増加分を処理する。  
@@ -104,15 +101,6 @@ srtファイルパスの個別指定
 有効 、無効
 
 
-    Priority  -1  
-プロセス優先度を指定。LogoGuilloに継承されます。  
-優先度は下げるのみです。指定優先度よりすでに低い場合は処理しません。  
- 2:  Normal  
- 1:  BelorNormal  
- 0:  Low  
--1:  Auto by Windows  
-
-
     Avs_iPlugin  lwi  
 d2v:  d2vで処理  
 lwi:  lwiで処理  
@@ -126,7 +114,7 @@ LogoGuillo   :  LogoGuilloで処理
 
 
     Detector_MultipleRun  1  
-Windows内での LogoGuilloの同時実行数
+Windows内での LogoGuillo同時実行数
 
 
 
@@ -175,7 +163,7 @@ Ogm chapter、フレームファイルを出力するフォルダを指定しま
 Out_misc_toTsDir = 0  にしてください。  
 
 
-    DeleteWorkItem  2  
+    DeleteWorkItem  3  
 3: 古い作業ファイル削除　＆　使い終わったファイル削除  
 2: 古い作業ファイル削除　＆　サイズの大きいファイル削除  
 1: 古い作業ファイル削除  
@@ -224,7 +212,7 @@ Out_misc_toTsDir = 0  にしてください。
 してからLogoGuilloを実行します。
 
 
-* Tvtp、Ogg chapter、フレームファイルは短い本編、ＣＭを除去してから作成しています。
+* Tvtp、ogm chapter、フレームファイルは短い本編、ＣＭを除去してから作成しています。
 
 * 文字コード
  * Tvtp chapter                  UTF-8 bom
@@ -232,6 +220,9 @@ Out_misc_toTsDir = 0  にしてください。
 
  
 * 作業ファイルのパスが２５５文字を超えると正常に動きません。深いフォルダにおかないでください。
+
+
+* LogoGuillo, avs2pipemod側でエラーが発生しても自動で再実行するので、多少のエラーなら無視できます。
 
 
 * LogoGuillo実行間隔による差
@@ -251,23 +242,6 @@ Out_misc_toTsDir = 0  にしてください。
 |     1      |    2.0     |
 
 
-
-------------------------------------------------------------------
-### LogoSelector
-
-* LSystemフォルダにあるLogoSelector.exe又は、LogoSelector.vbs、LogoSelector.jsを実行します。  
-
-
-* LogoSelector.exe  
-    引数に "チャンネル名"  "番組名"  "tsパス"を渡します。  
-    返り値の１行目にロゴデータ、２行目にパラメーターのフルパスを返してください。  
-
-
-* LogoSelector.vbs　＆　LogoSelector.js  
-    cscriptの引数に"スクリプトパス"  "チャンネル名"  "番組名"  "tsパス"を渡します。  
-    返り値の１行目にロゴデータ、２行目にパラメーターのフルパスを返してください。
-
-    
 
 ------------------------------------------------------------------
 ### lwi
