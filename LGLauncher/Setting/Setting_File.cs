@@ -17,32 +17,36 @@ namespace LGLauncher
   [Serializable]
   public class Setting_File
   {
-    public int bEnable = 1;
-    public int iPriority = -1;
+    public int Enable = 1;
     public string memo1 = "  set sAvs_iPlugin     d2v            or  lwi         ";
     public string memo2 = "  set sLogoDetector    Join_Logo_Scp  or  LogoGuillo  ";
     public string memo3 = "                       JLS            or  LG          ";
     public string memo4 = "  cannot set d2v with Join_Logo_Scp                   ";
-    public string sAvs_iPlugin = "  lwi         ";
-    public string sLogoDetector = "  LogoGuillo  ";
-    public int iDetector_MultipleRun = 1;
+    public string Avs_iPlugin = "  lwi         ";
+    public string LogoDetector = "  LogoGuillo  ";
+    public int Detector_MultipleRun = 1;
     public string space_1 = "";
 
-    //enable chapter
-    public int bOut_tvtp = 1;
-    public int bOut_nero = 1;
-    public int bOut_frame = 1;
-    public int bOut_rawframe = 0;
-    public int bOut_tvtp_toTsDir = 1;
-    public int bOut_misc_toTsDir = 1;
+    //edit chapter
+    public double Regard_NsecCM_AsMain = 14.0;
+    public double Regard_NsecMain_AsCM = 29.0;
     public string space_2 = "";
 
-    //chapter directory
-    public string sDirPath_tvtp = @"   C:\tvtp_Dir                ";
-    public string sDirPath_misc = @"   C:\frame_and_nero_Dir      ";
+    //output chapter
+    public int Out_tvtp = 1;
+    public int Out_ogm = 1;
+    public int Out_frame = 1;
+    public int Out_rawframe = 0;
     public string space_3 = "";
 
-    public int iDeleteWorkItem = 2;
+    //chapter directory
+    public int Out_tvtp_toTsDir = 1;
+    public int Out_misc_toTsDir = 1;
+    public string DirPath_tvtp = @"   C:\tvtp_Dir               ";
+    public string DirPath_misc = @"   C:\ogm_and_frame_Dir      ";
+    public string space_4 = "";
+
+    public int DeleteWorkItem = 3;
 
 
     //設定ファイル名
@@ -60,7 +64,7 @@ namespace LGLauncher
     public static Setting_File LoadFile(string xmlpath = null)
     {
       //デフォルト名を使用
-      if (xmlpath == null)
+      if (string.IsNullOrEmpty(xmlpath))
       {
         xmlpath = Default_XmlPath;
 
@@ -68,55 +72,15 @@ namespace LGLauncher
         {
           //設定ファイル作成
           var def_Setting = new Setting_File();
-          XmlRW.Save(xmlpath, def_Setting);      //保存
+          XmlRW.Save(xmlpath, def_Setting);
         }
       }
 
       var file = XmlRW.Load<Setting_File>(xmlpath);
-
       XmlRW.Save(xmlpath, file);                 //古いバージョンのファイルなら新たに追加された項目がxmlに加わる。
-
-      //プロセス優先度設定
-      SetPriority(file.iPriority);
 
       return file;
     }
-
-
-    /// <summary>
-    /// プロセス優先度設定
-    /// </summary>
-    static void SetPriority(int ipriority)
-    {
-      var self = Process.GetCurrentProcess().PriorityClass;
-
-      //優先度は下げるのみ。
-      //優先度を上げることはしない。
-      if (ipriority == 2)  // ==2  normal
-      {
-        //do nothing
-      }
-      if (ipriority == 1   // == 1 BelowNormal
-        && self != ProcessPriorityClass.Idle)
-      {
-        Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.BelowNormal;
-      }
-      else if (ipriority == 0)  // == 0 Idle
-      {
-        Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.Idle;
-      }
-      else if (ipriority == -1)  // == 1 Auto by Windows
-      {
-        //do nothing
-        //depend on windows setting
-      }
-
-      return;
-    }
-
-
-
-
 
 
   }

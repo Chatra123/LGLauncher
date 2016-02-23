@@ -15,33 +15,30 @@ namespace LGLauncher.EditFrame.JLS
   public static class Convert_JLS
   {
     /// <summary>
-    ///  JLS result　→　Frame File
+    ///  JLS  result.txt　→　frame.txt
     /// </summary>
-    public static List<int> ResultAvs_to_FrameFile(bool useLastText)
+    public static List<int> ResultAvs_to_FrameFile(bool use_LastCatText)
     {
+      //入力、出力パス
       string avsPath, framePath;
       {
-        if (useLastText == false)
+        if (use_LastCatText == false)
         {
           avsPath = PathList.WorkPath + ".jls.result.txt";
           framePath = PathList.WorkPath + ".frame.txt";
         }
         else
         {
-          // jls last text
+          // jls lastcat text
           avsPath = Path.Combine(PathList.LWorkDir,
                                  PathList.TsShortName + ".jls.lastcat.result.txt");
           framePath = Path.Combine(PathList.LWorkDir,
                                    PathList.TsShortName + ".lastcat.frame.txt");
         }
-
-
       }
-
 
       if (File.Exists(avsPath) == false)
         return null;
-
 
       //読
       //avsファイルが無ければ　avsText= null、 framelist = nullになる。

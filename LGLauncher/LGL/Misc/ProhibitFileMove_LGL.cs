@@ -11,7 +11,7 @@ namespace LGLauncher
   /// <summary>
   /// ファイルの移動禁止
   /// </summary>
-  static class ProhibitFileMove
+  static class ProhibitFileMove_LGL
   {
     private static FileStream lock_ts, lock_d2v, lock_lwi, lock_lwifooter, lock_srt;     //プロセス終了でロック解放
 
@@ -41,7 +41,7 @@ namespace LGLauncher
         {
           lock_lwi = new FileStream(PathList.LwiPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
-          if (File.Exists(PathList.LwiFooterPath))  //lwifooterファイルが無い場合もある
+          if (File.Exists(PathList.LwiFooterPath))  //lwifooterファイルが無いときもある
             lock_lwifooter = new FileStream(PathList.LwiFooterPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
         }
         catch { throw new LGLException("cant lock lwi file"); }
@@ -50,7 +50,7 @@ namespace LGLauncher
       try
       {
         //srtファイルはすでに削除されている可能性がある。
-        //　テキストが書き込まれて無いとCaption2Ass_PCR_pfによって削除される。
+        //　テキストが書き込まれて無いとCaption2Ass_PCR_pfによって削除されるのでbomサイズで判断
         if (File.Exists(PathList.SrtPath))
         {
           var filesize = new FileInfo(PathList.SrtPath).Length;

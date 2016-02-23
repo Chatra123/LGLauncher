@@ -4,6 +4,7 @@ SetWorkingDir("#AvsWorkDir#")
 
 
 LoadPlugin("#InputPlugin#")
+
 #  d2v
 #d2v#  DGDecode_MPEG2Source("#D2vName#")
 

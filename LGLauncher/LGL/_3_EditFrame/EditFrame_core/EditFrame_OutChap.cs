@@ -96,31 +96,31 @@ namespace LGLauncher.EditFrame
 
 
     /// <summary>
-    /// NeroChapを出力
+    /// OgmChapを出力
     /// </summary>
-    public static void To_NeroChap(string outPath, List<int> framelist, int endFrame)
+    public static void To_OgmChap(string outPath, List<int> framelist, int endFrame)
     {
       if (framelist == null || framelist.Count == 0) return;
 
-      //NeroChap用に少し加工
+      //OgmChap用に少し加工
 
       //本編の開始のみを抽出、ＣＭの開始を除去   　Linqでディープコピー
       var chaplist = framelist.Where((frameNo, index) => index % 2 == 0).ToList();
 
       //00:00:00にChap追加
-      if (30 * 1 <= framelist[0])
+      if (30 * 3 <= framelist[0])
         chaplist.Insert(0, 0);
 
-      //最後から３秒前にChap追加
-      //　５分以上、IsLastPartのみ
+      //最後から１秒前にChap追加
+      //　３０秒以上、IsLastPartのみ
       if (PathList.IsLastPart)
       {
-        if (30 * 60 * 5 <= endFrame)
-          chaplist.Add(endFrame - 30 * 3);
+        if (30 * 30 <= endFrame)
+          chaplist.Add(endFrame - 30 * 1);
       }
 
 
-      string chapText = EditFrame_Convert.To_NeroChap_type2(chaplist);
+      string chapText = EditFrame_Convert.To_OgmChap_type2(chaplist);
 
       try
       {

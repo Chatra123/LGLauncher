@@ -20,12 +20,6 @@ namespace LGLauncher.EditFrame.JLS
     /// </summary>
     public static void Concat(int[] trimFrame)
     {
-      //avsの開始、終了フレーム番号
-      //　オフセット用
-      int beginFrame = trimFrame[0];
-      int endFrame = trimFrame[1];
-
-
       //パス作成
       //logoframeによって作成されるファイル             *.p3.jls.logoframe.txt
       string add_ScposPath = PathList.WorkPath + ".jls.logoframe.txt";
@@ -62,9 +56,12 @@ namespace LGLauncher.EditFrame.JLS
       //　　add_LogoframeTextがあれば連結、なければold_CatTextのまま
       List<string> new_CatText = old_CatText;                                  // *.jls.logoframe.cat.txt
       {
-        if (1 <= PathList.PartNo
-            && beginFrame != int.MaxValue)
+        if (1 <= PathList.PartNo)
         {
+          if (trimFrame == null || trimFrame.Count() != 2)
+            throw new LGLException("invalid trimFrame");
+
+          int beginFrame = trimFrame[0];
           add_LogoframeText = ApeendOffset_logoframe(add_LogoframeText, beginFrame);
         }
 

@@ -34,27 +34,12 @@ namespace LGLauncher
 
 
     /// <summary>
-    /// 例外発生時のファイル削除
+    /// 例外発生時にavsファイル削除
     /// </summary>
-    /// <remarks>
-    /// エラーで処理できなかった場合に、
-    /// 次回の処理が動作するようにする。
-    /// *.p3.frame.cat.txt 削除
-    /// *.p3.lwi_36000__54000.avs 削除
-    /// 
-    /// partNo自動検出でないなら、
-    /// *.p3.lwi_36000__36000.avs を作成して対処する。　未実装
-    /// </remarks>
-    public static void Clean_OnError()
+    public static void CleanAvs_OnError()
     {
-      //partNo自動検出なら次も同じpartNoになるように、
-      //*.p3.frame.cat.txt 削除
-      Delete_file(0.0, PathList.LWorkDir, PathList.WorkName + ".frame.cat.txt");
-
-      //*.p3.lwi_36000__54000.avs 削除
-      Delete_file(0.0, PathList.LWorkDir, PathList.WorkName + ".d2v_*__*.avs");
-      Delete_file(0.0, PathList.LWorkDir, PathList.WorkName + ".lwi_*__*.avs");
-
+      //*.p3.lwi_2000__3000.avs 削除
+      Delete_file(0.0, PathList.LWorkDir, PathList.WorkName + ".*_*__*.avs");
     }
 
 
@@ -79,7 +64,7 @@ namespace LGLauncher
           //今回作成したTsName.p3.lwi_20000__30000.avsは、
           //次回のLGLauncherが使用するので削除しない。
           //ひとつ前の作業ファイルを削除。
-          Delete_file(0.0, PathList.LWorkDir, PathList.WorkName_m1 + "*");
+          Delete_file(0.0, PathList.LWorkDir, PathList.WorkName_prv1 + "*");
         }
       }
 
@@ -126,8 +111,23 @@ namespace LGLauncher
       Thread.Sleep(500);
 
       //ファイル取得
-      var dirInfo = new DirectoryInfo(directory);
-      var files = dirInfo.GetFiles(searchKey, SearchOption.AllDirectories);
+      var files = new FileInfo[] { };
+      try
+      {
+        var dirInfo = new DirectoryInfo(directory);
+        files = dirInfo.GetFiles(searchKey, SearchOption.AllDirectories);
+      }
+      catch (System.UnauthorizedAccessException)
+      {
+        /* Java  jre-8u73-windows-i586.exeを実行してインストール用のウィンドウを表示させると、
+         * Tempフォルダにjds262768703.tmpがReadOnlyで作成される。
+         * 
+         * アクセス権限の無いファイルが含まれているフォルダに
+         * files = dirInfo.GetFiles();
+         * を実行すると System.UnauthorizedAccessExceptionが発生する。
+         */
+        return;
+      }
 
       foreach (var onefile in files)
       {
@@ -145,6 +145,7 @@ namespace LGLauncher
       }
     }
 
+
     /// <summary>
     /// 空フォルダ削除
     /// </summary>
@@ -153,9 +154,17 @@ namespace LGLauncher
     {
       if (Directory.Exists(parent_directory) == false) return;
 
-
-      var dirInfo = new DirectoryInfo(parent_directory);
-      var dirs = dirInfo.GetDirectories("*", SearchOption.AllDirectories);
+      //フォルダ取得
+      var dirs = new DirectoryInfo[] { };
+      try
+      {
+        var dirInfo = new DirectoryInfo(parent_directory);
+        dirs = dirInfo.GetDirectories("*", SearchOption.AllDirectories);
+      }
+      catch (System.UnauthorizedAccessException)
+      {
+        return;
+      }
 
       foreach (var onedir in dirs)
       {

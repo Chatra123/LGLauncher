@@ -1,5 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace LGLauncher
 {
@@ -8,13 +12,11 @@ namespace LGLauncher
   internal class AvsWithD2v : AbstractAvsMaker
   {
     public override string AvsPath { get; protected set; }            //作成したAVSのパス
-    public override int[] TrimFrame { get; protected set; }           //今回のトリム用フレーム数
-    public override int[] TrimFrame_m1 { get; protected set; }        //前回のトリム用フレーム数  minus 1
+    public override int[] TrimFrame { get; protected set; }           //トリム用フレーム数
 
     /// <summary>
     /// Trim付きavs作成
     /// </summary>
-    /// <returns>作成したd2vパス</returns>
     public override void Make()
     {
       //ファイルチェック
@@ -41,16 +43,16 @@ namespace LGLauncher
       var avsInfo = MakeAvsCommon.GetAvsInfo(PathList.WorkName + ".d2vinfo.txt");
       int totalframe = (int)avsInfo[0];
 
-      //前回のトリム用フレーム数取得
-      this.TrimFrame_m1 = (2 <= PathList.PartNo)
-                              ? MakeAvsCommon.GetTrimFrame_fromName(PathList.WorkName_m1 + ".d2v_*__*.avs")
-                              : null;
+      //前回のトリム用フレーム数取得   previous 1
+      int[] trimFrame_prv1 = (2 <= PathList.PartNo)
+                                ? MakeAvsCommon.GetTrimFrame_fromAvsName(PathList.WorkName_prv1 + ".d2v_*__*.avs")
+                                : null;
 
-      //トリム用フレーム数取得
-      this.TrimFrame = MakeAvsCommon.GetTrimFrame(totalframe, TrimFrame_m1);
+      //トリム用フレーム計算
+      this.TrimFrame = MakeAvsCommon.CalcTrimFrame(totalframe, trimFrame_prv1);
 
       //Trim付きavs作成
-      this.AvsPath = CreateTrimAvs_d2v(formatD2vPath, TrimFrame);
+      this.AvsPath = CreateTrimAvs_d2v(formatD2vPath, this.TrimFrame);
 
     }
 
@@ -164,20 +166,20 @@ namespace LGLauncher
     /// <summary>
     /// トリムつきAVS作成
     /// </summary>
-    private string CreateTrimAvs_d2v(string d2vPath, int[] trimBeginEnd)
+    private string CreateTrimAvs_d2v(string d2vPath, int[] trimFrame)
     {
-      int beginFrame = trimBeginEnd[0];
-      int endFrame = trimBeginEnd[1];
+      int beginFrame = trimFrame[0];
+      int endFrame = trimFrame[1];
 
-      //トリムつきAVS作成  共通部
-      var avsText = MakeAvsCommon.CreateTrimAvs(trimBeginEnd);
+      //トリムつきAVS作成
+      //avs共通部分
+      var avsText = MakeAvsCommon.CreateTrimAvs(trimFrame);
 
-      //d2v部分　書き換え
+      //d2v部分
       string d2vName = Path.GetFileName(d2vPath);
       for (int i = 0; i < avsText.Count; i++)
       {
         var line = avsText[i];
-
         line = Regex.Replace(line, "#InputPlugin#", PathList.DGDecode_dll, RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#d2v#", "", RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#D2vName#", d2vName, RegexOptions.IgnoreCase);
@@ -186,13 +188,13 @@ namespace LGLauncher
       }
 
       //長さチェック
-      //　30frame以下だとlogoGuilloのavs2pipemodがエラーで落ちる。
-      //　120frame以下ならno frame errorと表示されて終了する。
+      //　 30frame以下だと logoGuilloの avs2pipemodがエラーで落ちる。
+      //　120frame以下なら no frame errorと表示されて終了する。
       //　150frame以上に設定する。
       int avslen = endFrame - beginFrame;
 
       //5sec以上か？
-      if (150 <= avslen)
+      if (30 * 5 <= avslen)
       {
         //avs書込み
         string outAvsPath = PathList.WorkPath + ".d2v_" + beginFrame + "__" + endFrame + ".avs";
@@ -202,18 +204,12 @@ namespace LGLauncher
       }
       else
       {
-        //ビデオの長さが短い
-        //　次回処理のGetTrimFrame()のために *.avs を作成しておく。
-        //  ”前回の終端フレーム数”として *.avs のファイル名が使用される。
-        string outAvsPath = PathList.WorkPath + ".d2v_" + beginFrame + "__" + beginFrame + ".avs";
-        File.WriteAllLines(outAvsPath, avsText, TextEnc.Shift_JIS);
-
-        throw new LGLException("short video length.  -lt 150frame");
+        throw new LGLException("short video length.  -lt 150 frame");
       }
     }
 
     #endregion CreateTrimAvs_d2v
 
-    
+
   }
 }

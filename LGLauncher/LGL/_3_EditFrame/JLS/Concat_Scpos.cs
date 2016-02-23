@@ -20,12 +20,6 @@ namespace LGLauncher.EditFrame.JLS
     /// </summary>
     public static void Concat(int[] trimFrame)
     {
-      //avsの開始、終了フレーム番号
-      //　オフセット用
-      int beginFrame = trimFrame[0];
-      int endFrame = trimFrame[1];
-
-
       //パス作成
       //chapter_exeによって作成されるファイル              *.p3.jls.scpos.txt
       string add_ScposPath = PathList.WorkPath + ".jls.scpos.txt";
@@ -64,10 +58,16 @@ namespace LGLauncher.EditFrame.JLS
       //　　add_ScposTextがあれば連結、なければold_CatTextのまま
       List<string> new_CatText = old_CatText;                                  // *.jls.scpos.cat.txt
       {
-        if (1 <= PathList.PartNo
-            && beginFrame != int.MaxValue)
+        if (trimFrame == null || trimFrame.Count() != 2)
+          throw new LGLException("invalid trimFrame");
+
+        //avsの開始、終了フレーム番号
+        int beginFrame = trimFrame[0];
+        int endFrame = trimFrame[1];
+
+        if (1 <= PathList.PartNo)
         {
-          //CHAPTER08  の 08 部分のオフセット数
+          //CHAPTER03  の 03 部分のオフセット数
           int chapcnt_offset = old_CatText.Count / 2;
           add_ScposText = ApeendOffset_Scpos(add_ScposText, chapcnt_offset, beginFrame);
         }
@@ -105,7 +105,8 @@ namespace LGLauncher.EditFrame.JLS
 
         var new_lines = ApeendOffset_ScposElement(
                                                    timecode_line, name_line,
-                                                   chapcnt_offset, frame_offset);
+                                                   chapcnt_offset, frame_offset
+                                                  );
         new_scposText.AddRange(new_lines);
       }
 
