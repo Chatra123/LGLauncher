@@ -17,7 +17,6 @@ namespace LGLauncher
     /// <summary>
     /// Trim付きavs作成
     /// </summary>
-    /// <returns>作成したavsパス</returns>
     public override void Make()
     {
       //ファイルチェック

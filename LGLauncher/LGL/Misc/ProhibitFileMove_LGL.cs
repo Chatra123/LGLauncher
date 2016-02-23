@@ -50,7 +50,7 @@ namespace LGLauncher
       try
       {
         //srtファイルはすでに削除されている可能性がある。
-        //　テキストが書き込まれて無いとCaption2Ass_PCR_pfによって削除される。
+        //　テキストが書き込まれて無いとCaption2Ass_PCR_pfによって削除されるのでbomサイズで判断
         if (File.Exists(PathList.SrtPath))
         {
           var filesize = new FileInfo(PathList.SrtPath).Length;

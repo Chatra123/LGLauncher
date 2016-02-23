@@ -14,9 +14,7 @@ namespace LGLauncher
   {
     public abstract string AvsPath { get; protected set; }            //作成したAVSのパス
     public abstract int[] TrimFrame { get; protected set; }           //トリム用フレーム数
-
     public abstract void Make();
-
   }
 
   internal static class MakeAvsCommon
@@ -217,9 +215,6 @@ namespace LGLauncher
 
 
 
-
-
-
     #region CalcTrimFrame
 
     /// <summary>
@@ -269,7 +264,6 @@ namespace LGLauncher
       int beginFrame = trimFrame[0];
       int endFrame = trimFrame[1];
 
-      //リソース読込み
       var avsText = FileR.ReadFromResource("LGLauncher.ResourceText.BaseTrimAvs.avs");
 
       //AVS書き換え
@@ -277,7 +271,7 @@ namespace LGLauncher
       {
         var line = avsText[i];
 
-        //current dir
+        //work dir
         line = Regex.Replace(line, "#AvsWorkDir#", PathList.LWorkDir, RegexOptions.IgnoreCase);
 
         //Detector

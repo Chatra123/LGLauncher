@@ -71,8 +71,8 @@ namespace LGLauncher
          * チャプター出力について
          * 　　エラーが発生してもチャプター出力は行う。
          * 　　detect part No があるので *.p3.frame.cat.txtを作成しなくてはいけない。
-         * 　　値は前回のチャプターと同じ値になる。
-         * 　　IsLastPartなら logo_scp_posの　last_batch、 mp4用チャプター出力等が実行される。
+         * 　　値は前回のチャプターと同じ値にする。
+         * 　　IsLastPartなら logo_scp_posのlast_batch、ogm chapter出力を実行する。
          */
         DeleteWorkItem.CleanAvs_OnError();
         MakeAvsCommon.CreateDummyAvs_OnError();
@@ -112,7 +112,6 @@ namespace LGLauncher
     /// <summary>
     /// Avs作成　から　LogoDetector起動　まで
     /// </summary>
-    /// <returns>Avsの開始、終了フレーム数</returns>
     private static void DetectFrame()
     {
       //avs
@@ -169,9 +168,9 @@ namespace LGLauncher
         if (isReady == false) return;
 
 
-        // logoframeが終了しないことがあったので timeoutを設定
-        // ”avsの総時間”の２倍の時間で処理できなければ中断
-        int timeout_ms = (int)(avsTime_sec * 2) * 1000;
+        //timeout
+        // ”avsの総時間”の４倍
+        int timeout_ms = (int)(avsTime_sec * 4) * 1000;
         timeout_ms = timeout_ms <= 60 * 1000 ? 60 * 1000 : timeout_ms;
 
         //Detector Bat実行
