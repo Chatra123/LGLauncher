@@ -65,14 +65,14 @@ namespace LGLauncher.EditFrame.JLS
         int beginFrame = trimFrame[0];
         int endFrame = trimFrame[1];
 
-        if (1 <= PathList.PartNo)
+        if (PathList.IsPart)
         {
           //CHAPTER03  の 03 部分のオフセット数
           int chapcnt_offset = old_CatText.Count / 2;
           add_ScposText = ApeendOffset_Scpos(add_ScposText, chapcnt_offset, beginFrame);
         }
 
-        //手間がかかるので連結部の繋ぎ目は消さない。
+        //手間がかかるので連結部の繋ぎ目はそのまま
         new_CatText.AddRange(add_ScposText);
         new_CatText.Add("# SCPos:" + endFrame + " " + endFrame);
       }
@@ -126,13 +126,12 @@ namespace LGLauncher.EditFrame.JLS
       CHAPTER02NAME=31フレーム ＿ SCPos:2081 2080
       */
 
-      //Regexで数値抽出
+      //文字抽出
       const string timecode_pattern = @"CHAPTER(?<ChapCnt>\d+)=(?<Hour>\d+):(?<Min>\d+):(?<Sec>\d+).(?<MSec>\d+)";
       const string name_pattern = @"CHAPTER(\d+)Name=(?<Mute>.*)SCPos:(?<SC_End>(\d+))\s+(?<SC_Begin>(\d+))";
       Match match_timecode = new Regex(timecode_pattern, RegexOptions.IgnoreCase).Match(timecode_line);
       Match match_name = new Regex(name_pattern, RegexOptions.IgnoreCase).Match(name_line);
 
-      //変換失敗
       if (match_timecode.Success == false || match_name.Success == false)
         throw new LGLException("scpos text regex match error");
 

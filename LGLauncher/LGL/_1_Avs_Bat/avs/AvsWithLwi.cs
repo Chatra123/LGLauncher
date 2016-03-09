@@ -38,11 +38,9 @@ namespace LGLauncher
     public override void Make()
     {
       //ファイルチェック
-      //LwiPath
       if (File.Exists(PathList.LwiPath) == false)
         throw new LGLException("LwiPath dose not exist");
 
-      //dll
       if (File.Exists(PathList.LSMASHSource_dll) == false)
         throw new LGLException("LSMASHSource.dll dose not exist");
 
@@ -258,7 +256,7 @@ namespace LGLauncher
           if (hasTag)
             break;                     //チェックＯＫ
           else
-            footer = null;             //チェック失敗、リトライ
+            footer = null; 
         }
 
         Thread.Sleep(1000);
@@ -270,8 +268,6 @@ namespace LGLauncher
     /// <summary>
     /// footer作成　footerファイルが無いときに使用。
     /// </summary>
-    /// <param name="lwiText"></param>
-    /// <returns></returns>
     private string Create_footer(List<string> lwiText)
     {
       //
@@ -337,7 +333,7 @@ namespace LGLauncher
     private string CreateInfoAvs_lwi()
     {
       //リソース読込み
-      var avsText = FileR.ReadFromResource("LGLauncher.ResourceText.BaseGetInfo.avs");
+      var avsText = FileR.ReadFromResource("LGLauncher.Resource.Base_GetInfo.avs");
 
       //AVS書き換え
       string lwiName = PathList.TsName + ".lwi";
@@ -465,7 +461,6 @@ namespace LGLauncher
       try
       {
         if (lock_lwi != null) lock_lwi.Close();            //ファイルロック解除
-        Thread.Sleep(500);
 
         File.Move(srcPath, dstPath);
         Thread.Sleep(500);

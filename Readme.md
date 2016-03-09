@@ -45,14 +45,18 @@ LGLauncher.exe  -AutoNo  -last  -ts "C:\Video.ts"  -channel "abc"  -program "def
     -No 1
 -noを増やすことで前回からの増加分を処理する。  
 -1 なら全体を処理します。
+通常は自動的に決定されるので-Noの指定は必要ありません。  
 
-    -AutoNo
--noを作業フォルダ内のファイルから決定します。
 
     -last
 最後の処理であることを明示します。  
 -lastがあればOgm chapterを出力し、  
 join_logo_scpならばJL_標準.txtを使い再実行します。  
+
+
+    -All  
+ファイル全体を処理します。  
+-No -1 と同様。  
 
 
     -ts "C:\video.ts"
@@ -90,7 +94,7 @@ srtファイルパスの個別指定
 
     -SequenceName  abcdef
 作業フォルダ名の一部に使用します。  
-基本的には無くても問題ありません。
+基本的には無くてかまいません。
     
     
 
@@ -111,10 +115,6 @@ JLS          :  Join_Logo_Scpで処理
 Join_Logo_Scp:  Join_Logo_Scpで処理  
 LG           :  LogoGuilloで処理  
 LogoGuillo   :  LogoGuilloで処理  
-
-
-    Detector_MultipleRun  1  
-Windows内での LogoGuillo同時実行数
 
 
 

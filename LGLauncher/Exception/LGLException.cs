@@ -27,9 +27,9 @@ namespace LGLauncher
     {
       var text = new StringBuilder();
       text.AppendLine(base.ToString());
-      text.AppendLine("▽▽  Message  ▽▽");
+      text.AppendLine("▽    Message    ▽");
       text.AppendLine(base.Message);
-      text.AppendLine("△△  Message  △△");
+      text.AppendLine("△    Message    △");
 
       return text.ToString();
     }

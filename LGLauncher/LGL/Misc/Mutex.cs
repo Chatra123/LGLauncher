@@ -20,12 +20,12 @@ namespace LGLauncher
     public static void Clean_Beforehand()
     {
       //LWorkDir
-      if (PathList.Is1stPart)
+      if (PathList.PartNo == 1)
       {
         Delete_file(0.0, PathList.LWorkDir, "*.p?*.*");                                //ワイルドカード指定可
         Delete_file(0.0, PathList.LWorkDir, PathList.TsShortName + ".frame.cat.txt");  //前回までの合成フレーム
       }
-      else if (PathList.IsAll)
+      else if (PathList.IsAllPart)
       {
         Delete_file(0.0, PathList.LWorkDir, "*.all.*");
         Delete_file(0.0, PathList.LWorkDir, PathList.TsShortName + ".frame.cat.txt");
@@ -79,7 +79,7 @@ namespace LGLauncher
       //古いファイル削除？
       if (1 <= PathList.Mode_DeleteWorkItem)
       {
-        if (PathList.Is1stPart || PathList.IsAll)
+        if (PathList.PartNo == 1 || PathList.IsAllPart)
         {
           const double nDaysBefore = 2.0;
           //LTopWorkDir         サブフォルダ内も対象

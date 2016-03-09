@@ -11,12 +11,11 @@ namespace LGLauncher
   /// <summary>
   /// コマンドライン引数を処理
   /// </summary>
-  internal class CommandLine
+  internal class Setting_CmdLine
   {
-
     public int No { get; private set; }
-    public bool AutoNo { get; private set; }
     public bool IsLast { get; private set; }
+    public bool IsAll { get; private set; }
     public string SequenceName { get; private set; }  //作業フォルダ名後半のハッシュ用
 
     public string TsPath { get; private set; }
@@ -27,10 +26,11 @@ namespace LGLauncher
     public string Channel { get; private set; }
     public string Program { get; private set; }
 
+
     /// <summary>
     /// constructor
     /// </summary>
-    public CommandLine(string[] args)
+    public Setting_CmdLine(string[] args)
     {
       Parse(args);
     }
@@ -42,17 +42,17 @@ namespace LGLauncher
     /// <param name="args">解析する引数</param>
     public void Parse(string[] args)
     {
-      //    /*  Mono.Options  */
-      //オプションと説明、そのオプションの引数に対するアクションを定義する
-      //OptionSet_icaseに渡すオプションは小文字にすること。
+      //    /*Mono.Options*/
+      //case insensitive
+      //”オプション”　”説明”　”オプションの引数に対するアクション”を定義する。
+      //OptionSet_icaseに渡すオプションは小文字で記述し、
       //オプションの最後に=をつける。 bool型ならつけない。
-      //判定は case insensitive
       var optionset = new OptionSet_icase();
 
       optionset
         .Add("no=", "Sequence no", (int v) => this.No = v)
-        .Add("autono", "Auto select no", (v) => this.AutoNo = v != null)
-        .Add("last", "Is last process", (v) => this.IsLast = v != null)
+        .Add("all", "Is etire part", (v) => this.IsAll = v != null)
+        .Add("last", "Is last part", (v) => this.IsLast = v != null)
 
         .Add("ts=", "ts file path", (v) => this.TsPath = v)
         .Add("d2v=", "d2v file path", (v) => this.D2vPath = v)
@@ -63,8 +63,8 @@ namespace LGLauncher
         .Add("channel=", "channel name", (v) => this.Channel = v)
         .Add("program=", "program name", (v) => this.Program = v)
 
-        .Add("sequencename=", "", (v) => this.SequenceName = v)      
-        .Add("and_more", "help mes", (v) => { });
+        .Add("sequencename=", "", (v) => this.SequenceName = v)
+        .Add("and_more", "help mes", (v) => { /*action*/ });
 
       try
       {
@@ -73,13 +73,11 @@ namespace LGLauncher
       }
       catch (OptionException e)
       {
-        //パース失敗
         Log.WriteLine("CommandLine parse error");
         Log.WriteLine("  " + e.Message);
         Log.WriteLine();
         return;
       }
-
     }
 
 
@@ -87,14 +85,13 @@ namespace LGLauncher
     /// <summary>
     /// コマンドライン一覧を出力
     /// </summary>
-    /// <returns></returns>
     public new string ToString()
     {
       var sb = new StringBuilder();
       sb.AppendLine("  App Command Line");
       sb.AppendLine("    No       = " + No);
-      sb.AppendLine("    AutoNo   = " + AutoNo);
-      sb.AppendLine("    IsLast   = " + IsLast);
+      sb.AppendLine("    Last     = " + IsLast);
+      sb.AppendLine("    All      = " + IsAll);
       sb.AppendLine("    Sequence = " + SequenceName);
 
       sb.AppendLine("    TsPath   = " + TsPath);

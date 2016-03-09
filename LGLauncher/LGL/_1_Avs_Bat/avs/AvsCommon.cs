@@ -23,47 +23,95 @@ namespace LGLauncher
     #region RunInfoAvs
 
     /// <summary>
-    /// InfoAvs実行
+    /// InfoAvs実行　起動制御部
     /// </summary>
-    /// <param name="avsPath">実行するavsパス</param>
     public static void RunInfoAvs(string avsPath)
     {
-      ////デバッグ用
-      //// 1/x の確立で例外を発生させる
-      //if (DateTime.Now.Second % 3 == 0)
-      //  throw new LGLException("fake error:  RunInfoAvs error");
-
-
-      //
-      // avs2pipeでのエラー発生を考慮して一度だけリトライする。
-      //
-      for (int retry = 1; retry <= 1; retry++)
+      WaitForSystemReady waitForReady = null;
+      try
       {
-        var psi = new ProcessStartInfo();
-        psi.FileName = PathList.avs2pipemod;
-        psi.Arguments = " -info \"" + avsPath + "\"";
-        psi.CreateNoWindow = true;
-        psi.UseShellExecute = false;
+        bool isReady;
+        {
+          waitForReady = new WaitForSystemReady();
+          isReady = waitForReady.GetReady(PathList.DetectorName);
+          if (isReady == false) return;
+        }
+
+        RunInfoAvs_run(avsPath);
+      }
+      finally
+      {
+        //Thread.Sleep(6 * 1000);
+        if (waitForReady != null)
+          waitForReady.Release();
+      }
+    }
+
+    /// <summary>
+    /// InfoAvs実行  実行部
+    /// </summary>
+    public static void RunInfoAvs_run(string avsPath)
+    {
+      // avs2pipeでのエラー発生を考慮して一度だけリトライする。
+      for (int retry = 1; retry <= 2; retry++)
+      {
         var prc = new Process();
-        prc.StartInfo = psi;
+        {
+          var psi = new ProcessStartInfo();
+          psi.FileName = PathList.avs2pipemod;
+          psi.Arguments = " -info \"" + avsPath + "\"";
+          psi.CreateNoWindow = true;
+          psi.UseShellExecute = false;
+          prc.StartInfo = psi;
+        }
 
-        //実行
-        if (prc.Start() == false)
-          throw new LGLException("avsinfo launch error");
+        prc.Start();
+        prc.WaitForExit(10 * 1000);
 
-        //３秒程はかかる
-        prc.WaitForExit(120 * 1000);
-
-        //正常終了ならreturn
-        if (prc.HasExited && 
-          prc.ExitCode == 0) return;
+        //正常終了
+        if (prc.HasExited && prc.ExitCode == 0) return;
 
         Thread.Sleep(10 * 1000);
       }
 
       Log.WriteLine("avsinfo process error");
     }
+    #endregion RunInfoAvs
 
+
+    #region RunInfoAvs
+
+    /// <summary>
+    /// InfoAvs実行
+    /// </summary>
+    public static void RunInfoAvs_lock(string avsPath)
+    {
+      // avs2pipeでのエラー発生を考慮して一度だけリトライする。
+      for (int retry = 1; retry <= 2; retry++)
+      {
+        var prc = new Process();
+        {
+          var psi = new ProcessStartInfo();
+          psi.FileName = PathList.avs2pipemod;
+          psi.Arguments = " -info \"" + avsPath + "\"";
+          psi.CreateNoWindow = true;
+          psi.UseShellExecute = false;
+          prc.StartInfo = psi;
+        }
+
+        prc.Start();
+
+        //３秒程はかかる
+        prc.WaitForExit(10 * 1000);
+
+        //正常終了
+        if (prc.HasExited && prc.ExitCode == 0) return;
+
+        Thread.Sleep(10 * 1000);
+      }
+
+      Log.WriteLine("avsinfo process error");
+    }
     #endregion RunInfoAvs
 
 
@@ -80,16 +128,14 @@ namespace LGLauncher
       string infoPath = Path.Combine(PathList.LWorkDir, infoName);
       var infoText = new List<string>();
 
-      for (int retry = 1; retry <= 10; retry++)
+      for (int retry = 1; retry <= 3; retry++)
       {
-        //ファイルチェック
         if (File.Exists(infoPath) == false)
         {
           Thread.Sleep(2000);
           continue;
         };
 
-        //読込み
         infoText = FileR.ReadAllLines(infoPath);
 
         //行数チェック
@@ -133,6 +179,8 @@ namespace LGLauncher
     /// <returns>開始、終了フレーム数</returns>
     public static int[] GetTrimFrame_fromAvsName(string nameKey)
     {
+      if (PathList.LWorkDir == null) return null;
+
       //ファイル検索
       var files = Directory.GetFiles(PathList.LWorkDir, nameKey);
       if (files.Count() != 1)
@@ -190,13 +238,14 @@ namespace LGLauncher
     {
       int[] trimFrame_prv1;
       {
-        if (PathList.PartALL || PathList.PartNo == 1)
+        if (PathList.IsAll || PathList.Is1stPart)
         {
           trimFrame_prv1 = new int[] { 0, 0 };
         }
         else
         {
           trimFrame_prv1 = GetTrimFrame_fromAvsName(PathList.WorkName_prv1 + ".*_*__*.avs");
+          if (trimFrame_prv1 == null) return;
         }
       }
 
@@ -208,7 +257,6 @@ namespace LGLauncher
         trimFrame_prv1[1]);
 
       File.Create(avsPath).Close();
-
     }
 
     #endregion GetTrimFrame_fromName
@@ -227,7 +275,7 @@ namespace LGLauncher
     {
       int beginFrame = 0, endFrame = 0;
 
-      if (PathList.PartNo == 1)
+      if (PathList.Is1stPart)
       {
         beginFrame = 0;
         endFrame = totalframe - 1;
@@ -240,7 +288,7 @@ namespace LGLauncher
         beginFrame = trimFrame_prv1[1] + 1;                  //前回の終端フレーム数＋１
         endFrame = totalframe - 1;
       }
-      else if (PathList.PartALL)
+      else if (PathList.IsAll)
       {
         beginFrame = 0;
         endFrame = totalframe - 1;
@@ -264,7 +312,7 @@ namespace LGLauncher
       int beginFrame = trimFrame[0];
       int endFrame = trimFrame[1];
 
-      var avsText = FileR.ReadFromResource("LGLauncher.ResourceText.BaseTrimAvs.avs");
+      var avsText = FileR.ReadFromResource("LGLauncher.Resource.Base_TrimAvs.avs");
 
       //AVS書き換え
       for (int i = 0; i < avsText.Count; i++)
@@ -285,7 +333,7 @@ namespace LGLauncher
         }
 
         //Trim
-        if (1 <= PathList.PartNo)
+        if (PathList.IsPart)
         {
           line = Regex.Replace(line, "#EnableTrim#", "", RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#BeginFrame#", "" + beginFrame, RegexOptions.IgnoreCase);

@@ -56,7 +56,7 @@ namespace LGLauncher.EditFrame.JLS
       //　　add_LogoframeTextがあれば連結、なければold_CatTextのまま
       List<string> new_CatText = old_CatText;                                  // *.jls.logoframe.cat.txt
       {
-        if (1 <= PathList.PartNo)
+        if (PathList.IsPart)
         {
           if (trimFrame == null || trimFrame.Count() != 2)
             throw new LGLException("invalid trimFrame");
@@ -65,7 +65,7 @@ namespace LGLauncher.EditFrame.JLS
           add_LogoframeText = ApeendOffset_logoframe(add_LogoframeText, beginFrame);
         }
 
-        //手間がかかるので連結部の繋ぎ目は消さない。
+        //手間がかかるので連結部の繋ぎ目はそのまま
         new_CatText.AddRange(add_LogoframeText);
       }
 
@@ -112,11 +112,10 @@ namespace LGLauncher.EditFrame.JLS
        * 2863 E 0 ALL   2837   2863
        */
 
-      //Regexで数値抽出
+      //文字抽出
       const string pattern = @"\s*(?<frame_1>\d+)\s+(?<SorE>\w+)\s+(?<fade>\d+)\s+(?<interlace>\w+)\s+(?<frame_2>\d+)\s+(?<frame_3>\d+)\s*";
       Match match = new Regex(pattern, RegexOptions.IgnoreCase).Match(line);
 
-      //変換失敗
       if (match.Success == false)
         throw new LGLException("logoframe text regex match error");
 

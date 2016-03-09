@@ -2,25 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Diagnostics;
 using System.IO;
-using System.Threading;
-using System.Text.RegularExpressions;
 
 
 namespace LGLauncher
 {
   internal class Program
   {
-
     private static void Main(string[] args)
     {
       ///*テスト用引数*/
-      //var testArgs = new List<string>() { "-no", "1", "-last" , "-ts",
+      //var testArgs = new List<string>() { // "-last", 
+      //                                    "-ts",
       //                                    @".\cap8s.ts",
-      //                                    "-ch", "A", "-program", "program"
+      //                                    "-ch", "A", 
       //                                    "-sequencename", "pfA233740427248"
-      //                                   };
+      //                                  };
       //args = testArgs.ToArray();
 
 
@@ -33,14 +30,13 @@ namespace LGLauncher
       {
         //初期化
         {
-          var cmdline = new CommandLine(args);
+          var cmdline = new Setting_CmdLine(args);
           CmdLine_ToString = cmdline.ToString();
 
           string AppPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
           string AppDir = System.IO.Path.GetDirectoryName(AppPath);
           Directory.SetCurrentDirectory(AppDir);
 
-          //設定ファイル
           var setting = Setting_File.LoadFile();
           if (setting.Enable <= 0) return;
           if (args.Count() == 0) return;                   //”引数無し”なら設定ファイル作成後に終了
@@ -50,6 +46,12 @@ namespace LGLauncher
 
           ProhibitFileMove_LGL.Lock();
           DeleteWorkItem.Clean_Beforehand();
+
+          if (PathList.Is1stPart || PathList.IsAll)
+          {
+            Log.WriteLine(CmdLine_ToString);
+            Log.WriteLine();
+          }
         }
 
         //フレーム検出
@@ -61,7 +63,6 @@ namespace LGLauncher
         Log.WriteLine();
         Log.WriteLine(CmdLine_ToString);
         Log.WriteLine(e.ToString());
-
         /*
          * エラー発生時の動作について
          * 　・作成済みのavs *.p3.lwi_2000__3000.avsを削除
@@ -77,7 +78,6 @@ namespace LGLauncher
         DeleteWorkItem.CleanAvs_OnError();
         MakeAvsCommon.CreateDummyAvs_OnError();
       }
-
 
 
       //チャプター出力
@@ -102,11 +102,8 @@ namespace LGLauncher
 
 
       DeleteWorkItem.Clean_Lastly();
-      Log.Close();　　                                     //ログは残すので削除処理の後でclose
-
+      Log.Close();　　                 //ログは残すので削除処理の後でclose
     }
-
-
 
 
     /// <summary>
@@ -129,7 +126,6 @@ namespace LGLauncher
         avsTime_sec = 1.0 * (avsMaker.TrimFrame[1] - avsMaker.TrimFrame[0]) / 29.970;
       }
 
-
       //srt
       string srtPath;
       {
@@ -145,8 +141,8 @@ namespace LGLauncher
           //Join_Logo_Scp
           var logoPath = LogoSelector.GetLogo();
           var jl_cmdPath = PathList.JL_Cmd_Recording;
-          batPath = Bat_Join_Logo_Scp.Make_InRecording(avsPath,
-                                                       logoPath[0], jl_cmdPath);
+          batPath = Bat_Join_Logo_Scp.Make_InRec(avsPath,
+                                                 logoPath[0], jl_cmdPath);
         }
         else
         {
@@ -157,31 +153,35 @@ namespace LGLauncher
         }
       }
 
+
+      WaitForSystemReady waitForReady = null;
       try
       {
-        //セマフォ取得
-        bool isReady = WaitForSystemIdle.GetReady(
-                                                  PathList.Detector_MultipleRun,
-                                                  new List<string> { "chapter_exe", "logoframe", "logoGuillo" },
-                                                  true
-                                                 );
-        if (isReady == false) return;
-
+        //Mutex取得
+        bool isReady;
+        {
+          /*
+           * avs2pipemodがエラー、フリーズが発生することがあったので、
+           * １つずつ起動するように変更。
+           * 
+           */
+          waitForReady = new WaitForSystemReady();
+          isReady = waitForReady.GetReady(PathList.DetectorName);
+          if (isReady == false) return;
+        }
 
         //timeout
-        // ”avsの総時間”の４倍
-        int timeout_ms = (int)(avsTime_sec * 4) * 1000;
-        timeout_ms = timeout_ms <= 60 * 1000 ? 60 * 1000 : timeout_ms;
+        //  ”avsの総時間”の３倍
+        int timeout_ms = (int)(avsTime_sec * 3) * 1000;
+        timeout_ms = timeout_ms <= 30 * 1000 ? 90 * 1000 : timeout_ms;
 
-        //Detector Bat実行
+        //Bat実行
         if (PathList.Avs_iPlugin == PluginType.D2v)
         {
-          //d2v
           BatLuncher.Launch(batPath, timeout_ms);
         }
         else
         {
-          //lwi
           AvsWithLwi.SetLwi();
           BatLuncher.Launch(batPath, timeout_ms);
         }
@@ -191,8 +191,10 @@ namespace LGLauncher
         if (PathList.Avs_iPlugin == PluginType.Lwi)
           AvsWithLwi.BackLwi();
 
-        //セマフォ解放
-        WaitForSystemIdle.ReleaseSemaphore();
+        //Mutex解放
+        //Thread.Sleep(6 * 1000);
+        if (waitForReady != null)
+          waitForReady.Release();
       }
 
     }

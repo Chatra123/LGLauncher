@@ -17,7 +17,6 @@ namespace LGLauncher.EditFrame
   /// </summary>
   static class EditFrame_Convert
   {
-
     /// <summary>
     /// read Frame File  →  List<int>
     /// </summary>
@@ -34,7 +33,6 @@ namespace LGLauncher.EditFrame
         {
           var intList = new List<int>();
           int result;
-
           stringList = stringList.Select(
                                   (line) =>
                                   {
@@ -101,7 +99,6 @@ namespace LGLauncher.EditFrame
           newList.Add(frameList[i + 1]);
         }
       }
-
       return newList;
     }
 
@@ -119,13 +116,11 @@ namespace LGLauncher.EditFrame
     /// <remarks>開始直後のＣＭはつぶさない。</remarks>
     public static List<int> FlatOut_CM__(List<int> frameList, double miniCM_sec)
     {
-      //エラーチェック
       if (frameList == null) return null;
       if (frameList.Count % 2 == 1) return null;
       if (frameList.Count <= 2) return frameList;
 
       var newList = new List<int>();
-
       //
       //”frameList[i]のフレーム数”と”newListの末尾のフレーム数”の差がcmLength
       //
@@ -143,7 +138,6 @@ namespace LGLauncher.EditFrame
       for (int i = 2; i < frameList.Count; i += 2)
       {
         double cmLength = 1.0 * (frameList[i] - newList[newList.Count - 1]) / 29.970;
-
         if (cmLength < miniCM_sec)
         {
           //短
@@ -176,11 +170,9 @@ namespace LGLauncher.EditFrame
     /// </returns>
     public static List<int> AvsTrim_to_FrameList(string avsTrim)
     {
-      //エラーチェック
       if (avsTrim == null) return null;
 
       var frameList = new List<int>();
-
       foreach (Match m in Regex.Matches(avsTrim, @"Trim\((\d+),(\d+)\)"))
       {
         try
