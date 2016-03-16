@@ -17,6 +17,9 @@ namespace LGLauncher
   [Serializable]
   public class Setting_File
   {
+    const double CurrentVer = 2.0;
+
+    public double Ver = 0.0;
     public int Enable = 1;
     public string memo1 = "  set sAvs_iPlugin     d2v            or  lwi         ";
     public string memo2 = "  set sLogoDetector    Join_Logo_Scp  or  LogoGuillo  ";
@@ -24,7 +27,6 @@ namespace LGLauncher
     public string memo4 = "  cannot set d2v with Join_Logo_Scp                   ";
     public string Avs_iPlugin = "  lwi         ";
     public string LogoDetector = "  LogoGuillo  ";
-    public int Detector_MultipleRun = 1;
     public string space_1 = "";
 
     //edit chapter
@@ -60,7 +62,7 @@ namespace LGLauncher
     /// <summary>
     /// 設定ファイルを読み込む
     /// </summary>
-    /// <param name="xmlpath">読込むファイルを指定</param>
+    /// <param name="xmlpath">ファイル名を指定</param>
     public static Setting_File LoadFile(string xmlpath = null)
     {
       //デフォルト名を使用
@@ -70,14 +72,19 @@ namespace LGLauncher
 
         if (File.Exists(xmlpath) == false)
         {
-          //設定ファイル作成
           var def_Setting = new Setting_File();
           XmlRW.Save(xmlpath, def_Setting);
         }
       }
 
       var file = XmlRW.Load<Setting_File>(xmlpath);
-      XmlRW.Save(xmlpath, file);                 //古いバージョンのファイルなら新たに追加された項目がxmlに加わる。
+
+      //新たに追加された項目、削除された項目を書き換え。
+      if (file.Ver != CurrentVer)
+      {
+        file.Ver = CurrentVer;
+        XmlRW.Save(xmlpath, file);
+      }
 
       return file;
     }

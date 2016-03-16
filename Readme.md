@@ -7,11 +7,11 @@
 ------------------------------------------------------------------
 ### 使い方　　コマンドライン
 
-LGLauncher.exe  -AutoNo         -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
+LGLauncher.exe         -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
 
 
 最後のみ  
-LGLauncher.exe  -AutoNo  -last  -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
+LGLauncher.exe  -last  -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
 
 
 
@@ -35,24 +35,22 @@ LGLauncher.exe  -AutoNo  -last  -ts "C:\Video.ts"  -channel "abc"  -program "def
    avs2pipemod.exe  
    を入れる。
 
-2. LogoSelector.exe を実行し設定ファイルを生成。  
-   LogoSelector.txtの"[LogoDir]"にlgd,paramファイルのあるフォルダを設定する。
+2. LogoSelector.exe を実行し設定ファイルを生成  
+   LogoSelector.txtの"[LogoDir]"にlgd,paramファイルのあるフォルダを指定する。
 
 
 ------------------------------------------------------------------
 ### 引数１
 
-    -No 1
--noを増やすことで前回からの増加分を処理する。  
--1 なら全体を処理します。
-
-    -AutoNo
--noを作業フォルダ内のファイルから決定します。
-
     -last
 最後の処理であることを明示します。  
 -lastがあればOgm chapterを出力し、  
-join_logo_scpならばJL_標準.txtを使い再実行します。  
+join_logo_scpならばJL_標準.txtを使い実行します。  
+
+
+    -All  
+ファイル全体を処理します。  
+-No -1 と同義  
 
 
     -ts "C:\video.ts"
@@ -77,6 +75,11 @@ LogoSelecterに渡すプログラム名
 ------------------------------------------------------------------
 ### 引数２
 
+    -No 1
+-noを増やすことで前回からの増加分を処理する。  
+-1 なら全体を処理します。
+通常は自動で決定するので-Noの指定は必要ありません。  
+
     -d2v "D:\rec\video.ts.d2v"
 d2vファイルパスの個別指定
 
@@ -90,7 +93,7 @@ srtファイルパスの個別指定
 
     -SequenceName  abcdef
 作業フォルダ名の一部に使用します。  
-基本的には無くても問題ありません。
+基本的には無くてかまいません。
     
     
 
@@ -111,10 +114,6 @@ JLS          :  Join_Logo_Scpで処理
 Join_Logo_Scp:  Join_Logo_Scpで処理  
 LG           :  LogoGuilloで処理  
 LogoGuillo   :  LogoGuilloで処理  
-
-
-    Detector_MultipleRun  1  
-Windows内での LogoGuillo同時実行数
 
 
 
@@ -261,9 +260,8 @@ AviSynthのファイル読込時にシステム側で使用します。
     - ２時間番組を
         - １０分ごとに処理したときは　　５５０ＭＢ  
         - 　１分ごとに処理したときは　　　　５ＧＢ  
-    必要に応じてiDeleteWorkItemの設定をしてください。
-    
-    
+
+        
     
 ------------------------------------------------------------------
 ### join_logo_scp

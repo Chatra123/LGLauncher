@@ -1,17 +1,11 @@
 ﻿/*
  * 
- * ・作成途中の srt　を読み込む。 
- * 
+ * ・作成途中の srtを読み込む。 
  * ・フォーマットを整えてsrtとして使用できる形にする。 
- * 
- * ・trimFrame_prv1から前回
- * 
- * ・取得フレーム数までをTrim()したavsを作成して完成
+ * ・shiftSecだけずらしたsrtを作成。 
  *  
  * 
  */
-
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -30,15 +24,13 @@ namespace LGLauncher
     /// <returns>作成したsrtファイルのパス</returns>
     public static string Make(double shiftSec)
     {
-      //ファイルチェック
       //　srtは削除されている可能性がある。
       if (File.Exists(PathList.SrtPath) == false) return "";
 
-      //  PartALLならsrtファイルをコピーしてreturn
-      if (PathList.PartALL)
+      //  IsAllPartならsrtファイルをコピーしてreturn
+      if (PathList.IsAll)
       {
         string copyDstPath = Path.Combine(PathList.LWorkDir, PathList.SrtName);
-
         try
         {
           File.Copy(PathList.SrtPath, copyDstPath);
@@ -56,9 +48,7 @@ namespace LGLauncher
       if (srtText == null) throw new LGLException("srt read file error");
       else if (srtText.Count <= 3) return "";                                  //まだテキストが書き込まれてない
 
-      //
       //フォーマット
-      //
       //最後の時間行から下を切り捨てる
       int idx_LastTimeline = 0;
       for (int idx = srtText.Count - 1; 0 <= idx; idx--)
@@ -78,25 +68,17 @@ namespace LGLauncher
       var formatText = (PathList.IsLastPart)
                             ? srtText : srtText.GetRange(0, idx_lastValidLine + 1);
 
-      //
-      //シフト
-      //
       //タイムコードの開始を０秒からにする
       var shiftText = formatText;
-
       if (2 <= PathList.PartNo)
       {
         shiftText = Shift_SrtText(shiftText, shiftSec);
       }
-
       if (shiftText.Count == 0) return "";
 
-      //出力ファイル名
+      //書込み
       string dstPath = PathList.WorkPath + ".srt";
-
-      //ファイル書込み
       File.WriteAllLines(dstPath, shiftText, TextEnc.UTF8_bom);
-
       return dstPath;
     }
 

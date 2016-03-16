@@ -76,8 +76,6 @@ namespace LGLauncher
       if (writer != null)
       {
         WriteLine("  exit");
-        WriteLine();
-        WriteLine();
         writer.Close();
       }
     }

@@ -16,13 +16,10 @@ namespace LGLauncher
     /// </summary>
     public static string Make(string avsPath, string srtPath, string logoPath, string paramPath)
     {
-      //引数チェック
       if (File.Exists(avsPath) == false)
-        throw new LGLException("format avs does not exist");           //avsがなければ終了
-
+        throw new LGLException("format avs does not exist"); 
       if (File.Exists(logoPath) == false)
         throw new LGLException("logoPath does not exist");
-
       if (File.Exists(paramPath) == false)
         throw new LGLException("paramPath does not exist");
 
@@ -32,27 +29,21 @@ namespace LGLauncher
       {
         string avsWithoutExt = Path.GetFileNameWithoutExtension(avsPath);
         string newSrtPath = Path.Combine(PathList.LWorkDir, avsWithoutExt + ".srt");
-
         try
         {
           if (File.Exists(newSrtPath))
             File.Delete(newSrtPath);
           File.Move(srtPath, newSrtPath);
         }
-        catch { }
+        catch { /*do nothing*/}
       }
 
-
-      //bat読込み
       var batText = new List<string>();
-      batText = FileR.ReadFromResource("LGLauncher.ResourceText.BaseLogoGuillo.bat");
-
+      batText = FileR.ReadFromResource("LGLauncher.Resource.Base_LogoGuillo.bat");
 
       //#LOGOG_PATH#
-     // string LOGOG_PATH = @"..\..\LSystem\LogoGuillo.exe";
       string LOGOG_PATH = PathList.LogoGuillo;
       //#AVS2X_PATH#
-      //string AVS2X_PATH = @"..\..\LSystem\avs2pipemod.exe";
       string AVS2X_PATH = PathList.avs2pipemod;
       //#AVSPLG_PATH#
       string AVSPLG_PATH = @"..\..\LWork\USE_AVS";
@@ -65,16 +56,14 @@ namespace LGLauncher
       //#OUTPUT_PATH#
       string OUTPUT_PATH = PathList.WorkName + ".frame.txt";
 
-
+      
       //bat置換
       for (int i = 0; i < batText.Count; i++)
       {
         var line = batText[i];
-
         //Part
         line = Regex.Replace(line, "#PartNo#", "" + PathList.PartNo, RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#TsShortName#", PathList.TsShortName, RegexOptions.IgnoreCase);
-
         //LogoGuillo
         line = Regex.Replace(line, "#LOGOG_PATH#", LOGOG_PATH, RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#AVS2X_PATH#", AVS2X_PATH, RegexOptions.IgnoreCase);
@@ -83,16 +72,12 @@ namespace LGLauncher
         line = Regex.Replace(line, "#LOGO_PATH#", LOGO_PATH, RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#PRM_PATH#", PRM_PATH, RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#OUTPUT_PATH#", OUTPUT_PATH, RegexOptions.IgnoreCase);
-
         batText[i] = line;
       }
 
-      //出力ファイル名
+      //書込み
       string outBatPath = PathList.WorkPath + ".LG.bat";
-
-      //ファイル書込み
       File.WriteAllLines(outBatPath, batText, TextEnc.Shift_JIS);
-
       return outBatPath;
     }
 

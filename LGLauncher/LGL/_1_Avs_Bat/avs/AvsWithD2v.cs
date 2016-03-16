@@ -20,11 +20,9 @@ namespace LGLauncher
     public override void Make()
     {
       //ファイルチェック
-      //D2vPath
       if (File.Exists(PathList.D2vPath) == false)
         throw new LGLException("D2vPath not exist");
 
-      //dll
       if (File.Exists(PathList.DGDecode_dll) == false)
         throw new LGLException("DGDecode.dll not exist");
 
@@ -128,7 +126,7 @@ namespace LGLauncher
     private string CreateInfoAvs_d2v(string d2vPath)
     {
       //リソース読込み
-      var avsText = FileR.ReadFromResource("LGLauncher.ResourceText.BaseGetInfo.avs");
+      var avsText = FileR.ReadFromResource("LGLauncher.Resource.BaseGetInfo.avs");
 
       //AVS書き換え
       string d2vName = Path.GetFileName(d2vPath);
