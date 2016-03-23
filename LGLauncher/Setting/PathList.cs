@@ -432,8 +432,18 @@ namespace LGLauncher
 
         //USE_AVS    LTopWorkDir内に作成
         var AVSPLG = Path.Combine(LTopWorkDir, "USE_AVS");
-        if (File.Exists(AVSPLG) == false)
-          File.Create(AVSPLG).Close();
+        try
+        {
+          if (File.Exists(AVSPLG) == false)
+            File.Create(AVSPLG).Close();
+        }
+        catch (IOException)
+        {
+          //別プロセスとぶつかった
+          System.Threading.Thread.Sleep(300);
+          if (File.Exists(AVSPLG) == false)
+            throw new LGLException("USE_AVS creating file error ");
+        }
       }
 
       //LogoSelector
