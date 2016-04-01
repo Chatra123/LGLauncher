@@ -38,7 +38,6 @@ namespace LGLauncher
     //はindex作成中のCreateLwiによって随時書き換えられる可能性が極わずかにあるが考慮しない。
     //書き換えの途中で読込み、不正なファイルになってもLSMASHSource.dllによって再作成されるだけ。
     //問題にはならない。
-
     /*
      *                       lwiのファイルサイズ
      * ts  60min  5.68 GB    lwi  40.3 MB  535,345 line
@@ -307,12 +306,11 @@ namespace LGLauncher
       string dstPath = PathList.WorkPath + ".lwi";
       bool isSameRoot = Path.GetPathRoot(srcPath).ToLower()
                            == Path.GetPathRoot(dstPath).ToLower();
+      if (lock_lwi != null) lock_lwi.Close();
       if (File.Exists(srcPath) == false) return;
 
       try
-      {
-        if (lock_lwi != null) lock_lwi.Close();
-
+      {     
         if (isSameRoot) File.Move(srcPath, dstPath);
         else File.Delete(srcPath);
         Thread.Sleep(500);

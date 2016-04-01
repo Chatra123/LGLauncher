@@ -229,9 +229,12 @@ namespace LGLauncher.EditFrame
       chapText.Add("0eox-c");                               //close
 
       //１行にする    List<string>  →  string
+      //string oneliner = "";
+      //foreach (var text in chapText)
+      //  oneliner += text;
       string oneliner = "";
-      foreach (var text in chapText)
-        oneliner += text;
+      chapText.ForEach((text) => { oneliner += text; });
+
       return oneliner;
     }
     /*

@@ -17,14 +17,14 @@ namespace LGLauncher
   [Serializable]
   public class Setting_File
   {
-    const double CurrentVer = 11.1;
+    const double CurrentVer = 11.2;
 
     public double Ver = 0.0;
     public int Enable = 1;
-    public string memo1 = "  set sAvs_iPlugin     d2v            or  lwi         ";
-    public string memo2 = "  set sLogoDetector    Join_Logo_Scp  or  LogoGuillo  ";
-    public string memo3 = "                       JLS            or  LG          ";
-    public string memo4 = "  cannot set d2v with Join_Logo_Scp                   ";
+    public string memo1 = "  set InputPlugin     d2v            or  lwi         ";
+    public string memo2 = "  set LogoDetector    Join_Logo_Scp  or  LogoGuillo  ";
+    public string memo3 = "                      JLS            or  LG          ";
+    public string memo4 = "  cannot set d2v with Join_Logo_Scp                  ";
     public string InputPlugin = "  lwi         ";
     public string LogoDetector = "  LogoGuillo  ";
     public int Detector_MultipleRun = 1;

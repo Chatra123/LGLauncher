@@ -58,7 +58,6 @@ namespace LGLauncher
 
         //フレーム検出
         DetectFrame();
-
       }
       catch (LGLException e)
       {
@@ -135,19 +134,17 @@ namespace LGLauncher
       }
 
       //bat
-      string batPath;
+      string batPath = "";
       {
         if (PathList.Detector == LogoDetector.Join_Logo_Scp)
         {
-          //Join_Logo_Scp
           var logoPath = LogoSelector.GetLogo();
           var jl_cmdPath = PathList.JL_Cmd_OnRec;
           batPath = Bat_Join_Logo_Scp.Make_OnRec(avsPath,
                                                  logoPath[0], jl_cmdPath);
         }
-        else
+        if (PathList.Detector == LogoDetector.LogoGuillo)
         {
-          //logoGuillo
           var logo_Param = LogoSelector.GetLogo_and_Param();
           batPath = Bat_LogoGuillo.Make(avsPath, srtPath,
                                         logo_Param[0], logo_Param[1]);
@@ -183,7 +180,7 @@ namespace LGLauncher
         LwiFile.Back_ifLwi();
 
         //Mutex解放
-        if (waitForReady != null) 
+        if (waitForReady != null)
           waitForReady.Release();
       }
 

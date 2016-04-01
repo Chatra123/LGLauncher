@@ -36,12 +36,12 @@ namespace LGLauncher.EditFrame
     {
       List<int> concat = null;
 
+      //Join_Logo_Scp
       if (PathList.Detector == LogoDetector.Join_Logo_Scp)
       {
-        if (PathList.IsAll == false)
+        if (PathList.IsPart)
         {
-          //Join_Logo_Scp
-          //part
+          //IsPart
           // *.jls.result.avs  -->  *.p1.frame.txt
           EditFrame.JLS.Convert_JLS.ResultAvs_to_FrameFile(false);
 
@@ -49,7 +49,7 @@ namespace LGLauncher.EditFrame
           concat = Concat_withPreviousFrame(trimFrame);
 
           //cat合成
-          //  catファイルはIsLastPartで使用する。
+          //  catファイルはIsLastで使用する。
           {
             JLS.Concat_scpos.Concat(trimFrame);
             JLS.Concat_logoframe.Concat(trimFrame);
@@ -69,15 +69,15 @@ namespace LGLauncher.EditFrame
         }
         else
         {
-          //Join_Logo_Scp
-          //all
+          //IsAll
           // *.jls.result.avs  -->  *.all.frame.txt
           concat = EditFrame.JLS.Convert_JLS.ResultAvs_to_FrameFile(false);
         }
       }
-      else
+
+      //LogoGuillo
+      if (PathList.Detector == LogoDetector.LogoGuillo)
       {
-        //LogoGuillo
         //part & all
         //フレームテキスト合成
         concat = Concat_withPreviousFrame(trimFrame);

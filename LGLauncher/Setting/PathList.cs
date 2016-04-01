@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 namespace LGLauncher
 {
   /// <summary>
-  /// Avs入力プラグイン
+  /// 入力プラグイン
   /// </summary>
   enum PluginType
   {
@@ -18,7 +18,7 @@ namespace LGLauncher
   }
 
   /// <summary>
-  /// FrameServer  /* test implement */
+  /// FrameServer
   /// </summary>
   enum AvsVpyType
   {
@@ -83,7 +83,10 @@ namespace LGLauncher
     public static string LTopWorkDir { get; private set; }
     public static string LWorkDir { get; private set; }
 
-    //    WorkPath                                           //example
+    //    WorkPath                                          //example
+    //public static string WorkPathBase { get; private set; }　//  C:\EDCB\Write\Write_PF\LGLauncher\LWork\010101_ショップジ_0a1b308c1\ショップジ.p
+    //public static string WorkNameBase { get; private set; }  //  ショップジ.p
+    //    current work path
     public static string WorkPath { get; private set; }　　  //  C:\EDCB\Write\Write_PF\LGLauncher\LWork\010101_ショップジ_0a1b308c1\ショップジ.p3
     public static string WorkName { get; private set; }      //  ショップジ.p3
     //    previous work path
@@ -101,7 +104,7 @@ namespace LGLauncher
     private static string SequenceName;                      //作業フォルダ名のMD5作成用
 
 
-    //  [  LSystem  ]
+    //  [  LSystem  ]  binary path
     public static string SystemIdleMonitor { get; private set; }
 
     //avs vpy
@@ -112,7 +115,7 @@ namespace LGLauncher
     public static string d2vsource_dll { get; private set; }
     public static string vslsmashsource_dll { get; private set; }
 
-    /* AvsVpyType Test */
+    //AvsVpyType
     public static AvsVpyType AvsVpy { get; private set; }
     public static string AvsVpyExt { get { return "." + AvsVpy.ToString().ToLower(); } }
 
@@ -253,11 +256,11 @@ namespace LGLauncher
 
       //PluginType  LogoDetector
       {
-        string iplugin = setting.InputPlugin.Trim().ToLower();
+        string plugin = setting.InputPlugin.Trim().ToLower();
         string detector = setting.LogoDetector.Trim().ToLower();
 
-        bool isD2v = iplugin == "d2v".ToLower();
-        bool isLwi = iplugin == "lwi".ToLower();
+        bool isD2v = plugin == "d2v".ToLower();
+        bool isLwi = plugin == "lwi".ToLower();
 
         bool isLG = detector == "LG".ToLower()
           || detector == "LogoGuillo".ToLower();
@@ -335,14 +338,14 @@ namespace LGLauncher
           if (files.Count() == 0)
             return 1;
 
-          //数字抽出
+          //ファイル名  -->  数字抽出
           var strNums = files.Select(fullname =>
           {
-            //ON&OF.p3.frame.cat.txt
+            //"ON&OF.p3.frame.cat.txt"
             string name = Path.GetFileName(fullname);
-            //  ON&OF.p
+            //  "ON&OF.p"
             int len_1st = (TsShortName + ".p").Length;
-            //       3  = ON&OF.p3.frame.cat.txt  -  ON&OF.p  -  frame.cat.txt
+            //     "3"  = "ON&OF.p3.frame.cat.txt"  -  "ON&OF.p"  -  ".frame.cat.txt"
             int len_num = name.Length - len_1st - ".frame.cat.txt".Length;
             string num = name.Substring(len_1st, len_num);
             return num;
@@ -351,15 +354,8 @@ namespace LGLauncher
           // string --> int
           var intNums = strNums.Select(strnum =>
           {
-            try
-            {
-              int num = int.Parse(strnum);
-              return num;
-            }
-            catch
-            {
-              throw new LGLException("PartNo parse error");
-            }
+            try { return int.Parse(strnum); }
+            catch { throw new LGLException("PartNo parse error"); }
           }).ToList();
 
           intNums.Sort();
@@ -368,10 +364,18 @@ namespace LGLauncher
         })();
 
       //WorkPath
-      WorkName = IsPart ? TsShortName + ".p" + PartNo : TsShortName + ".all";
+      WorkName = (IsAll) ? TsShortName + ".all" : TsShortName + ".p" + PartNo;
       WorkPath = Path.Combine(LWorkDir, WorkName);
       WorkName_prv = TsShortName + ".p" + (PartNo - 1);
       WorkPath_prv = Path.Combine(LWorkDir, WorkName_prv);
+
+      //WorkPath
+      //WorkNameBase = (IsAll) ? TsShortName + ".all" : TsShortName + ".p";
+      //WorkPathBase = Path.Combine(LWorkDir, WorkNameBase);
+      //WorkName = (IsAll) ? WorkName : WorkNameBase + PartNo;
+      //WorkPath = Path.Combine(LWorkDir, WorkName);
+      //WorkName_prv = WorkNameBase + (PartNo - 1);
+      //WorkPath_prv = Path.Combine(LWorkDir, WorkName_prv);
     }
 
 
@@ -386,7 +390,6 @@ namespace LGLauncher
         var md5 = System.Security.Cryptography.MD5.Create();
         byte[] bytes_md5 = md5.ComputeHash(data);                                          //ハッシュ値を計算する
         md5.Clear();
-
         string result = BitConverter.ToString(bytes_md5).ToLower().Replace("-", "");       //16進数の文字列に変換
         return result;
       }
@@ -438,13 +441,11 @@ namespace LGLauncher
       }
       if (PathList.AvsVpy == AvsVpyType.Vpy)
       {
-        /* テスト実装なのでファイルがなくてもいい */
         if (InputPlugin == PluginType.D2v)
-          d2vsource_dll = SearchItem_OrEmpty(sysFiles, "d2vsource.dll");
+          d2vsource_dll = SearchItem(sysFiles, "d2vsource.dll");
         else if (InputPlugin == PluginType.Lwi)
-          vslsmashsource_dll = SearchItem_OrEmpty(sysFiles, "vslsmashsource.dll");
+          vslsmashsource_dll = SearchItem(sysFiles, "vslsmashsource.dll");
       }
-
 
       //Detector
       if (Detector == LogoDetector.Join_Logo_Scp)
@@ -537,7 +538,7 @@ namespace LGLauncher
           Log.WriteLine();
         }
         if (IsLastPart)
-          Log.WriteLine("            IsLast :  " + IsLastPart);
+          Log.WriteLine("         IsLast       :  " + IsLastPart);
       }
 
       // error check

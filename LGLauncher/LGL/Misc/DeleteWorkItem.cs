@@ -105,7 +105,8 @@ namespace LGLauncher
     /// <param name="directory">ファイルを探すフォルダ。　サブフォルダ内も対象</param>
     /// <param name="searchKey">ファイル名に含まれる文字。ワイルドカード可 * </param>
     /// <param name="ignoreKey">除外するファイルに含まれる文字。ワイルドカード不可 × </param>
-    private static void Delete_file(double nDaysBefore, string directory, string searchKey, string ignoreKey = null)
+    private static void Delete_file(double nDaysBefore, string directory,
+                                    string searchKey, string ignoreKey = null)
     {
       if (Directory.Exists(directory) == false) return;
       Thread.Sleep(500);

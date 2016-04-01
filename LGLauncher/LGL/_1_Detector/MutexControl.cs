@@ -57,7 +57,7 @@ namespace LGLauncher
       }
       catch (AbandonedMutexException)
       {
-        //別のスレッドが解放せずに終了することによって放棄した Mutex オブジェクトを取得
+        //別のスレッドが解放せずに放棄した Mutex オブジェクトを取得した
         HasControl = false;
       }
 
@@ -118,7 +118,8 @@ namespace LGLauncher
       if (HasControl) return HasControl;
       if (string.IsNullOrEmpty(SemaphoreName)) throw new Exception();
 
-      const int timeout_min = 120;
+      //const int timeout_min = 120;
+      const int timeout_min = 10;
       hSemaphore = new Semaphore(MaxCount, MaxCount, SemaphoreName);
       if (hSemaphore.WaitOne(TimeSpan.FromMinutes(timeout_min)))
       {

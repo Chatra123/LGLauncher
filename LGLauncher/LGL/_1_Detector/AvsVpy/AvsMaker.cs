@@ -71,7 +71,7 @@ namespace LGLauncher
           line = Regex.Replace(line, "#DGDecode#", PathList.DGDecode_dll, RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#D2vName#", PathList.WorkName + ".d2v", RegexOptions.IgnoreCase);
         }
-        else
+        if (PathList.InputPlugin == PluginType.Lwi)
         {
           line = Regex.Replace(line, "#lwi#", "", RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#LSMASHSource#", PathList.LSMASHSource_dll, RegexOptions.IgnoreCase);
@@ -149,7 +149,7 @@ namespace LGLauncher
           line = Regex.Replace(line, "#DGDecode#", PathList.DGDecode_dll, RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#D2vName#", PathList.WorkName + ".d2v", RegexOptions.IgnoreCase);
         }
-        else
+        if (PathList.InputPlugin == PluginType.Lwi)
         {
           line = Regex.Replace(line, "#lwi#", "", RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#LSMASHSource#", PathList.LSMASHSource_dll, RegexOptions.IgnoreCase);
@@ -159,7 +159,7 @@ namespace LGLauncher
         //Detector
         if (PathList.Detector == LogoDetector.Join_Logo_Scp)
           line = Regex.Replace(line, "#Join_Logo_Scp#", "", RegexOptions.IgnoreCase);
-        else
+        if (PathList.Detector == LogoDetector.LogoGuillo)
           line = Regex.Replace(line, "#LogoGuillo#", "", RegexOptions.IgnoreCase);
 
         //Trim

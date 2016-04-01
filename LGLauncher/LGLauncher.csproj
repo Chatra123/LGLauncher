@@ -42,7 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LGL\Misc\MutexControl.cs" />
+    <Compile Include="LGL\_1_Detector\MutexControl.cs" />
     <Compile Include="Exception\LGLException.cs" />
     <Compile Include="LGL\Misc\ProhibitFileMove_LGL.cs" />
     <Compile Include="LGL\_1_Detector\AvsVpy\VpyMaker.cs" />

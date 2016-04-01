@@ -7,7 +7,7 @@ using System.Threading;
 using System.Diagnostics;
 
 
-#pragma warning disable 0162           //警告0162：到達できないコード
+
 namespace LGLauncher
 {
   using OctNov.IO;
@@ -18,6 +18,7 @@ namespace LGLauncher
     public override string AvsPath { get; protected set; }            //作成したVpyのパス
     public override int[] TrimFrame { get; protected set; }           //トリム用フレーム数
 
+#pragma warning disable 0162           //警告0162：到達できないコード
     /// <summary>
     /// Trim付きVpy作成
     /// </summary>
@@ -56,7 +57,7 @@ namespace LGLauncher
       this.AvsPath = CommonAvsVpy.OutScript(this.TrimFrame, vpyText, ".vpy", TextEnc.UTF8_nobom);
 
     }
-
+#pragma warning restore 0162          //警告0162：到達できないコード
 
     /// <summary>
     /// フレーム数取得用のVpy作成
@@ -79,7 +80,7 @@ namespace LGLauncher
           line = Regex.Replace(line, "#d2vsource#", PathList.d2vsource_dll, RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#D2vName#", PathList.WorkName + ".d2v", RegexOptions.IgnoreCase);
         }
-        else
+        if (PathList.InputPlugin == PluginType.Lwi)
         {
           line = Regex.Replace(line, "#lwi#", "", RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#vslsmashsoruce#", PathList.vslsmashsource_dll, RegexOptions.IgnoreCase);
@@ -153,19 +154,17 @@ namespace LGLauncher
           line = Regex.Replace(line, "#d2vsource#", PathList.d2vsource_dll, RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#D2vName#", PathList.WorkName + ".d2v", RegexOptions.IgnoreCase);
         }
-        else
+        if (PathList.InputPlugin == PluginType.Lwi)
         {
           line = Regex.Replace(line, "#lwi#", "", RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#vslsmashsoruce#", PathList.vslsmashsource_dll, RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#TsPath#", PathList.TsPath, RegexOptions.IgnoreCase);
         }
 
-        /* ☆ NotImplementedException */
-        throw new NotImplementedException();
         //Detector
         //if (PathList.Detector == LogoDetector.Join_Logo_Scp)
         //  line = Regex.Replace(line, "#Join_Logo_Scp#", "", RegexOptions.IgnoreCase);
-        //else
+        //if (PathList.Detector == LogoDetector.LogoGuillo)
         //  line = Regex.Replace(line, "#LogoGuillo#", "", RegexOptions.IgnoreCase);
 
         //Trim
@@ -188,4 +187,3 @@ namespace LGLauncher
 
 
 
-#pragma warning restore 0162          //警告0162：到達できないコード
