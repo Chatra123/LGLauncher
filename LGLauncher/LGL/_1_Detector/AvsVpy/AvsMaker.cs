@@ -1,0 +1,181 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Diagnostics;
+
+namespace LGLauncher
+{
+  using OctNov.IO;
+
+  internal class AvsMaker : AbstractAvsMaker
+  {
+    public override string AvsPath { get; protected set; }            //作成したAvsのパス
+    public override int[] TrimFrame { get; protected set; }           //トリム用フレーム数
+
+    /// <summary>
+    /// Trim付きScript作成
+    /// </summary>
+    public override void Make()
+    {
+      //フレーム数取得用スクリプト
+      {
+        string infoPath = CreateInfo_avs();
+
+        var action = new Action(() => { RunInfo_avs(infoPath); });
+        CommonAvsVpy.RunInfo(action);
+      }
+
+      //総フレーム数取得
+      int totalframe;
+      {
+        string infoText = Path.Combine(PathList.LWorkDir, PathList.WorkName + ".info.txt");
+        var info = CommonAvsVpy.GetInfoText(infoText);
+        totalframe = (int)info[0];
+      }
+
+      //前回のトリム用フレーム数取得   previous
+      int[] trimFrame_prv = (2 <= PathList.PartNo)
+                                ? CommonAvsVpy.GetTrimFrame_previous()
+                                : null;
+
+      //トリム用フレーム計算
+      this.TrimFrame = CommonAvsVpy.CalcTrimFrame(totalframe, trimFrame_prv);
+
+      //avs作成
+      var avsText = CreateTrim_avs(this.TrimFrame);
+      this.AvsPath = CommonAvsVpy.OutScript(this.TrimFrame, avsText, ".avs", TextEnc.Shift_JIS);
+    }
+
+
+    /// <summary>
+    /// フレーム数取得用のAVS作成
+    /// </summary>
+    private string CreateInfo_avs()
+    {
+      //読
+      var avsText = FileR.ReadFromResource("LGLauncher.Resource.GetInfo_avs.avs");
+
+      //置換
+      for (int i = 0; i < avsText.Count; i++)
+      {
+        var line = avsText[i];
+        line = Regex.Replace(line, "#LWorkDir#", PathList.LWorkDir, RegexOptions.IgnoreCase);
+
+        //Plugin
+        if (PathList.InputPlugin == PluginType.D2v)
+        {
+          line = Regex.Replace(line, "#d2v#", "", RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#DGDecode#", PathList.DGDecode_dll, RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#D2vName#", PathList.WorkName + ".d2v", RegexOptions.IgnoreCase);
+        }
+        else
+        {
+          line = Regex.Replace(line, "#lwi#", "", RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#LSMASHSource#", PathList.LSMASHSource_dll, RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#TsPath#", PathList.TsPath, RegexOptions.IgnoreCase);
+        }
+
+        line = Regex.Replace(line, "#InfoName#", PathList.WorkName + ".info.txt", RegexOptions.IgnoreCase);
+        avsText[i] = line.Trim();
+      }
+
+      //書
+      string infoPath = PathList.WorkPath + ".info.avs";
+      File.WriteAllLines(infoPath, avsText, TextEnc.Shift_JIS);
+      return infoPath;
+    }
+    /*
+     * note
+     *  - avs内のWriteFileStart()のファイル名が長いと*.info.txtのファイル名が途中で切れる。
+     *  -  ファイルパスの長さが255byteあたりでファイル名が切れる
+     */
+
+
+
+    /// <summary>
+    /// InfoSciprt実行  avs
+    /// </summary>
+    private void RunInfo_avs(string avsPath)
+    {
+      for (int retry = 1; retry <= 2; retry++)
+      {
+        var prc = new Process();
+        {
+          var psi = new ProcessStartInfo();
+          psi.FileName = PathList.avs2pipemod;
+          psi.Arguments = " -info \"" + avsPath + "\"";
+          psi.CreateNoWindow = true;
+          psi.UseShellExecute = false;
+          prc.StartInfo = psi;
+        }
+
+        prc.Start();
+        prc.WaitForExit(6 * 1000);
+        if (prc.HasExited && prc.ExitCode == 0)
+          return;  //正常終了
+
+        Thread.Sleep(6 * 1000);
+      }
+
+      Log.WriteLine("RunInfo process error");
+    }
+
+
+
+    /// <summary>
+    /// TrimAvs作成
+    /// </summary>
+    private List<string> CreateTrim_avs(int[] trimFrame)
+    {
+      int beginFrame = trimFrame[0];
+      int endFrame = trimFrame[1];
+
+      //読
+      var avsText = FileR.ReadFromResource("LGLauncher.Resource.TrimAvs.avs");
+
+      //置換
+      for (int i = 0; i < avsText.Count; i++)
+      {
+        var line = avsText[i];
+        line = Regex.Replace(line, "#LWorkDir#", PathList.LWorkDir, RegexOptions.IgnoreCase);
+
+        //Plugin
+        if (PathList.InputPlugin == PluginType.D2v)
+        {
+          line = Regex.Replace(line, "#d2v#", "", RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#DGDecode#", PathList.DGDecode_dll, RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#D2vName#", PathList.WorkName + ".d2v", RegexOptions.IgnoreCase);
+        }
+        else
+        {
+          line = Regex.Replace(line, "#lwi#", "", RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#LSMASHSource#", PathList.LSMASHSource_dll, RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#TsPath#", PathList.TsPath, RegexOptions.IgnoreCase);
+        }
+
+        //Detector
+        if (PathList.Detector == LogoDetector.Join_Logo_Scp)
+          line = Regex.Replace(line, "#Join_Logo_Scp#", "", RegexOptions.IgnoreCase);
+        else
+          line = Regex.Replace(line, "#LogoGuillo#", "", RegexOptions.IgnoreCase);
+
+        //Trim
+        if (PathList.IsPart)
+        {
+          line = Regex.Replace(line, "#EnableTrim#", "", RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#BeginFrame#", "" + beginFrame, RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#EndFrame#", "" + endFrame, RegexOptions.IgnoreCase);
+        }
+        avsText[i] = line.Trim();
+      }
+
+      return avsText;
+    }
+
+
+
+  }
+}

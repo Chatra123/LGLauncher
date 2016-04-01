@@ -17,7 +17,7 @@ namespace LGLauncher
   [Serializable]
   public class Setting_File
   {
-    const double CurrentVer = 2.0;
+    const double CurrentVer = 11.1;
 
     public double Ver = 0.0;
     public int Enable = 1;
@@ -25,8 +25,9 @@ namespace LGLauncher
     public string memo2 = "  set sLogoDetector    Join_Logo_Scp  or  LogoGuillo  ";
     public string memo3 = "                       JLS            or  LG          ";
     public string memo4 = "  cannot set d2v with Join_Logo_Scp                   ";
-    public string Avs_iPlugin = "  lwi         ";
+    public string InputPlugin = "  lwi         ";
     public string LogoDetector = "  LogoGuillo  ";
+    public int Detector_MultipleRun = 1;
     public string space_1 = "";
 
     //edit chapter

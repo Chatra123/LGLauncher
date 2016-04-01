@@ -34,10 +34,10 @@ namespace LGLauncher
     }
 
     /// <summary>
-    /// システム状態確認 ＆　Mutex取得
+    /// システム状態確認　＆　Mutex取得
     /// </summary>
     public bool GetReady(IEnumerable<string> targetNames,
-                          int multiRun = 1,                //Semaphoreのみ、Mutexは常に１
+                          int multiRun = 1,                //Mutexは常に１
                           bool check_SysIdle = true)
     {
       if (multiRun <= 0) return false;
@@ -95,31 +95,33 @@ namespace LGLauncher
       });
 
 
+      //Mutex取得        LGL
+      //  LGLauncher同士での衝突回避
+      //  Mutexが取得できないときは待機時間の追加を設定
+      //bool addtionalWait;
+      //{
+      //  const string MutexName = "LGL-A8245043-3476";      //LGL
+      //  mutexControl = new MutexControl();
+      //  mutexControl.Initlize(MutexName);
+      //  mutexControl.Get();
+      //  addtionalWait = mutexControl.HasControl == false;
+      //}
+      ////Semaphore取得    LGL V2P
+      bool addtionalWait;
+      {
+        const string MutexName = "LGL-A8245043-3476";  //LGL
+        //const string MutexName = "V2P-491E1B11-9DC0";    //V2P
+        mutexControl = new SemaphoreControl();
+        mutexControl.Initlize(MutexName, multiRun);
+        mutexControl.Get();
+        addtionalWait = mutexControl.HasControl == false;
+      }
+
+
       //
       //システムチェック
       //
       var rand = new Random(DateTime.Now.Millisecond + Process.GetCurrentProcess().Id);
-
-      //Mutex取得        LGL
-      bool addtionalWait;
-      {
-        const string MutexName = "LGL-A8245043-3476";      //LGL
-        mutexControl = new MutexControl();
-        mutexControl.Initlize(MutexName);
-        mutexControl.Get();
-        addtionalWait = mutexControl.HasControl == false;
-      }
-      ////Semaphore取得    LGL V2P
-      //bool addtionalWait;
-      //{
-      //  //const string MutexName = "LGL-A8245043-3476";  //LGL
-      //  const string MutexName = "V2P-491E1B11-9DC0";    //V2P
-      //  mutexControl = new SemaphoreControl();
-      //  mutexControl.Initlize(MutexName, multiRun);
-      //  mutexControl.Get();
-      //  addtionalWait = mutexControl.HasControl == false;
-      //}
-
 
       //タイムアウトなし
       while (true)
@@ -127,7 +129,7 @@ namespace LGLauncher
         //プロセス数
         while (TargetHasExited() == false)
         {
-          Thread.Sleep(1 * 60 * 1000);                               // 1 min
+          Thread.Sleep(2 * 60 * 1000);                               // 2 min
         }
 
         //ＣＰＵ使用率
@@ -137,7 +139,7 @@ namespace LGLauncher
           continue;
         }
 
-        //Mutexが取得できない場合は追加待機
+        //Mutexが取得できないときは追加待機
         if (addtionalWait)
         {
           Thread.Sleep(rand.Next(0 * 1000, 3 * 60 * 1000));          // 0  to  3 min

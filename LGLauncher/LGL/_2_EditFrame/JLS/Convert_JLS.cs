@@ -49,7 +49,7 @@ namespace LGLauncher.EditFrame.JLS
       avsText.ForEach((line) => { avsliner += line; });
 
 
-      var framelist = EditFrame_Convert.AvsTrim_to_FrameList(avsliner);
+      var framelist = ConvertFrame.AvsTrim_to_FrameList(avsliner);
 
       if (framelist != null)
       {

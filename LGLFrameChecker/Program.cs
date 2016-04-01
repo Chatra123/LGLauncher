@@ -52,40 +52,16 @@ namespace LGLFrameChecker
       Directory.SetCurrentDirectory(LWorkDir);
 
 
-      //d2v lwi  iPluginチェック
-      string iPluginType = "";
+      //file チェック
       {
-        bool existD2v, existLwi;
-        {
-          string[] d2vfiles = Directory.GetFiles(LWorkDir, "*.d2v_*__*.avs");		 //d2v
-          string[] lwifiles = Directory.GetFiles(LWorkDir, "*.lwi_*__*.avs");		 //lwi
-          existD2v = 0 < d2vfiles.Count();
-          existLwi = 0 < lwifiles.Count();
-        }
-
-        if (existD2v == true && existLwi == false)
-        {
-          iPluginType = "d2v";
-          Console.WriteLine("  mode:  d2v");
-        }
-        else if (existD2v == false && existLwi == true)
-        {
-          iPluginType = "lwi";
-          Console.WriteLine("  mode:  lwi");
-        }
-        else if (existD2v == true && existLwi == true)
-        {
-          return "  Error:  found both d2v and lwi";
-        }
-        else if (existD2v == false && existLwi == false)
-        {
-          return "  Error:  not found  VideoName.p1.d2v_*__*.avs";
-        }
+        string[] avsfiles = Directory.GetFiles(LWorkDir, "*.*__*.avs");
+        if (avsfiles.Count() == 0)
+          return "  Error:  not found  VideoName.p1.*__*.avs";
       }
 
 
       //frameset_all取得
-      var frameset_all = FrameSet.Create(LWorkDir, -1, iPluginType);
+      var frameset_all = FrameSet.Create(LWorkDir, -1);
       if (frameset_all.HaveValidData == false) return frameset_all.ErrMessage;
 
       //FrameSetList
@@ -94,10 +70,10 @@ namespace LGLFrameChecker
       //
       //比較ループ
       //
-      for (int i = 1; i <= 200; i++)
+      for (int partNo = 1; partNo <= 200; partNo++)
       {
         //frameset_one取得
-        var frameset_one = FrameSet.Create(LWorkDir, i, iPluginType);
+        var frameset_one = FrameSet.Create(LWorkDir, partNo);
         if (frameset_one.HaveValidData == false) { FrameSetList.Add(null); continue; }
 
         //比較
@@ -130,12 +106,13 @@ namespace LGLFrameChecker
         text.AppendLine("                     Match( %)                 Match(frame)");
         text.AppendLine(" No    Time       Main   CM  Not          Main       CM      Not");
 
-        //fs_one
-        foreach (var fs_one in FrameSetList)
+        //frameset
+        foreach (var fs in FrameSetList)
         {
-          if (fs_one == null) { text.AppendLine(); continue; }
-          text.AppendLine(fs_one.GetResult());
+          if (fs == null) { text.AppendLine(); continue; }
+          text.AppendLine(fs.GetResult());
         }
+
         //total
         {
           int Match_Main = FrameSetList.Select(fs => { if (fs != null) return fs.Match_Main; else return 0; }).Sum();
@@ -257,9 +234,8 @@ namespace LGLFrameChecker
     /// </summary>
     /// <param name="dir"></param>
     /// <param name="no"></param>
-    /// <param name="ipluginType"></param>
     /// <returns></returns>
-    public static FrameSet Create(string dir, int no, string ipluginType)
+    public static FrameSet Create(string dir, int no)
     {
       var frameset = new FrameSet();
       frameset.No = no;
@@ -269,7 +245,7 @@ namespace LGLFrameChecker
       //		*.p1.frame.txt				*.p1.lwi_0__18808.avs
       string partID = (no == -1) ? "all" : "p" + no;
       string frameListName = "*." + partID + ".frame.txt";
-      string avsName = "*." + partID + "." + ipluginType + "_*__*.avs";
+      string avsName = "*." + partID + "." + "*__*.avs";
 
       //file取得
       var files = Directory.GetFiles(dir, frameListName);

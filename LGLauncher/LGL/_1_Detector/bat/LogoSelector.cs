@@ -48,16 +48,6 @@ namespace LGLauncher
 
 
     /// <summary>
-    /// 未実装　 Join_logo_Scpos用    Cmdファイル取得
-    /// </summary>
-    public static List<string> GetJLCmd()
-    {
-      //未実装
-      throw new NotImplementedException();
-    }
-
-
-    /// <summary>
     /// LogoSelector実行
     /// </summary>
     private static List<string> RunLogoSelector()
@@ -65,19 +55,20 @@ namespace LGLauncher
       if (File.Exists(PathList.LogoSelector) == false)
         throw new LGLException("LogoSelector does not exist");
 
-      //パス、引数
-      string exepath = PathList.LogoSelector;
-      string args = string.Format("  \"{0}\"   \"{1}\"   \"{2}\"  ", 
-        PathList.Channel, PathList.Program, PathList.TsPath);
-      SetScriptLoader(ref exepath, ref args);
+      string exepath, args;
+      {
+        exepath = PathList.LogoSelector;
+        args = string.Format("  \"{0}\"   \"{1}\"   \"{2}\"  ",
+                              PathList.Channel, PathList.Program, PathList.TsPath);
+        SetScriptLoader(ref exepath, ref args);
+      }
 
       //実行
-      string result;
-      bool success = Start_GetStdout(exepath, args, out result);
+      string result = Start_GetStdout(exepath, args);
       var split = result.Split(new string[] { Environment.NewLine }, StringSplitOptions.None).ToList();
 
       //Log
-      if (PathList.Is1stPart || PathList.IsAll || success == false)
+      if (PathList.Is1stPart || PathList.IsAll)
       {
         Log.WriteLine("      LogoSelector :");
         Log.WriteLine(exepath);
@@ -109,31 +100,33 @@ namespace LGLauncher
     /// <summary>
     /// プロセス実行  標準出力を取得
     /// </summary>
-    private static bool Start_GetStdout(string exepath, string arg, out string result)
+    private static string Start_GetStdout(string exepath, string arg)
     {
       var Process = new Process();
-      Process.StartInfo.FileName = exepath;
-      Process.StartInfo.Arguments = arg;
+      {
+        Process.StartInfo.FileName = exepath;
+        Process.StartInfo.Arguments = arg;
 
-      //シェルコマンドを無効に、入出力をリダイレクトするなら必ずfalseに設定
-      Process.StartInfo.UseShellExecute = false;
-      //入出力のリダイレクト
-      Process.StartInfo.RedirectStandardOutput = true;
+        //シェルコマンドを無効に、入出力をリダイレクトするなら必ずfalseに設定
+        Process.StartInfo.UseShellExecute = false;
+        //入出力のリダイレクト
+        Process.StartInfo.RedirectStandardOutput = true;
+      }
 
       try
       {
         //標準出力を取得、プロセス終了まで待機
         Process.Start();
-        result = Process.StandardOutput.ReadToEnd();
+        string result = Process.StandardOutput.ReadToEnd();
         Process.WaitForExit();
         Process.Close();
-        return true;
+        return result;
       }
       catch (Exception exc)
       {
-        //例外を返してログに書き込んでもらう。
-        result = exc.ToString();
-        return false;
+        Log.WriteLine("");
+        Log.WriteLine("" + exc.ToString());
+        throw new LGLException("LogoSelector has error");
       }
     }
 

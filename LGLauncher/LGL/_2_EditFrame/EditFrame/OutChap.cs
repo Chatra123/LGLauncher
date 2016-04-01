@@ -8,7 +8,7 @@ namespace LGLauncher.EditFrame
 {
   using OctNov.IO;
 
-  static class EditFrame_OutChap
+  static class OutChap
   {
 
     /// <summary>
@@ -22,25 +22,22 @@ namespace LGLauncher.EditFrame
       {
         //付加情報
         //　終端はＣＭ？
-        var end_is_CM = "";
-        int main_endframeNo = framelist[framelist.Count - 1];
-        end_is_CM = (main_endframeNo != endFrame) ? "1" : "0";     //(mainの終端！＝avsの終端)
-        var is_last_file = PathList.IsLastPart ? "1" : "0";
+        int main_endframeNo = framelist[framelist.Count - 1];          //本編部の最後のフレーム番号
+        string end_is_CM = (main_endframeNo != endFrame) ? "1" : "0";  //(mainの終端！＝avsの終端)
+        string is_last_file = PathList.IsLastPart ? "1" : "0";
 
         frameText.AppendLine("//    end_frame=" + endFrame);
         frameText.AppendLine("//    end_is_cm=" + end_is_CM);
         frameText.AppendLine("//      part_no=" + PathList.PartNo);
         frameText.AppendLine("// is_last_file=" + is_last_file);
-
         foreach (var f in framelist)
           frameText.AppendLine(f.ToString());
       }
 
       try
       {
-        string dirPath = Path.GetDirectoryName(outPath);
-
-        if (Directory.Exists(dirPath))
+        string dir = Path.GetDirectoryName(outPath);
+        if (Directory.Exists(dir))
           File.WriteAllText(outPath, frameText.ToString(), TextEnc.Shift_JIS);
       }
       catch
@@ -59,31 +56,34 @@ namespace LGLauncher.EditFrame
     {
       if (framelist == null || framelist.Count == 0) return;
 
-      var chapList = new List<int>(framelist);  //ディープコピー
 
-      //TvtPlay用に少し加工
-      //終端はＣＭ？
-      //　　終端がＣＭの途中　→　スキップ用にendFrame追加
-      //　　終端が本編の途中　→　最後のフレーム削除
-      if (PathList.IsLastPart == false)
+      List<int> chapList;
       {
-        int main_endframeNo = chapList[chapList.Count - 1];
-        bool end_is_CM = (main_endframeNo != endFrame);              //(mainの終端！＝avsの終端)
+        chapList = new List<int>(framelist);  //シャローコピー
 
-        if (end_is_CM)
-          chapList.Add(endFrame);
-        else
-          chapList.RemoveAt(chapList.Count - 1);
+        //TvtPlay用に少し加工
+        //終端はＣＭ？
+        //　　終端がＣＭの途中　→　スキップ用にendFrame追加
+        //　　終端が本編の途中　→　最後のフレーム削除
+        if (PathList.IsLastPart == false)
+        {
+          int main_endframeNo = chapList[chapList.Count - 1];
+          bool end_is_CM = (main_endframeNo != endFrame);              //(mainの終端！＝avsの終端)
+
+          if (end_is_CM)
+            chapList.Add(endFrame);
+          else
+            chapList.RemoveAt(chapList.Count - 1);
+        }
       }
 
 
-      string chapText = EditFrame_Convert.To_TvtPlayChap(chapList);
+      string chapText = ConvertFrame.To_TvtPlayChap(chapList);
 
       try
       {
-        string dirPath = Path.GetDirectoryName(outPath);
-
-        if (Directory.Exists(dirPath))
+        string dir = Path.GetDirectoryName(outPath);
+        if (Directory.Exists(dir))
           File.WriteAllText(outPath, chapText, TextEnc.UTF8_bom);
       }
       catch
@@ -103,30 +103,29 @@ namespace LGLauncher.EditFrame
       if (framelist == null || framelist.Count == 0) return;
 
       //OgmChap用に少し加工
-
-      //本編の開始のみを抽出、ＣＭの開始を除去   　Linqでディープコピー
-      var chaplist = framelist.Where((frameNo, index) => index % 2 == 0).ToList();
-
-      //00:00:00にChap追加
-      if (30 * 3 <= framelist[0])
-        chaplist.Insert(0, 0);
-
-      //最後から１秒前にChap追加
-      //　３０秒以上、IsLastPartのみ
-      if (PathList.IsLastPart)
+      List<int> chaplist;
       {
-        if (30 * 30 <= endFrame)
+        //本編の開始のみを抽出、ＣＭの開始を除去   　Linqでシャローコピー
+        chaplist = framelist.Where((frameNo, index) => index % 2 == 0).ToList();
+
+        //00:00:00 追加
+        if (30 * 3 <= framelist[0])
+          chaplist.Insert(0, 0);
+
+        //最後から１秒前にChap追加
+        //　IsLastPart and ３０秒以上のみ
+        if (PathList.IsLastPart
+          && 30 * 30 <= endFrame)
           chaplist.Add(endFrame - 30 * 1);
       }
 
 
-      string chapText = EditFrame_Convert.To_OgmChap_type2(chaplist);
+      string chapText = ConvertFrame.To_OgmChap_type2(chaplist);
 
       try
       {
-        string dirPath = Path.GetDirectoryName(outPath);
-
-        if (Directory.Exists(dirPath))
+        string dir = Path.GetDirectoryName(outPath);
+        if (Directory.Exists(dir))
           File.WriteAllText(outPath, chapText.ToString(), TextEnc.Shift_JIS);
       }
       catch

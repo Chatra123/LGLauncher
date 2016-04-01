@@ -64,7 +64,7 @@ namespace LGLauncher
           //今回作成したTsName.p3.lwi_20000__30000.avsは、
           //次回のLGLauncherが使用するので削除しない。
           //ひとつ前の作業ファイルを削除。
-          Delete_file(0.0, PathList.LWorkDir, PathList.WorkName_prv1 + "*");
+          Delete_file(0.0, PathList.LWorkDir, PathList.WorkName_prv + "*");
         }
       }
 

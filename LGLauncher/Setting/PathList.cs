@@ -18,6 +18,16 @@ namespace LGLauncher
   }
 
   /// <summary>
+  /// FrameServer  /* test implement */
+  /// </summary>
+  enum AvsVpyType
+  {
+    Unknown,
+    Avs,
+    Vpy,
+  }
+
+  /// <summary>
   /// ロゴ検出器
   /// </summary>
   enum LogoDetector
@@ -77,8 +87,8 @@ namespace LGLauncher
     public static string WorkPath { get; private set; }　　  //  C:\EDCB\Write\Write_PF\LGLauncher\LWork\010101_ショップジ_0a1b308c1\ショップジ.p3
     public static string WorkName { get; private set; }      //  ショップジ.p3
     //    previous work path
-    public static string WorkPath_prv1 { get; private set; } //  C:\EDCB\Write\Write_PF\LGLauncher\LWork\010101_ショップジ_0a1b308c1\ショップジ.p2
-    public static string WorkName_prv1 { get; private set; } //  ショップジ.p2
+    public static string WorkPath_prv { get; private set; }  //  C:\EDCB\Write\Write_PF\LGLauncher\LWork\010101_ショップジ_0a1b308c1\ショップジ.p2
+    public static string WorkName_prv { get; private set; }  //  ショップジ.p2
 
 
     //PartNo
@@ -93,9 +103,18 @@ namespace LGLauncher
 
     //  [  LSystem  ]
     public static string SystemIdleMonitor { get; private set; }
+
+    //avs vpy
     public static string avs2pipemod { get; private set; }
+    public static PluginType InputPlugin { get; private set; }
     public static string DGDecode_dll { get; private set; }
     public static string LSMASHSource_dll { get; private set; }
+    public static string d2vsource_dll { get; private set; }
+    public static string vslsmashsource_dll { get; private set; }
+
+    /* AvsVpyType Test */
+    public static AvsVpyType AvsVpy { get; private set; }
+    public static string AvsVpyExt { get { return "." + AvsVpy.ToString().ToLower(); } }
 
     //lgd logo
     public static string Channel { get; private set; }
@@ -103,8 +122,8 @@ namespace LGLauncher
     public static string LogoSelector { get; private set; }
 
     //Detector
-    public static PluginType Avs_iPlugin { get; private set; }
     public static LogoDetector Detector { get; private set; }
+    public static int Detector_MultipleRun { get; private set; }
     public static readonly string[] DetectorName =
       new string[] { "chapter_exe", "logoframe", "logoGuillo" };
 
@@ -118,7 +137,7 @@ namespace LGLauncher
     public static string Join_Logo_Scp { get; private set; }
 
     //  JL command
-    public static string JL_Cmd_Recording { get; private set; }
+    public static string JL_Cmd_OnRec { get; private set; }
     public static string JL_Cmd_Standard { get; private set; }
 
     //  [  Chapter  ]
@@ -234,7 +253,7 @@ namespace LGLauncher
 
       //PluginType  LogoDetector
       {
-        string iplugin = setting.Avs_iPlugin.Trim().ToLower();
+        string iplugin = setting.InputPlugin.Trim().ToLower();
         string detector = setting.LogoDetector.Trim().ToLower();
 
         bool isD2v = iplugin == "d2v".ToLower();
@@ -247,7 +266,7 @@ namespace LGLauncher
           || detector == "Join_Logo_Scp".ToLower()
           || detector == "Join_Logo_Scpos".ToLower();
 
-        Avs_iPlugin = isD2v ? PluginType.D2v
+        InputPlugin = isD2v ? PluginType.D2v
           : isLwi ? PluginType.Lwi
           : PluginType.Unknown;
 
@@ -256,6 +275,12 @@ namespace LGLauncher
           : LogoDetector.Unknown;
       }
 
+      /* Avs固定 */
+      {
+        AvsVpy = AvsVpyType.Avs;
+      }
+
+      Detector_MultipleRun = setting.Detector_MultipleRun;
     }
 
 
@@ -345,8 +370,8 @@ namespace LGLauncher
       //WorkPath
       WorkName = IsPart ? TsShortName + ".p" + PartNo : TsShortName + ".all";
       WorkPath = Path.Combine(LWorkDir, WorkName);
-      WorkName_prv1 = TsShortName + ".p" + (PartNo - 1);
-      WorkPath_prv1 = Path.Combine(LWorkDir, WorkName_prv1);
+      WorkName_prv = TsShortName + ".p" + (PartNo - 1);
+      WorkPath_prv = Path.Combine(LWorkDir, WorkName_prv);
     }
 
 
@@ -404,13 +429,20 @@ namespace LGLauncher
       avs2pipemod = SearchItem(sysFiles, "avs2pipemod.exe");
 
       //Plugin
-      if (Avs_iPlugin == PluginType.D2v)
+      if (PathList.AvsVpy == AvsVpyType.Avs)
       {
-        DGDecode_dll = SearchItem(sysFiles, "DGDecode.dll");
+        if (InputPlugin == PluginType.D2v)
+          DGDecode_dll = SearchItem(sysFiles, "DGDecode.dll");
+        else if (InputPlugin == PluginType.Lwi)
+          LSMASHSource_dll = SearchItem(sysFiles, "LSMASHSource.dll");
       }
-      else if (Avs_iPlugin == PluginType.Lwi)
+      if (PathList.AvsVpy == AvsVpyType.Vpy)
       {
-        LSMASHSource_dll = SearchItem(sysFiles, "LSMASHSource.dll");
+        /* テスト実装なのでファイルがなくてもいい */
+        if (InputPlugin == PluginType.D2v)
+          d2vsource_dll = SearchItem_OrEmpty(sysFiles, "d2vsource.dll");
+        else if (InputPlugin == PluginType.Lwi)
+          vslsmashsource_dll = SearchItem_OrEmpty(sysFiles, "vslsmashsource.dll");
       }
 
 
@@ -422,7 +454,7 @@ namespace LGLauncher
         Chapter_exe = SearchItem(sysFiles, "Chapter_exe.exe");
         LogoFrame = SearchItem(sysFiles, "LogoFrame.exe");
         Join_Logo_Scp = SearchItem(sysFiles, "Join_Logo_Scp.exe");
-        JL_Cmd_Recording = SearchItem(sysFiles, "JL_標準_Recording.txt");
+        JL_Cmd_OnRec = SearchItem(sysFiles, "JL_標準_Rec.txt");
         JL_Cmd_Standard = SearchItem(sysFiles, "JL_標準.txt");
       }
       else if (Detector == LogoDetector.LogoGuillo)
@@ -442,7 +474,7 @@ namespace LGLauncher
           //別プロセスとぶつかった
           System.Threading.Thread.Sleep(300);
           if (File.Exists(AVSPLG) == false)
-            throw new LGLException("USE_AVS creating file error ");
+            throw new LGLException("USE_AVS creating error ");
         }
       }
 
@@ -494,41 +526,43 @@ namespace LGLauncher
     private static void Log_and_ErrorCheck()
     {
       //log
-      Log.WriteLine("  No  = 【    " + PathList.PartNo + "    】");
-
-      if (PathList.Is1stPart || PathList.IsAll)
       {
-        Log.WriteLine("        " + PathList.TsPath);
-        Log.WriteLine("    AvsInputPlugin :  " + Avs_iPlugin.ToString());
-        Log.WriteLine("      LogoDetector :  " + Detector.ToString());
-        Log.WriteLine();
-      }
-      if (IsLastPart)
-        Log.WriteLine("            IsLast :  " + IsLastPart);
+        Log.WriteLine("  No  = 【    " + PathList.PartNo + "    】");
 
+        if (PathList.Is1stPart || PathList.IsAll)
+        {
+          Log.WriteLine("         " + PathList.TsPath);
+          Log.WriteLine("         InputPlugin  :  " + InputPlugin.ToString());
+          Log.WriteLine("         LogoDetector :  " + Detector.ToString());
+          Log.WriteLine();
+        }
+        if (IsLastPart)
+          Log.WriteLine("            IsLast :  " + IsLastPart);
+      }
 
       // error check
-      if (Avs_iPlugin == PluginType.D2v)
+      if (InputPlugin == PluginType.D2v)
       {
         if (File.Exists(D2vPath) == false)
           throw new LGLException(D2vName + " dose not exist");
       }
 
-      if (Avs_iPlugin == PluginType.Lwi)
+      if (InputPlugin == PluginType.Lwi)
       {
         if (File.Exists(LwiPath) == false)
           throw new LGLException(LwiName + " dose not exist");
       }
 
-      if (Avs_iPlugin == PluginType.Unknown)
-        throw new LGLException("Unknown  AvsInputPlugin");
+      if (InputPlugin == PluginType.Unknown)
+        throw new LGLException("Unknown  InputPlugin");
 
       if (Detector == LogoDetector.Unknown)
         throw new LGLException("Unknown  LogoDetector");
 
-      if (Avs_iPlugin == PluginType.D2v
+      if (InputPlugin == PluginType.D2v
         && Detector == LogoDetector.Join_Logo_Scp)
         throw new LGLException("Cannot select d2v with Join_Logo_Scp");
+
     }
 
 

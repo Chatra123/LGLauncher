@@ -12,13 +12,15 @@ namespace LGLauncher
     private static void Main(string[] args)
     {
       ///*テスト用引数*/
-      //var testArgs = new List<string>() { // "-last", 
+      //var testArgs = new List<string>() { 
+      //                                    "-last", 
       //                                    "-ts",
       //                                    @".\cap8s.ts",
       //                                    "-ch", "A", 
-      //                                    "-sequencename", "pfA233740427248"
+      //                                    "-SequenceName", "pfA233740427248"
       //                                  };
       //args = testArgs.ToArray();
+
 
 
       //例外を捕捉する
@@ -61,8 +63,8 @@ namespace LGLauncher
       catch (LGLException e)
       {
         Log.WriteLine();
-        Log.WriteLine(CmdLine_ToString);
         Log.WriteLine(e.ToString());
+        Log.WriteLine(CmdLine_ToString);
         /*
          * エラー発生時の動作について
          * 　・作成済みのavs *.p3.lwi_2000__3000.avsを削除
@@ -76,22 +78,22 @@ namespace LGLauncher
          * 　　IsLastPartなら logo_scp_posのlast_batch、ogm chapter出力を実行する。
          */
         DeleteWorkItem.CleanAvs_OnError();
-        MakeAvsCommon.CreateDummyAvs_OnError();
+        CommonAvsVpy.CreateDummy_OnError();
       }
 
 
       //チャプター出力
       try
       {
-        int[] trimFrame = MakeAvsCommon.GetTrimFrame_fromAvsName(PathList.WorkName + ".*_*__*.avs");
+        int[] trimFrame = CommonAvsVpy.GetTrimFrame();
         if (trimFrame == null)
           throw new LGLException("Could'nt specify trim range.");
 
         //フレーム合成
-        var concat = EditFrame.FrameEditor.ConcatFrame(trimFrame);
+        var concat = EditFrame.FrameEditor.Edit_ConcatFrame(trimFrame);
 
         //チャプター作成、出力
-        EditFrame.FrameEditor.OutChap(concat, trimFrame);
+        EditFrame.FrameEditor.Edit_OutChapter(concat, trimFrame);
       }
       catch (LGLException e)
       {
@@ -107,7 +109,7 @@ namespace LGLauncher
 
 
     /// <summary>
-    /// Avs作成　から　LogoDetector起動　まで
+    /// ”Avs作成”から”LogoDetector起動”まで
     /// </summary>
     private static void DetectFrame()
     {
@@ -116,15 +118,14 @@ namespace LGLauncher
       int beginFrame;
       double avsTime_sec;
       {
-        var avsMaker = PathList.Avs_iPlugin == PluginType.D2v
-                            ? new AvsWithD2v() as AbstractAvsMaker
-                            : new AvsWithLwi() as AbstractAvsMaker;
-        avsMaker.Make();
+        var maker = new AvsVpyMaker();
+        maker.Make();
 
-        avsPath = avsMaker.AvsPath;
-        beginFrame = avsMaker.TrimFrame[0];
-        avsTime_sec = 1.0 * (avsMaker.TrimFrame[1] - avsMaker.TrimFrame[0]) / 29.970;
+        avsPath = maker.AvsVpyPath;
+        beginFrame = maker.TrimFrame[0];
+        avsTime_sec = 1.0 * (maker.TrimFrame[1] - maker.TrimFrame[0]) / 29.970;
       }
+
 
       //srt
       string srtPath;
@@ -140,8 +141,8 @@ namespace LGLauncher
         {
           //Join_Logo_Scp
           var logoPath = LogoSelector.GetLogo();
-          var jl_cmdPath = PathList.JL_Cmd_Recording;
-          batPath = Bat_Join_Logo_Scp.Make_InRec(avsPath,
+          var jl_cmdPath = PathList.JL_Cmd_OnRec;
+          batPath = Bat_Join_Logo_Scp.Make_OnRec(avsPath,
                                                  logoPath[0], jl_cmdPath);
         }
         else
@@ -158,42 +159,31 @@ namespace LGLauncher
       try
       {
         //Mutex取得
-        bool isReady;
         {
-          /*
-           * avs2pipemodがエラー、フリーズが発生することがあったので、
-           * １つずつ起動するように変更。
-           * 
-           */
           waitForReady = new WaitForSystemReady();
-          isReady = waitForReady.GetReady(PathList.DetectorName);
+          bool isReady = waitForReady.GetReady(PathList.DetectorName, PathList.Detector_MultipleRun);
           if (isReady == false) return;
         }
 
         //timeout
         //  ”avsの総時間”の３倍
-        int timeout_ms = (int)(avsTime_sec * 3) * 1000;
-        timeout_ms = timeout_ms <= 30 * 1000 ? 90 * 1000 : timeout_ms;
+        int timeout_ms;
+        {
+          timeout_ms = (int)(avsTime_sec * 3) * 1000;
+          timeout_ms = timeout_ms <= 30 * 1000 ? 90 * 1000 : timeout_ms;
+        }
 
         //Bat実行
-        if (PathList.Avs_iPlugin == PluginType.D2v)
-        {
-          BatLuncher.Launch(batPath, timeout_ms);
-        }
-        else
-        {
-          AvsWithLwi.SetLwi();
-          BatLuncher.Launch(batPath, timeout_ms);
-        }
+        LwiFile.Set_ifLwi();
+        BatLuncher.Launch(batPath, timeout_ms);
+
       }
       finally
       {
-        if (PathList.Avs_iPlugin == PluginType.Lwi)
-          AvsWithLwi.BackLwi();
+        LwiFile.Back_ifLwi();
 
         //Mutex解放
-        //Thread.Sleep(6 * 1000);
-        if (waitForReady != null)
+        if (waitForReady != null) 
           waitForReady.Release();
       }
 

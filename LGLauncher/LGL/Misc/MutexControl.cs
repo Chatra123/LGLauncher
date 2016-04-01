@@ -50,10 +50,17 @@ namespace LGLauncher
 
       // Mutex のシグナルを受信できるまで待機
       //　プロセスが強制終了されても基本的には自動で解放される。
-      if (hMutex.WaitOne())
+      try
       {
-        HasControl = true;
+        if (hMutex.WaitOne())
+          HasControl = true;
       }
+      catch (AbandonedMutexException)
+      {
+        //別のスレッドが解放せずに終了することによって放棄した Mutex オブジェクトを取得
+        HasControl = false;
+      }
+
       return HasControl;
     }
 
@@ -62,10 +69,13 @@ namespace LGLauncher
     /// </summary>
     public void Release()
     {
+      if (hMutex != null && HasControl)
+      {
+        hMutex.ReleaseMutex();
+        HasControl = false;
+      }
       if (hMutex != null)
       {
-        HasControl = false;
-        hMutex.ReleaseMutex();
         hMutex.Close();
         hMutex = null;
       }
@@ -125,19 +135,24 @@ namespace LGLauncher
       return HasControl;
     }
 
+
     /// <summary>
     /// Release
     /// </summary>
     public void Release()
     {
+      if (hSemaphore != null && HasControl)
+      {
+        hSemaphore.Release();
+        HasControl = false;
+      }
       if (hSemaphore != null)
       {
-        HasControl = false;
-        hSemaphore.Release();
         hSemaphore.Close();
         hSemaphore = null;
       }
     }
+
 
     /// <summary>
     /// destructor

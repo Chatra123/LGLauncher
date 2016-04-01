@@ -28,7 +28,7 @@ namespace LGLauncher
       catch { throw new LGLException("cant lock ts file"); }
 
       //d2v
-      if (PathList.Avs_iPlugin == PluginType.D2v)
+      if (PathList.InputPlugin == PluginType.D2v)
         try
         {
           lock_d2v = new FileStream(PathList.D2vPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
@@ -36,7 +36,7 @@ namespace LGLauncher
         catch { throw new LGLException("cant lock d2v file"); }
 
       //lwi
-      if (PathList.Avs_iPlugin == PluginType.Lwi)
+      if (PathList.InputPlugin == PluginType.Lwi)
         try
         {
           lock_lwi = new FileStream(PathList.LwiPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);

@@ -8,8 +8,9 @@ namespace LGLauncher.EditFrame
 {
   using OctNov.IO;
 
-
   /*
+   * 変換の流れ
+   * 
    * ConcatFrame(int[] trimFrame)
    * 
    *     Join_Logo_Scp
@@ -31,7 +32,7 @@ namespace LGLauncher.EditFrame
     /// <summary>
     /// 結合フレームリストを作成
     /// </summary>
-    public static List<int> ConcatFrame(int[] trimFrame)
+    public static List<int> Edit_ConcatFrame(int[] trimFrame)
     {
       List<int> concat = null;
 
@@ -45,12 +46,12 @@ namespace LGLauncher.EditFrame
           EditFrame.JLS.Convert_JLS.ResultAvs_to_FrameFile(false);
 
           // *.frame.cat.txt合成
-          concat = Concat_withOldFrame(trimFrame);
+          concat = Concat_withPreviousFrame(trimFrame);
 
           //cat合成
           //  catファイルはIsLastPartで使用する。
           {
-            JLS.Concat_Scpos.Concat(trimFrame);
+            JLS.Concat_scpos.Concat(trimFrame);
             JLS.Concat_logoframe.Concat(trimFrame);
           }
 
@@ -79,7 +80,7 @@ namespace LGLauncher.EditFrame
         //LogoGuillo
         //part & all
         //フレームテキスト合成
-        concat = Concat_withOldFrame(trimFrame);
+        concat = Concat_withPreviousFrame(trimFrame);
       }
 
       return concat;
@@ -90,60 +91,60 @@ namespace LGLauncher.EditFrame
     /// <summary>
     /// 前回までのフレームリストと、今回　生成したリストをつなげる。
     /// </summary>
-    private static List<int> Concat_withOldFrame(int[] trimFrame)
+    private static List<int> Concat_withPreviousFrame(int[] trimFrame)
     {
-
-      //パス作成
       //logoGuilloによって作成されるファイル               *.p3.frame.txt
       string add_FramePath = PathList.WorkPath + ".frame.txt";
 
-      //前回までの結合フレーム                             *.frame.cat.txt
-      //　　 PartNo=1, PartALLではエラーなどでファイルが残っていても読み込まないようにする。
+      //結合フレーム                                       *.frame.cat.txt
       string catPath = Path.Combine(PathList.LWorkDir,
                                     PathList.TsShortName + ".frame.cat.txt");
 
-      //
-      //フレーム読込み
+      //読
       //　LogoGuilloが映像からロゴをみつけられない場合、*.p3.frame.txtは作成されていない
       //　add_FrameListが見つからなくても処理は継続する。
       List<int> add_FrameList = null, old_CatList = null;
       {
-        add_FrameList = EditFrame_Convert.FrameFile_to_List(add_FramePath);    // from  *.p3.frame.txt
+        add_FrameList = ConvertFrame.FrameFile_to_List(add_FramePath);    // from  *.p3.frame.txt
+
+        //前回までの結合フレームを取得
         if (2 <= PathList.PartNo)
         {
-          old_CatList = EditFrame_Convert.FrameFile_to_List(catPath);          // from  *.frame.cat.txt
-
+          old_CatList = ConvertFrame.FrameFile_to_List(catPath);          // from  *.frame.cat.txt
           if (old_CatList == null && add_FrameList == null)
             throw new LGLException("not detect frame file");
         }
+        //ファイルがなければnullが返されているのでnew()。
         old_CatList = old_CatList ?? new List<int>();
         add_FrameList = add_FrameList ?? new List<int>();
       }
 
 
-      //
       //連結 with offset
-      List<int> new_CatList = old_CatList;                                     // *.p3.frame.cat.txt
+      List<int> new_CatList;
       {
+        new_CatList = new List<int>(old_CatList);
+
         if (PathList.IsPart && trimFrame != null)
         {
           int beginFrame = trimFrame[0];
           add_FrameList = add_FrameList.Select((f) => f + beginFrame).ToList();
         }
+
         new_CatList.AddRange(add_FrameList);
         //連結部の繋ぎ目をけす。
-        new_CatList = EditFrame_Convert.FlatOut_CM__(new_CatList, 0.5);
+        new_CatList = ConvertFrame.FlatOut_CM__(new_CatList, 0.5);
       }
 
 
       //List<string>  <--  List<int>
       var new_CatText = new_CatList.Select(f => f.ToString()).ToList();
 
-      //書込み
+      //書
       {
-        //次回の参照用
+        //次回の参照用                          *.frame.cat.txt
         File.WriteAllLines(catPath, new_CatText, TextEnc.Shift_JIS);
-        //デバッグ記録用
+        //デバッグ用記録                        *.p3.frame.cat.txt
         string catPath_debug = PathList.WorkPath + ".frame.cat.txt";
         File.WriteAllLines(catPath_debug, new_CatText, TextEnc.Shift_JIS);
       }
@@ -154,7 +155,7 @@ namespace LGLauncher.EditFrame
     /// <summary>
     /// チャプター出力
     /// </summary>
-    public static void OutChap(List<int> rawFrame, int[] trimFrame)
+    public static void Edit_OutChapter(List<int> rawFrame, int[] trimFrame)
     {
       if (rawFrame == null)
       {
@@ -172,43 +173,56 @@ namespace LGLauncher.EditFrame
       //raw frame
       if (PathList.Out_rawframe)
       {
-        string frameDir = (PathList.Out_misc_toTsDir)
-                           ? PathList.TsDir
-                           : PathList.DirPath_misc;
-        string framePath = Path.Combine(frameDir,
-                                        PathList.TsNameWithoutExt + ".rawframe.txt");
-        EditFrame_OutChap.To_FrameFile(framePath, rawFrame, endFrame);
+        string path;
+        {
+          string dir = (PathList.Out_misc_toTsDir)
+                             ? PathList.TsDir
+                             : PathList.DirPath_misc;
+          string name = (PathList.IsLastPart)
+                             ? PathList.TsNameWithoutExt + ".rawframe.txt"
+                             : PathList.TsNameWithoutExt + ".part.rawframe.txt";
+          path = Path.Combine(dir, name);
+        }
+        OutChap.To_FrameFile(path, rawFrame, endFrame);
       }
+
 
       //短いＭａｉｎ、ＣＭを潰す
       List<int> editFrame = null;
       {
         editFrame = new List<int>(rawFrame);
-        editFrame = EditFrame_Convert.FlatOut_CM__(editFrame, PathList.Regard_NsecCM_AsMain);
-        editFrame = EditFrame_Convert.FlatOut_Main(editFrame, PathList.Regard_NsecMain_AsCM);
+        editFrame = ConvertFrame.FlatOut_CM__(editFrame, PathList.Regard_NsecCM_AsMain);
+        editFrame = ConvertFrame.FlatOut_Main(editFrame, PathList.Regard_NsecMain_AsCM);
       }
 
-      //edited frame
+      //frame
       if (PathList.Out_frame)
       {
-        string frameDir = (PathList.Out_misc_toTsDir)
-                          ? PathList.TsDir
-                          : PathList.DirPath_misc;
-        string framePath = Path.Combine(frameDir,
-                                        PathList.TsNameWithoutExt + ".frame.txt");
-        EditFrame_OutChap.To_FrameFile(framePath, editFrame, endFrame);
+        string path;
+        {
+          string dir = (PathList.Out_misc_toTsDir)
+                             ? PathList.TsDir
+                             : PathList.DirPath_misc;
+          string name = (PathList.IsLastPart)
+                             ? PathList.TsNameWithoutExt + ".frame.txt"
+                             : PathList.TsNameWithoutExt + ".part.frame.txt";
+          path = Path.Combine(dir, name);
+        }
+        OutChap.To_FrameFile(path, editFrame, endFrame);
       }
 
 
       //TvtPlay
       if (PathList.Out_tvtp)
       {
-        string chapDir = (PathList.Out_tvtp_toTsDir)
-                          ? PathList.TsDir
-                          : PathList.DirPath_tvtp;
-        string chapPath = Path.Combine(chapDir,
-                                       PathList.TsNameWithoutExt + ".chapter");
-        EditFrame_OutChap.To_TvtPlayChap(chapPath, editFrame, endFrame);
+        string path;
+        {
+          string dir = (PathList.Out_tvtp_toTsDir)
+                            ? PathList.TsDir
+                            : PathList.DirPath_tvtp;
+          path = Path.Combine(dir, PathList.TsNameWithoutExt + ".chapter");
+        }
+        OutChap.To_TvtPlayChap(path, editFrame, endFrame);
       }
 
 
@@ -216,14 +230,15 @@ namespace LGLauncher.EditFrame
       if (PathList.IsLastPart)
         if (PathList.Out_ogm)
         {
-          string chapDir = (PathList.Out_misc_toTsDir)
-                            ? PathList.TsDir
-                            : PathList.DirPath_misc;
-          string chapPath = Path.Combine(chapDir,
-                                         PathList.TsNameWithoutExt + ".ogm.chapter");
-          EditFrame_OutChap.To_OgmChap(chapPath, editFrame, endFrame);
+          string path;
+          {
+            string dir = (PathList.Out_misc_toTsDir)
+                              ? PathList.TsDir
+                              : PathList.DirPath_misc;
+            path = Path.Combine(dir, PathList.TsNameWithoutExt + ".ogm.chapter");
+          }
+          OutChap.To_OgmChap(path, editFrame, endFrame);
         }
-
     }
 
 

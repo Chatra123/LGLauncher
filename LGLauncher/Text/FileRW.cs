@@ -1,5 +1,6 @@
 ﻿/*
- * 最終更新日　16/03/05
+ * 最終更新日
+ *   16/03/29
  *  
  * 概要
  *   テキストファイルの読み書きにファイル共有設定をつける。
@@ -23,7 +24,8 @@ namespace OctNov.IO
   ///  *.ts.program.txt        Shift-JIS
   /// 
   ///  avs, d2v, lwi, bat      Shift-JIS
-  ///  srt                     UTF-8 bom
+  ///  vpy                     UTF8_nobom
+  ///  srt                     UTF8_bom
   /// </remarks>
   internal class TextEnc
   {

@@ -1,14 +1,14 @@
 
 SetMemoryMax(16)
-SetWorkingDir("#AvsWorkDir#")
+SetWorkingDir("#LWorkDir#")
 
 
-LoadPlugin("#InputPlugin#")
-
-#  d2v
+## d2v
+#d2v#  LoadPlugin("#DGDecode#")
 #d2v#  DGDecode_MPEG2Source("#D2vName#")
 
-#  Lwi
+## Lwi
+#lwi#  LoadPlugin("#LSMASHSource#")
 #lwi#  tspath = "#TsPath#"
 #lwi#  #LogoGuillo#     LWLibavVideoSource(tspath, cache=true, stream_index=-1, threads=0, repeat=true)
 #lwi#  #Join_Logo_Scp#  video = LWLibavVideoSource(tspath, cache=true, stream_index=-1, threads=0, repeat=true)
@@ -16,9 +16,7 @@ LoadPlugin("#InputPlugin#")
 #lwi#  #Join_Logo_Scp#  AudioDub(video, audio) 
 
 
-
 #EnableTrim#  Trim(#BeginFrame#, #EndFrame#)
-
 AssumeFPS(30000, 1001, true) 
 
 

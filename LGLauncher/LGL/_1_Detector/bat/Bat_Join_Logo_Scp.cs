@@ -14,7 +14,7 @@ namespace LGLauncher
     /// <summary>
     /// Join_Logo_Scp起動用バッチ作成
     /// </summary>
-    public static string Make_InRec(string avsPath, string logoPath, string jl_CmdPath)
+    public static string Make_OnRec(string avsPath, string logoPath, string jl_CmdPath)
     {
       if (File.Exists(avsPath) == false)
         throw new LGLException("format avs does not exist");
@@ -23,8 +23,9 @@ namespace LGLauncher
       if (File.Exists(jl_CmdPath) == false)
         throw new LGLException("jl_cmdPath does not exist");
 
+      //読
       var batText = new List<string>();
-      batText = FileR.ReadFromResource("LGLauncher.Resource.Base_JLS_InRec.bat");
+      batText = FileR.ReadFromResource("LGLauncher.Resource.JLS_OnRec.bat");
 
       //chapter_exe
       string chapter_exePath = PathList.Chapter_exe;
@@ -36,7 +37,7 @@ namespace LGLauncher
       string join_logo_scpPath = PathList.Join_Logo_Scp;
       string jls_resultPath = PathList.WorkName + ".jls.result.txt";
 
-      //bat置換
+      //置換
       for (int i = 0; i < batText.Count; i++)
       {
         var line = batText[i];
@@ -58,7 +59,7 @@ namespace LGLauncher
         batText[i] = line;
       }
 
-      //書込み
+      //書
       string outBatPath = PathList.WorkPath + ".JLS.bat";
       File.WriteAllLines(outBatPath, batText, TextEnc.Shift_JIS);
       return outBatPath;
@@ -74,8 +75,9 @@ namespace LGLauncher
       if (File.Exists(jl_CmdPath) == false)
         throw new LGLException("jl_CmdPath does not exist");
 
+      //読
       var batText = new List<string>();
-      batText = FileR.ReadFromResource("LGLauncher.Resource.Base_JLS_Last.bat");
+      batText = FileR.ReadFromResource("LGLauncher.Resource.JLS_Last.bat");
 
       //scpos
       string scpos_catPath =   PathList.TsShortName + ".jls.scpos.cat.txt";
@@ -85,7 +87,7 @@ namespace LGLauncher
       string join_logo_scpPath = PathList.Join_Logo_Scp;
       string jls_resultPath = PathList.TsShortName + ".jls.lastcat.result.txt";
 
-      //bat置換
+      //置換
       for (int i = 0; i < batText.Count; i++)
       {
         var line = batText[i];
@@ -100,7 +102,7 @@ namespace LGLauncher
         batText[i] = line;
       }
 
-      //書込み
+      //書
       string outBatPath = Path.Combine(PathList.LWorkDir,
                                        PathList.TsShortName + ".JLS.last.bat");
       File.WriteAllLines(outBatPath, batText, TextEnc.Shift_JIS);
