@@ -36,10 +36,11 @@ namespace LGLauncher
     /// <summary>
     /// 例外発生時にavsファイル削除
     /// </summary>
-    public static void CleanAvs_OnError()
+    public static void Clean_OnError()
     {
       //*.p3.lwi_2000__3000.avs 削除
-      Delete_file(0.0, PathList.LWorkDir, PathList.WorkName + ".p*_*__*.avs");
+      Delete_file(0.0, PathList.LWorkDir, PathList.WorkName + ".p*.*__*.avs");
+      Delete_file(0.0, PathList.LWorkDir, PathList.WorkName + ".p*.*__*.vpy");
     }
 
 
@@ -88,7 +89,6 @@ namespace LGLauncher
           Delete_file(nDaysBefore, PathList.LTopWorkDir, "*.p?*.*");
           Delete_file(nDaysBefore, PathList.LTopWorkDir, "*.sys.*");
           Delete_emptydir(PathList.LTopWorkDir);
-
           //Windows Temp
           Delete_file(nDaysBefore, Path.GetTempPath(), "logoGuillo_*.avs");
           Delete_file(nDaysBefore, Path.GetTempPath(), "logoGuillo_*.txt");

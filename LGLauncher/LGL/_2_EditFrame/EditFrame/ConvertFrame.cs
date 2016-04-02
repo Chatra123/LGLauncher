@@ -78,12 +78,12 @@ namespace LGLauncher.EditFrame
     /// 短いＭａｉｎをつぶす
     /// </summary>
     /// <param name="frameList">元になるフレームリスト</param>
-    /// <param name="miniMain_sec">指定秒数以下のＭａｉｎをつぶす</param>
+    /// <param name="ths_Mainsec">指定秒数以下のＭａｉｎをつぶす</param>
     /// <returns>
     ///   成功　→　List<int>
     ///   失敗　→　null
     /// </returns>
-    public static List<int> FlatOut_Main(List<int> frameList, double miniMain_sec)
+    public static List<int> FlatOut_Main(List<int> frameList, double ths_Mainsec)
     {
       //エラーチェック
       if (frameList == null) return null;
@@ -95,7 +95,7 @@ namespace LGLauncher.EditFrame
       {
         double mainLength = 1.0 * (frameList[i + 1] - frameList[i]) / 29.970;
 
-        if (miniMain_sec < mainLength)
+        if (ths_Mainsec < mainLength)
         {
           newList.Add(frameList[i]);
           newList.Add(frameList[i + 1]);
@@ -110,13 +110,13 @@ namespace LGLauncher.EditFrame
     /// 短いＣＭをつぶす
     /// </summary>
     /// <param name="frameList">元になるフレームリスト</param>
-    /// <param name="miniCM_sec">指定秒数以下のＣＭをつぶす</param>
+    /// <param name="ths_CMsec">指定秒数以下のＣＭをつぶす</param>
     /// <returns>
     ///   成功　→　List<int>
     ///   失敗　→　null
     /// </returns>
     /// <remarks>開始直後のＣＭはつぶさない。</remarks>
-    public static List<int> FlatOut_CM__(List<int> frameList, double miniCM_sec)
+    public static List<int> FlatOut_CM__(List<int> frameList, double ths_CMsec)
     {
       if (frameList == null) return null;
       if (frameList.Count % 2 == 1) return null;
@@ -140,7 +140,7 @@ namespace LGLauncher.EditFrame
       for (int i = 2; i < frameList.Count; i += 2)
       {
         double cmLength = 1.0 * (frameList[i] - newList[newList.Count - 1]) / 29.970;
-        if (cmLength < miniCM_sec)
+        if (cmLength < ths_CMsec)
         {
           //短
           //ＣＭを無視し本編内とする。本編終端を入れ替える

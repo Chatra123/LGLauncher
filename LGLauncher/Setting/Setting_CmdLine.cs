@@ -88,7 +88,7 @@ namespace LGLauncher
     public new string ToString()
     {
       var sb = new StringBuilder();
-      sb.AppendLine("  App Command Line");
+      sb.AppendLine("  [ App Command Line ]");
       sb.AppendLine("    No       = " + No);
       sb.AppendLine("    Last     = " + IsLast);
       sb.AppendLine("    All      = " + IsAll);
@@ -100,8 +100,7 @@ namespace LGLauncher
       sb.AppendLine("    SrtPath  = " + SrtPath);
 
       sb.AppendLine("    Channel  = " + Channel);
-      sb.AppendLine("    Program  = " + Program);
-      
+      sb.AppendLine("    Program  = " + Program);      
       return sb.ToString();
     }
 

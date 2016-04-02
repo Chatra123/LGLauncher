@@ -16,7 +16,7 @@ namespace LGLauncher
     private static List<FileStream> lock_items;
 
     /// <summary>
-    /// ファイルを移動禁止にする。
+    /// ファイルの移動禁止
     /// </summary>
     public static void Lock()
     {
@@ -73,7 +73,7 @@ namespace LGLauncher
 
 
     /// <summary>
-    /// ファイルを移動禁止を解除
+    /// ファイルの移動禁止を解除
     /// </summary>
     public static void Unlock()
     {

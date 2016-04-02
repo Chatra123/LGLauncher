@@ -26,7 +26,7 @@ namespace LGLauncher
       //d2v, lwiのフォーマットを整える
       if (PathList.InputPlugin == PluginType.D2v)
         D2vFormatter.Format(PathList.D2vPath);
-      else
+      if (PathList.InputPlugin == PluginType.Lwi)
         LwiFormatter.Format(PathList.LwiPath);
 
       var avsMaker = new AvsMaker();
@@ -152,7 +152,7 @@ namespace LGLauncher
 
 
 
-    #region GetTrimFrame_fromScriptName
+    #region GetTrimFrame_fromName
 
     /// <summary>
     /// ファイル名からトリムフレーム数取得
@@ -183,8 +183,8 @@ namespace LGLauncher
       var files = Directory.GetFiles(PathList.LWorkDir, nameKey);
       if (files.Count() != 1)
       {
-        Log.WriteLine("file Count() = " + files.Count() + "  Could'nt specify previous trim range.");
-        Log.WriteLine("nameKey      = " + nameKey);
+        Log.WriteLine(" file Count() = " + files.Count() + "  Could'nt specify trim range.");
+        Log.WriteLine(" nameKey      = " + nameKey);
         return null;
       }
 

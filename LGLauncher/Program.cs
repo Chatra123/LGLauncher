@@ -61,22 +61,22 @@ namespace LGLauncher
       }
       catch (LGLException e)
       {
+        /*
+        * エラー発生時の動作について
+        * 　・作成済みのavs *.p3.lwi_2000__3000.avsを削除
+        * 　・ダミーavs     *.p3.lwi_2000__2000.avsを作成
+        * 　　次回のLGLauncherでダミーavsのトリムレンジを読み込んでもらう。
+        * 
+        * チャプター出力について
+        * 　　エラーが発生してもチャプター出力は行う。
+        * 　　detect part No があるので *.p3.frame.cat.txtを作成しなくてはいけない。
+        * 　　値は前回のチャプターと同じ値にする。
+        * 　　IsLastPartなら logo_scp_posのlast_batch、ogm chapter出力を実行する。
+        */
         Log.WriteLine();
         Log.WriteLine(e.ToString());
         Log.WriteLine(CmdLine_ToString);
-        /*
-         * エラー発生時の動作について
-         * 　・作成済みのavs *.p3.lwi_2000__3000.avsを削除
-         * 　・ダミーavs     *.p3.lwi_2000__2000.avsを作成
-         * 　　次回のLGLauncherでダミーavsのトリムレンジを読み込んでもらう。
-         * 
-         * チャプター出力について
-         * 　　エラーが発生してもチャプター出力は行う。
-         * 　　detect part No があるので *.p3.frame.cat.txtを作成しなくてはいけない。
-         * 　　値は前回のチャプターと同じ値にする。
-         * 　　IsLastPartなら logo_scp_posのlast_batch、ogm chapter出力を実行する。
-         */
-        DeleteWorkItem.CleanAvs_OnError();
+        DeleteWorkItem.Clean_OnError();
         CommonAvsVpy.CreateDummy_OnError();
       }
 
@@ -97,13 +97,13 @@ namespace LGLauncher
       catch (LGLException e)
       {
         Log.WriteLine();
-        Log.WriteLine(CmdLine_ToString);
         Log.WriteLine(e.ToString());
+        Log.WriteLine(CmdLine_ToString);
       }
 
 
       DeleteWorkItem.Clean_Lastly();
-      Log.Close();　　                 //ログは残すので削除処理の後でclose
+      Log.Close();　　                 //ログは残すのでDeleteWorkItemの後でclose
     }
 
 
