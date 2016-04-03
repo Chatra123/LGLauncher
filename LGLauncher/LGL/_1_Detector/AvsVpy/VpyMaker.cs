@@ -7,70 +7,75 @@ using System.Threading;
 using System.Diagnostics;
 
 
-
 namespace LGLauncher
 {
   using OctNov.IO;
 
-  internal class VpyMaker : AbstractAvsMaker
+  class VpyMaker : AbstractAvsMaker
   {
+    VpyMakerModule module = new VpyMakerModule();
 
-    public override string AvsPath { get; protected set; }            //作成したVpyのパス
-    public override int[] TrimFrame { get; protected set; }           //トリム用フレーム数
 
-#pragma warning disable 0162           //警告0162：到達できないコード
     /// <summary>
-    /// Trim付きVpy作成
+    /// トリム用フレーム数取得
     /// </summary>
-    public override void Make()
+    public override int[] GetTrimFrame()
     {
-      /* ☆ NotImplementedException */
-      throw new NotImplementedException();
-
-      //フレーム数取得用スクリプト
+      //フレーム数取得用スクリプト　作成、実行
       {
-        string infoPath = CreateInfo_vpy();
-
-        var action = new Action(() => { RunInfo_vpy(infoPath); });
-        CommonAvsVpy.RunInfo(action);
+        string infoPath = module.CreateInfo_vpy();
+        var action = new Action(() => { module.RunInfo_vpy(infoPath); });
+        AvsVpyCommon.RunInfo(action);
       }
-
 
       //総フレーム数取得
       int totalframe;
       {
         string infoText = Path.Combine(PathList.LWorkDir, PathList.WorkName + ".info.txt");
-        var info = CommonAvsVpy.GetInfoText(infoText);
+        var info = AvsVpyCommon.GetInfoText(infoText);
         totalframe = (int)info[0];
       }
 
       //前回のトリム用フレーム数取得   previous
       int[] trimFrame_prv = (2 <= PathList.PartNo)
-                                ? CommonAvsVpy.GetTrimFrame_previous()
+                                ? AvsVpyCommon.GetTrimFrame_previous()
                                 : null;
 
       //トリム用フレーム計算
-      this.TrimFrame = CommonAvsVpy.CalcTrimFrame(totalframe, trimFrame_prv);
-
-      //vpy作成
-      var vpyText = CreateTrim_vpy(this.TrimFrame);
-      this.AvsPath = CommonAvsVpy.OutScript(this.TrimFrame, vpyText, ".vpy", TextEnc.UTF8_nobom);
-
+      int[] trimFrame = AvsVpyCommon.CalcTrimFrame(totalframe, trimFrame_prv);      //Trim付きスクリプト作成
+      return trimFrame;
     }
-#pragma warning restore 0162          //警告0162：到達できないコード
 
+    /// <summary>
+    /// Trim付きスクリプト作成
+    /// </summary>
+    public override string MakeTrimScript(int[] trimFrame)
+    {
+      var text = module.CreateTrim_vpy(trimFrame);
+      string path = AvsVpyCommon.OutScript(trimFrame, text, ".vpy", TextEnc.UTF8_nobom);
+      return path;
+    }
+  }//  class VpyMaker
+
+
+
+  /// <summary>
+  /// VpyMaker用 Module
+  /// </summary>
+  class VpyMakerModule
+  {
     /// <summary>
     /// フレーム数取得用のVpy作成
     /// </summary>
-    private string CreateInfo_vpy()
+    public string CreateInfo_vpy()
     {
       //読
-      var vpyText = FileR.ReadFromResource("LGLauncher.Resource.GetInfo_vpy.vpy");
+      var text = FileR.ReadFromResource("LGLauncher.Resource.GetInfo_vpy.vpy");
 
       //置換
-      for (int i = 0; i < vpyText.Count; i++)
+      for (int i = 0; i < text.Count; i++)
       {
-        var line = vpyText[i];
+        var line = text[i];
         line = Regex.Replace(line, "#LWorkDir#", PathList.LWorkDir, RegexOptions.IgnoreCase);
 
         //Plugin
@@ -78,9 +83,9 @@ namespace LGLauncher
         {
           line = Regex.Replace(line, "#d2v#", "", RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#d2vsource#", PathList.d2vsource_dll, RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#D2vName#", PathList.WorkName + ".d2v", RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#D2vName#", PathList.D2vNameInWork, RegexOptions.IgnoreCase);
         }
-        if (PathList.InputPlugin == PluginType.Lwi)
+        else if (PathList.InputPlugin == PluginType.Lwi)
         {
           line = Regex.Replace(line, "#lwi#", "", RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#vslsmashsoruce#", PathList.vslsmashsource_dll, RegexOptions.IgnoreCase);
@@ -88,12 +93,12 @@ namespace LGLauncher
         }
 
         line = Regex.Replace(line, "#InfoName#", PathList.WorkName + ".info.txt", RegexOptions.IgnoreCase);
-        vpyText[i] = line.Trim(); // pythonは unexpected indentになるので必ずTrim()
+        text[i] = line.Trim(); // pythonは unexpected indentになるので必ずTrim()
       }
 
       //書
       string infoPath = PathList.WorkPath + ".info.vpy";
-      File.WriteAllLines(infoPath, vpyText, TextEnc.UTF8_bom);
+      File.WriteAllLines(infoPath, text, TextEnc.UTF8_bom);
       return infoPath;
     }
 
@@ -102,7 +107,7 @@ namespace LGLauncher
     /// <summary>
     /// InfoSciprt実行  vpy
     /// </summary>
-    private void RunInfo_vpy(string vpyPath)
+    public void RunInfo_vpy(string vpyPath)
     {
       var prc = new Process();
       {
@@ -135,26 +140,26 @@ namespace LGLauncher
     /// <summary>
     /// TrimVpy作成
     /// </summary>
-    private List<string> CreateTrim_vpy(int[] trimFrame)
+    public List<string> CreateTrim_vpy(int[] trimFrame)
     {
       int beginFrame = trimFrame[0];
       int endFrame = trimFrame[1];
 
       //読
-      var vpyText = FileR.ReadFromResource("LGLauncher.Resource.TrimVpy.vpy");
+      var text = FileR.ReadFromResource("LGLauncher.Resource.TrimVpy.vpy");
 
       //置換
-      for (int i = 0; i < vpyText.Count; i++)
+      for (int i = 0; i < text.Count; i++)
       {
-        var line = vpyText[i];
+        var line = text[i];
         //Plugin
         if (PathList.InputPlugin == PluginType.D2v)
         {
           line = Regex.Replace(line, "#d2v#", "", RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#d2vsource#", PathList.d2vsource_dll, RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#D2vName#", PathList.WorkName + ".d2v", RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#D2vName#", PathList.D2vNameInWork, RegexOptions.IgnoreCase);
         }
-        if (PathList.InputPlugin == PluginType.Lwi)
+        else if (PathList.InputPlugin == PluginType.Lwi)
         {
           line = Regex.Replace(line, "#lwi#", "", RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#vslsmashsoruce#", PathList.vslsmashsource_dll, RegexOptions.IgnoreCase);
@@ -164,7 +169,7 @@ namespace LGLauncher
         //Detector
         //if (PathList.Detector == LogoDetector.Join_Logo_Scp)
         //  line = Regex.Replace(line, "#Join_Logo_Scp#", "", RegexOptions.IgnoreCase);
-        //if (PathList.Detector == LogoDetector.LogoGuillo)
+        //else if (PathList.Detector == LogoDetector.LogoGuillo)
         //  line = Regex.Replace(line, "#LogoGuillo#", "", RegexOptions.IgnoreCase);
 
         //Trim
@@ -174,15 +179,14 @@ namespace LGLauncher
           line = Regex.Replace(line, "#BeginFrame#", "" + beginFrame, RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#EndFrame_plus1#", "" + (endFrame + 1), RegexOptions.IgnoreCase);
         }
-        vpyText[i] = line.Trim(); // pythonは unexpected indentになるので必ずTrim()
+        text[i] = line.Trim(); // pythonは unexpected indentになるので必ずTrim()
       }
 
-      return vpyText;
+      return text;
     }
 
 
-
-  }
+  }//  class VpyMakerModule
 }
 
 

@@ -9,9 +9,8 @@ using System.Threading.Tasks;
 
 namespace LGLFrameChecker
 {
-  internal class Program
+  class Program
   {
-
     private static void Main(string[] args)
     {
       Console.WriteLine("LGLFrameChecker");

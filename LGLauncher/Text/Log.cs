@@ -7,7 +7,7 @@ using System.Linq;
 namespace LGLauncher
 {
 
-  internal static class Log
+  static class Log
   {
     public static bool Enable = true;
     private static StreamWriter writer = null;

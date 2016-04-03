@@ -8,11 +8,11 @@ namespace LGLauncher.EditFrame
 {
   using OctNov.IO;
 
-  static class OutChap
+  static class OutputChapter
   {
 
     /// <summary>
-    /// フレームを外部フォルダに出力
+    /// フレームリストを出力
     /// </summary>
     public static void To_FrameFile(string outPath, List<int> framelist, int endFrame)
     {
@@ -50,7 +50,7 @@ namespace LGLauncher.EditFrame
 
 
     /// <summary>
-    /// TvtPlay用chapter出力
+    /// TvtPlay chapterを出力
     /// </summary>
     public static void To_TvtPlayChap(string outPath, List<int> framelist, int endFrame)
     {
@@ -96,7 +96,7 @@ namespace LGLauncher.EditFrame
 
 
     /// <summary>
-    /// OgmChapを出力
+    /// OgmChapterを出力
     /// </summary>
     public static void To_OgmChap(string outPath, List<int> framelist, int endFrame)
     {

@@ -101,7 +101,7 @@ namespace LGLauncher.EditFrame
                                     PathList.TsShortName + ".frame.cat.txt");
 
       //読
-      //　LogoGuilloが映像からロゴをみつけられない場合、*.p3.frame.txtは作成されていない
+      //　LogoGuilloが映像からロゴをみつけられない場合、*.p3.frame.txtは作成されていない。
       //　add_FrameListが見つからなくても処理は継続する。
       List<int> add_FrameList = null, old_CatList = null;
       {
@@ -112,7 +112,7 @@ namespace LGLauncher.EditFrame
         {
           old_CatList = ConvertFrame.FrameFile_to_List(catPath);          // from  *.frame.cat.txt
           if (old_CatList == null && add_FrameList == null)
-            throw new LGLException("not detect frame file");
+            throw new LGLException("not detect frame file  or  is invalid file");
         }
         //ファイルがなければnullが返されているのでnew()。
         old_CatList = old_CatList ?? new List<int>();
@@ -155,7 +155,7 @@ namespace LGLauncher.EditFrame
     /// <summary>
     /// チャプター出力
     /// </summary>
-    public static void Edit_OutChapter(List<int> rawFrame, int[] trimFrame)
+    public static void Edit_Chapter(List<int> rawFrame, int[] trimFrame)
     {
       if (rawFrame == null)
       {
@@ -183,7 +183,7 @@ namespace LGLauncher.EditFrame
                              : PathList.TsNameWithoutExt + ".part.rawframe.txt";
           path = Path.Combine(dir, name);
         }
-        OutChap.To_FrameFile(path, rawFrame, endFrame);
+        OutputChapter.To_FrameFile(path, rawFrame, endFrame);
       }
 
 
@@ -208,7 +208,7 @@ namespace LGLauncher.EditFrame
                              : PathList.TsNameWithoutExt + ".part.frame.txt";
           path = Path.Combine(dir, name);
         }
-        OutChap.To_FrameFile(path, editFrame, endFrame);
+        OutputChapter.To_FrameFile(path, editFrame, endFrame);
       }
 
 
@@ -222,7 +222,7 @@ namespace LGLauncher.EditFrame
                             : PathList.DirPath_tvtp;
           path = Path.Combine(dir, PathList.TsNameWithoutExt + ".chapter");
         }
-        OutChap.To_TvtPlayChap(path, editFrame, endFrame);
+        OutputChapter.To_TvtPlayChap(path, editFrame, endFrame);
       }
 
 
@@ -237,7 +237,7 @@ namespace LGLauncher.EditFrame
                               : PathList.DirPath_misc;
             path = Path.Combine(dir, PathList.TsNameWithoutExt + ".ogm.chapter");
           }
-          OutChap.To_OgmChap(path, editFrame, endFrame);
+          OutputChapter.To_OgmChap(path, editFrame, endFrame);
         }
     }
 

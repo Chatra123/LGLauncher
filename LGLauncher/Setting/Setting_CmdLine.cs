@@ -11,7 +11,7 @@ namespace LGLauncher
   /// <summary>
   /// コマンドライン引数を処理
   /// </summary>
-  internal class Setting_CmdLine
+  class Setting_CmdLine
   {
     public int No { get; private set; }
     public bool IsLast { get; private set; }
@@ -87,21 +87,21 @@ namespace LGLauncher
     /// </summary>
     public new string ToString()
     {
-      var sb = new StringBuilder();
-      sb.AppendLine("  [ App Command Line ]");
-      sb.AppendLine("    No       = " + No);
-      sb.AppendLine("    Last     = " + IsLast);
-      sb.AppendLine("    All      = " + IsAll);
-      sb.AppendLine("    Sequence = " + SequenceName);
+      var text = new StringBuilder();
+      text.AppendLine("  [ App Command Line ]");
+      text.AppendLine("    No       = " + No);
+      text.AppendLine("    Last     = " + IsLast);
+      text.AppendLine("    All      = " + IsAll);
+      text.AppendLine("    Sequence = " + SequenceName);
 
-      sb.AppendLine("    TsPath   = " + TsPath);
-      sb.AppendLine("    D2vPath  = " + D2vPath);
-      sb.AppendLine("    LwiPath  = " + LwiPath);
-      sb.AppendLine("    SrtPath  = " + SrtPath);
+      text.AppendLine("    TsPath   = " + TsPath);
+      text.AppendLine("    D2vPath  = " + D2vPath);
+      text.AppendLine("    LwiPath  = " + LwiPath);
+      text.AppendLine("    SrtPath  = " + SrtPath);
 
-      sb.AppendLine("    Channel  = " + Channel);
-      sb.AppendLine("    Program  = " + Program);      
-      return sb.ToString();
+      text.AppendLine("    Channel  = " + Channel);
+      text.AppendLine("    Program  = " + Program);      
+      return text.ToString();
     }
 
 

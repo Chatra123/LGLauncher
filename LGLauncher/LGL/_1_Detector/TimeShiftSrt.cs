@@ -16,7 +16,7 @@ namespace LGLauncher
 {
   using OctNov.IO;
 
-  internal static class TimeShiftSrt
+  static class TimeShiftSrt
   {
     /// <summary>
     /// TimeShiftSrtファイルを作成

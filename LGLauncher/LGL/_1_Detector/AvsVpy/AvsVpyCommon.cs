@@ -11,48 +11,74 @@ namespace LGLauncher
   using OctNov.IO;
 
   /// <summary>
+  /// AbstractAvsMaker
+  /// </summary>
+  abstract class AbstractAvsMaker
+  {
+    public abstract int[] GetTrimFrame();
+    public abstract string MakeTrimScript(int[] trimFrame);
+  }
+
+  /// <summary>
   /// AvsVpy作成
   /// </summary>
-  internal class AvsVpyMaker
+  class AvsVpyMaker
   {
-    public string AvsVpyPath { get; protected set; }         //作成したAvsのパス
-    public int[] TrimFrame { get; protected set; }           //トリム用フレーム数
+    AbstractAvsMaker maker;
+    static bool IndexHasFormatted = false;
 
     /// <summary>
-    /// AvsVpy作成
+    /// constructor
     /// </summary>
-    public void Make()
+    public AvsVpyMaker()
     {
-      //d2v, lwiのフォーマットを整える
-      if (PathList.InputPlugin == PluginType.D2v)
-        D2vFormatter.Format(PathList.D2vPath);
-      if (PathList.InputPlugin == PluginType.Lwi)
-        LwiFormatter.Format(PathList.LwiPath);
+      //format d2v, lwi　
+      if (IndexHasFormatted == false)
+      {
+        IndexHasFormatted = true;
+        if (PathList.InputPlugin == PluginType.D2v)
+        {
+          D2vFormatter.Format();
+        }
+        else if (PathList.InputPlugin == PluginType.Lwi)
+        {
+          LwiFormatter.Format();
+        }
+      }
 
-      var avsMaker = new AvsMaker();
-      avsMaker.Make();
+      maker =
+        (PathList.AvsVpy == AvsVpyType.Avs) ? new AvsMaker() as AbstractAvsMaker :
+        (PathList.AvsVpy == AvsVpyType.Vpy) ? new VpyMaker() as AbstractAvsMaker :
+        null;
 
-      this.AvsVpyPath = avsMaker.AvsPath;
-      this.TrimFrame = avsMaker.TrimFrame;
+      if (PathList.AvsVpy == AvsVpyType.Vpy)
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// トリムフレーム取得
+    /// </summary>
+    public int[] GetTrimFrame()
+    {
+      return maker.GetTrimFrame();
+    }
+
+    /// <summary>
+    /// スクリプト作成
+    /// </summary>
+    public string MakeTrimScript(int[] trimFrame)
+    {
+      return maker.MakeTrimScript(trimFrame);
     }
   }
 
 
-  /// <summary>
-  /// AbstractAvsMaker
-  /// </summary>
-  internal abstract class AbstractAvsMaker
-  {
-    public abstract string AvsPath { get; protected set; }            //作成したAvsのパス
-    public abstract int[] TrimFrame { get; protected set; }           //トリム用フレーム数
-    public abstract void Make();
-  }
 
 
   /// <summary>
-  /// CommonAvsVpy
+  /// AvsVpyCommon
   /// </summary>
-  internal static class CommonAvsVpy
+  static class AvsVpyCommon
   {
 
     #region InfoScript
@@ -223,15 +249,14 @@ namespace LGLauncher
     #region CreateDummy_OnError
 
     /// <summary>
-    /// エラー発生時に次回　参照用のavsファイル作成
+    /// エラー発生時、次回のLGLancher実行で参照するavsファイル作成
     /// </summary>
     /// <remarks>
     /// ・作成済みのavsファイルはあらかじめ削除しておくこと。
     /// ・TrimFrame数を進めないために　trimFrame_prv[1], trimFrame_prv[1]　にする。
     /// 
     /// 　TsShortName.p2.1000__2000.avs　を削除しておき
-    /// 　TsShortName.p2.1000__1000.avs　を作成
-    /// 
+    /// 　TsShortName.p2.1000__1000.avs　を作成 
     /// </remarks>
     public static void CreateDummy_OnError()
     {
@@ -255,7 +280,9 @@ namespace LGLauncher
         trimFrame_prv[1],
         PathList.AvsVpyExt
         );
+
       File.Create(dummyFilePath).Close();
+
     }
 
     #endregion CreateDummy_OnError
@@ -265,7 +292,7 @@ namespace LGLauncher
     #region CalcTrimFrame
 
     /// <summary>
-    /// トリム用フレーム計算
+    /// トリム用フレーム数　計算
     /// </summary>
     /// <param name="totalframe">総フレーム数</param>
     /// <param name="trimFrame_prv">前回のトリムフレーム数</param>

@@ -34,13 +34,13 @@ namespace LGLauncher
 
 
     /// <summary>
-    /// 例外発生時にavsファイル削除
+    /// 例外発生時に作成済みのavsファイル削除
     /// </summary>
     public static void Clean_OnError()
     {
-      //*.p3.lwi_2000__3000.avs 削除
-      Delete_file(0.0, PathList.LWorkDir, PathList.WorkName + ".p*.*__*.avs");
-      Delete_file(0.0, PathList.LWorkDir, PathList.WorkName + ".p*.*__*.vpy");
+      // *.p3.2000__3000.avs 削除
+      Delete_file(0.0, PathList.LWorkDir, PathList.WorkName + ".*__*.avs");
+      Delete_file(0.0, PathList.LWorkDir, PathList.WorkName + ".*__*.vpy");
     }
 
 
@@ -62,18 +62,17 @@ namespace LGLauncher
         //  2 <= PartNo  　　→　　１つ前の作業ファイル削除
         else if (2 <= PathList.PartNo)
         {
-          //今回作成したTsName.p3.lwi_20000__30000.avsは、
+          //今回作成したTsName.p3.20000__30000.avsは、
           //次回のLGLauncherが使用するので削除しない。
-          //ひとつ前の作業ファイルを削除。
           Delete_file(0.0, PathList.LWorkDir, PathList.WorkName_prv + "*");
         }
       }
 
-      //ファイルサイズが大きい lwi, d2v, srt削除
+      //ファイルサイズが大きい d2v, lwi, srt削除
       if (2 <= PathList.Mode_DeleteWorkItem)
       {
-        Delete_file(0.0, PathList.LWorkDir, PathList.TsShortName + "*.lwi");
         Delete_file(0.0, PathList.LWorkDir, PathList.TsShortName + "*.d2v");
+        Delete_file(0.0, PathList.LWorkDir, PathList.TsShortName + "*.lwi");
         Delete_file(0.0, PathList.LWorkDir, PathList.TsShortName + "*.srt");
       }
 

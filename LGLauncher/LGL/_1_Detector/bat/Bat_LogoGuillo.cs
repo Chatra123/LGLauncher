@@ -9,7 +9,7 @@ namespace LGLauncher
 {
   using OctNov.IO;
 
-  internal static class Bat_LogoGuillo
+  static class Bat_LogoGuillo
   {
     /// <summary>
     /// LogoGuillo起動用バッチ作成

@@ -16,7 +16,7 @@ namespace LGLauncher
     /// </summary>
     public static void Launch(string batPath, int timeout_ms = -1)
     {
-      //logoguilloでエラーが発生しても一度だけリトライする
+      //LogoGuilloでエラーが発生しても一度だけリトライする
       for (int retry = 1; retry <= 2; retry++)
       {
         try
@@ -24,7 +24,8 @@ namespace LGLauncher
           var startTime = DateTime.Now;
           Launch_Detector(batPath, timeout_ms);
 
-          //windows sleepが原因のタイムアウト
+          //Windows Sleepが原因のタイムアウト
+          //  timeout_msから１０秒以上経過している。
           var elapse_ms = (DateTime.Now - startTime).TotalMilliseconds;
           if (timeout_ms + 10 * 1000 < elapse_ms)
           {
@@ -45,7 +46,7 @@ namespace LGLauncher
           {
             Log.WriteLine();
             Log.WriteLine(e.Message);
-            Log.WriteLine("Retry detector");
+            Log.WriteLine("Retry BatLuncher");
             continue;
           }
         }
@@ -70,6 +71,7 @@ namespace LGLauncher
         prc.StartInfo.UseShellExecute = false;
         prc.Start();
         prc.WaitForExit(timeout_ms);
+
         hasExisted = prc.HasExited;
         exitCode = prc.ExitCode;
         if (hasExisted == false) prc.Kill();

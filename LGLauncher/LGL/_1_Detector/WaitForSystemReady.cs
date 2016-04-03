@@ -100,7 +100,7 @@ namespace LGLauncher
       //  Mutexが取得できないときは待機時間の追加を設定
       //bool addtionalWait;
       //{
-      //  const string MutexName = "LGL-A8245043-3476";      //LGL
+      //  const string MutexName = "LGL-41CDEAC6-6717";      //LGL
       //  mutexControl = new MutexControl();
       //  mutexControl.Initlize(MutexName);
       //  mutexControl.Get();
@@ -109,7 +109,7 @@ namespace LGLauncher
       ////Semaphore取得    LGL V2P
       bool addtionalWait;
       {
-        const string MutexName = "LGL-A8245043-3476";  //LGL
+        const string MutexName = "LGL-41CDEAC6-6717";  //LGL
         //const string MutexName = "V2P-491E1B11-9DC0";    //V2P
         mutexControl = new SemaphoreControl();
         mutexControl.Initlize(MutexName, multiRun);

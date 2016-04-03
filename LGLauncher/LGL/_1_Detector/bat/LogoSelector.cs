@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace LGLauncher
 {
   using OctNov.IO;
 
-  internal static class LogoSelector
+  static class LogoSelector
   {
     /// <summary>
     /// LogoGuillo用　Logo、Param取得
@@ -70,12 +71,15 @@ namespace LGLauncher
       //Log
       if (PathList.Is1stPart || PathList.IsAll)
       {
-        Log.WriteLine("      LogoSelector :");
-        Log.WriteLine(exepath);
-        Log.WriteLine("              args :");
-        Log.WriteLine(args);
-        Log.WriteLine("            return :");
-        Log.WriteLine(result);
+        var log = new StringBuilder();
+        log.AppendLine("  [ LogoSelector ]");
+        log.AppendLine("    path   :");
+        log.AppendLine(exepath);
+        log.AppendLine("    args   :");
+        log.AppendLine(args);
+        log.AppendLine("    return :");
+        log.AppendLine(result);
+        Log.WriteLine(log.ToString());
       }
       return split;
     }
@@ -124,8 +128,7 @@ namespace LGLauncher
       }
       catch (Exception exc)
       {
-        Log.WriteLine("");
-        Log.WriteLine("" + exc.ToString());
+        Log.WriteLine(exc.ToString());
         throw new LGLException("LogoSelector has error");
       }
     }

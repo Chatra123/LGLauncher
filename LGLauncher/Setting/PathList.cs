@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 
@@ -41,7 +42,7 @@ namespace LGLauncher
   /// <summary>
   /// パス一覧　＆　アプリ設定
   /// </summary>
-  internal static class PathList
+  static class PathList
   {
     //  [  Input file  ]
     //    Ts
@@ -55,11 +56,16 @@ namespace LGLauncher
     public static string D2vPath { get; private set; }
     public static string D2vDir { get { return Path.GetDirectoryName(D2vPath); } }
     public static string D2vName { get { return Path.GetFileName(D2vPath); } }
+    public static string D2vPathInWork { get { return Path.Combine(LWorkDir, D2vNameInWork); } }
+    public static string D2vNameInWork { get { return PathList.TsShortName + ".d2v"; } }
+
 
     //    Lwi
     public static string LwiPath { get; private set; }
     public static string LwiDir { get { return Path.GetDirectoryName(LwiPath); } }
     public static string LwiName { get { return Path.GetFileName(LwiPath); } }
+    public static string LwiPathInWork { get { return Path.Combine(LWorkDir, LwiNameInWork); } }
+    public static string LwiNameInWork { get { return PathList.TsShortName + ".lwi"; } }
 
     //    LwiFooter
     public static string LwiFooterPath { get; private set; }
@@ -77,49 +83,77 @@ namespace LGLauncher
     public static string AppName { get { return Path.GetFileName(AppPath); } }
 
 
-    //  [  Work item  ]
+    //  [  Work value  ]
     //    LSystemDir
     public static string LSystemDir { get; private set; }
     public static string LTopWorkDir { get; private set; }
     public static string LWorkDir { get; private set; }
 
-    //    WorkPath                                          //example
-    //public static string WorkPathBase { get; private set; }　//  C:\EDCB\Write\Write_PF\LGLauncher\LWork\010101_ショップジ_0a1b308c1\ショップジ.p
-    //public static string WorkNameBase { get; private set; }  //  ショップジ.p
-    //    current work path
-    public static string WorkPath { get; private set; }　　  //  C:\EDCB\Write\Write_PF\LGLauncher\LWork\010101_ショップジ_0a1b308c1\ショップジ.p3
-    public static string WorkName { get; private set; }      //  ショップジ.p3
-    //    previous work path
-    public static string WorkPath_prv { get; private set; }  //  C:\EDCB\Write\Write_PF\LGLauncher\LWork\010101_ショップジ_0a1b308c1\ショップジ.p2
-    public static string WorkName_prv { get; private set; }  //  ショップジ.p2
 
+    //  WorkPath                example
+    //    current  work path      C:\EDCB\Write\Write_PF\LGLauncher\LWork\010101_ショップジ_0a1b308c1\ショップジ.p3
+    //                            ショップジ.p3
+    //    previous work path      C:\EDCB\Write\Write_PF\LGLauncher\LWork\010101_ショップジ_0a1b308c1\ショップジ.p2
+    //                            ショップジ.p2
+    public static string WorkName { get { return (IsAll) ? TsShortName + ".all" : TsShortName + ".p" + PartNo; } }
+    public static string WorkPath { get { return Path.Combine(LWorkDir, WorkName); } }
+    public static string WorkName_prv { get { return TsShortName + ".p" + (PartNo - 1); } }
+    public static string WorkPath_prv { get { return Path.Combine(LWorkDir, WorkName_prv); } }
 
     //PartNo
     public static int PartNo { get; private set; }
     public static bool IsPart { get { return 1 <= PartNo; } }
     public static bool Is1stPart { get { return PartNo == 1; } }
     public static bool IsAll { get; private set; }
-    public static bool IsLastPart { get; private set; }
     private static bool AutoDetectPartNo;
     private static string SequenceName;                      //作業フォルダ名のMD5作成用
+
+    //コマンドラインに -IsLast 指定があるか？
+    public static bool HasLastFlag_OnCmdLine { get; private set; }
+    //SplitTrim
+    public static bool Enable_SplitTrim { get; private set; }
+    public static bool IsLastSplit { get; private set; }
+    public static void Set_IsLastSplit(bool islast)
+    {
+      //IsLastSplit更新
+      IsLastSplit = islast;
+    }
+
+    //最終 PartNoか？
+    public static bool IsLastPart
+    {
+      get
+      {
+        if (Enable_SplitTrim)
+          return HasLastFlag_OnCmdLine && IsLastSplit;
+        else
+          return HasLastFlag_OnCmdLine;
+      }
+    }
+
+    //PartNo＋＋
+    public static void IncreamentPartNo()
+    {
+      PartNo++;
+      if (IsAll) throw new Exception();
+    }
 
 
     //  [  LSystem  ]  binary path
     public static string SystemIdleMonitor { get; private set; }
+    public static string avs2pipemod { get; private set; }
 
     //avs vpy
-    public static string avs2pipemod { get; private set; }
+    public static AvsVpyType AvsVpy { get; private set; }
+    public static string AvsVpyExt { get { return "." + AvsVpy.ToString().ToLower(); } }
+
     public static PluginType InputPlugin { get; private set; }
     public static string DGDecode_dll { get; private set; }
     public static string LSMASHSource_dll { get; private set; }
     public static string d2vsource_dll { get; private set; }
     public static string vslsmashsource_dll { get; private set; }
 
-    //AvsVpyType
-    public static AvsVpyType AvsVpy { get; private set; }
-    public static string AvsVpyExt { get { return "." + AvsVpy.ToString().ToLower(); } }
-
-    //lgd logo
+    //logo select
     public static string Channel { get; private set; }
     public static string Program { get; private set; }
     public static string LogoSelector { get; private set; }
@@ -195,7 +229,7 @@ namespace LGLauncher
     {
       PartNo = cmdline.No;
       IsAll = cmdline.IsAll || cmdline.No == -1;
-      IsLastPart = cmdline.IsLast || cmdline.IsAll || cmdline.No == -1;
+      HasLastFlag_OnCmdLine = cmdline.IsLast || cmdline.IsAll || cmdline.No == -1;
       SequenceName = cmdline.SequenceName ?? "";
 
       TsPath = cmdline.TsPath;
@@ -278,12 +312,10 @@ namespace LGLauncher
           : LogoDetector.Unknown;
       }
 
-      /* Avs固定 */
+      //Avs固定 
       {
         AvsVpy = AvsVpyType.Avs;
       }
-
-      Detector_MultipleRun = setting.Detector_MultipleRun;
     }
 
 
@@ -297,8 +329,8 @@ namespace LGLauncher
       AppPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
 
       //Dir作成
-      LTopWorkDir = Path.Combine(AppDir, @"LWork\");
-      LSystemDir = Path.Combine(AppDir, @"LSystem\");
+      LTopWorkDir = Path.Combine(AppDir, @"LWork");
+      LSystemDir = Path.Combine(AppDir, @"LSystem");
       if (Directory.Exists(LTopWorkDir) == false)
         Directory.CreateDirectory(LTopWorkDir);
       if (Directory.Exists(LSystemDir) == false)
@@ -362,21 +394,8 @@ namespace LGLauncher
           intNums.Reverse();
           return intNums[0] + 1;
         })();
-
-      //WorkPath
-      WorkName = (IsAll) ? TsShortName + ".all" : TsShortName + ".p" + PartNo;
-      WorkPath = Path.Combine(LWorkDir, WorkName);
-      WorkName_prv = TsShortName + ".p" + (PartNo - 1);
-      WorkPath_prv = Path.Combine(LWorkDir, WorkName_prv);
-
-      //WorkPath
-      //WorkNameBase = (IsAll) ? TsShortName + ".all" : TsShortName + ".p";
-      //WorkPathBase = Path.Combine(LWorkDir, WorkNameBase);
-      //WorkName = (IsAll) ? WorkName : WorkNameBase + PartNo;
-      //WorkPath = Path.Combine(LWorkDir, WorkName);
-      //WorkName_prv = WorkNameBase + (PartNo - 1);
-      //WorkPath_prv = Path.Combine(LWorkDir, WorkName_prv);
     }
+
 
 
     class Hash
@@ -431,7 +450,7 @@ namespace LGLauncher
       SystemIdleMonitor = SearchItem_OrEmpty(sysFiles, "SystemIdleMonitor.exe");
       avs2pipemod = SearchItem(sysFiles, "avs2pipemod.exe");
 
-      //Plugin
+      //InputPlugin
       if (PathList.AvsVpy == AvsVpyType.Avs)
       {
         if (InputPlugin == PluginType.D2v)
@@ -439,7 +458,7 @@ namespace LGLauncher
         else if (InputPlugin == PluginType.Lwi)
           LSMASHSource_dll = SearchItem(sysFiles, "LSMASHSource.dll");
       }
-      if (PathList.AvsVpy == AvsVpyType.Vpy)
+      else if (PathList.AvsVpy == AvsVpyType.Vpy)
       {
         if (InputPlugin == PluginType.D2v)
           d2vsource_dll = SearchItem(sysFiles, "d2vsource.dll");
@@ -516,7 +535,10 @@ namespace LGLauncher
       DirPath_misc = setting.DirPath_misc;
 
       //misc
-      //  delete work item
+      Detector_MultipleRun = setting.Detector_MultipleRun;
+      const bool enable_SplitTrim = true;      //  true  false
+      Enable_SplitTrim = enable_SplitTrim;
+
       Mode_DeleteWorkItem = setting.DeleteWorkItem;
     }
 
@@ -528,17 +550,18 @@ namespace LGLauncher
     {
       //log
       {
-        Log.WriteLine("  No  = 【    " + PathList.PartNo + "    】");
-
+        var log = new StringBuilder();
+        log.AppendLine("  No  = 【    " + PathList.PartNo + "    】");
         if (PathList.Is1stPart || PathList.IsAll)
         {
-          Log.WriteLine("         " + PathList.TsPath);
-          Log.WriteLine("         InputPlugin  :  " + InputPlugin.ToString());
-          Log.WriteLine("         LogoDetector :  " + Detector.ToString());
-          Log.WriteLine();
+          log.AppendLine("         " + PathList.TsPath);
+          log.AppendLine("         InputPlugin  :  " + InputPlugin.ToString());
+          log.AppendLine("         LogoDetector :  " + Detector.ToString());
+          log.AppendLine();
         }
-        if (IsLastPart)
-          Log.WriteLine("         IsLast       :  " + IsLastPart);
+        if (HasLastFlag_OnCmdLine)
+          log.AppendLine("         HasLastFlag  :  " + HasLastFlag_OnCmdLine);
+        Log.WriteLine(log.ToString());
       }
 
       // error check

@@ -23,7 +23,7 @@ using System.Text;
 
 namespace OctNov.Excp
 {
-  internal static class ExceptionInfo
+  static class ExceptionInfo
   {
     /// <summary>
     /// 例外発生時に内容をファイルに保存する。

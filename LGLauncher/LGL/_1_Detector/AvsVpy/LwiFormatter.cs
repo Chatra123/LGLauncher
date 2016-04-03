@@ -49,12 +49,11 @@ namespace LGLauncher
     /// <summary>
     /// lwiのフォーマットを整える
     /// </summary>
-    /// <returns>フォーマット済みlwiのパス</returns>
-    public static string Format(string baseLwiPath)
-    { 
-      string outlwiPath = PathList.WorkPath + ".lwi";
-      var reader = new FileR(baseLwiPath);
-      var writer = new FileW(outlwiPath);
+    public static void Format()
+    {
+      string outPath = PathList.LwiPathInWork;
+      var reader = new FileR(PathList.LwiPath);
+      var writer = new FileW(outPath);
       writer.SetNewline_n();
 
       try
@@ -133,7 +132,7 @@ namespace LGLauncher
             writer.Close();
 
             //footerをバイナリーモードで書込み
-            FileW.AppendBytes(outlwiPath, footer_bin);
+            FileW.AppendBytes(outPath, footer_bin);
           }
           else
           {
@@ -148,7 +147,13 @@ namespace LGLauncher
           }
         }
 
-        return outlwiPath;
+        //コピー
+        {
+          //デバッグ用記録  TsShortName.lwi --> TsShortName.p2.lwi
+          string outPath_debug = PathList.WorkPath + ".lwi";
+          File.Copy(outPath, outPath_debug);
+        }
+
       }
       finally
       {
@@ -177,7 +182,7 @@ namespace LGLauncher
 
       //footerは数秒間隔でファイル全体が更新されるので、
       //</LibavReaderIndexFile>を確認するまで繰り返す。
-      for (int i = 0; i < 5; i++)
+      for (int i = 0; i < 3; i++)
       {
         if (File.Exists(PathList.LwiFooterPath) == false) return null;
 
@@ -210,7 +215,6 @@ namespace LGLauncher
       //lwiText line sample
       //  Key=0,Pic=3,POC=0,Repeat=1,Field=1,Width=1440,Height=1080,Format=yuv420p,ColorSpace=1
       //
-
       //Width, Height, Format取得
       string Width = "", Height = "", Format = "";
       var pattern = @"Key=\d+,.*,Width=(\d+),Height=(\d+),Format=([\w\d]+),.*";
@@ -248,13 +252,12 @@ namespace LGLauncher
                     </ExtraDataList>
                     </LibavReaderIndexFile>";
 
-      string footer_rpl = footer_const;
-      footer_rpl = Regex.Replace(footer_rpl, @"[ \t　]", "", RegexOptions.IgnoreCase);         //VisualStudio上での表示用スペース削除
-      footer_rpl = Regex.Replace(footer_rpl, @"#Width#", Width, RegexOptions.IgnoreCase);
-      footer_rpl = Regex.Replace(footer_rpl, @"#Height#", Height, RegexOptions.IgnoreCase);
-      footer_rpl = Regex.Replace(footer_rpl, @"#Format#", Format, RegexOptions.IgnoreCase);
-
-      return footer_rpl;
+      string footer = footer_const;
+      footer = Regex.Replace(footer, @"[ \t　]", "", RegexOptions.IgnoreCase);         //VisualStudio上での表示用スペース削除
+      footer = Regex.Replace(footer, @"#Width#", Width, RegexOptions.IgnoreCase);
+      footer = Regex.Replace(footer, @"#Height#", Height, RegexOptions.IgnoreCase);
+      footer = Regex.Replace(footer, @"#Format#", Format, RegexOptions.IgnoreCase);
+      return footer;
     }
   }
   #endregion LwiFormatter
@@ -273,18 +276,21 @@ namespace LGLauncher
     {
       if (PathList.InputPlugin != PluginType.Lwi) return;
 
-      string srcPath = PathList.WorkPath + ".lwi";
+      string srcPath = Path.Combine(PathList.LWorkDir, PathList.TsShortName + ".lwi");
       string dstPath = PathList.TsPath + ".lwi";
       bool isSameRoot = Path.GetPathRoot(srcPath).ToLower()
                            == Path.GetPathRoot(dstPath).ToLower();
       try
       {
         //すでにTsDirにlwiファイルがあるなら削除
-        if (File.Exists(dstPath)) File.Delete(dstPath);
+        if (File.Exists(dstPath))
+          File.Delete(dstPath);
         Thread.Sleep(500);
 
-        if (isSameRoot) File.Move(srcPath, dstPath);
-        else File.Copy(srcPath, dstPath);
+        if (isSameRoot)
+          File.Move(srcPath, dstPath);
+        else
+          File.Copy(srcPath, dstPath);
         Thread.Sleep(500);
 
         lock_lwi = new FileStream(dstPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
@@ -303,16 +309,23 @@ namespace LGLauncher
       if (PathList.InputPlugin != PluginType.Lwi) return;
 
       string srcPath = PathList.TsPath + ".lwi";
-      string dstPath = PathList.WorkPath + ".lwi";
+      string dstPath = Path.Combine(PathList.LWorkDir, PathList.TsShortName + ".lwi");
       bool isSameRoot = Path.GetPathRoot(srcPath).ToLower()
                            == Path.GetPathRoot(dstPath).ToLower();
-      if (lock_lwi != null) lock_lwi.Close();
       if (File.Exists(srcPath) == false) return;
 
       try
-      {     
-        if (isSameRoot) File.Move(srcPath, dstPath);
-        else File.Delete(srcPath);
+      {
+        if (lock_lwi != null)
+        {
+          lock_lwi.Close();
+          lock_lwi = null;
+        }
+
+        if (isSameRoot)
+          File.Move(srcPath, dstPath);
+        else
+          File.Delete(srcPath);
         Thread.Sleep(500);
       }
       catch
