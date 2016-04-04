@@ -110,13 +110,12 @@ namespace LGLauncher
       bool addtionalWait;
       {
         const string MutexName = "LGL-41CDEAC6-6717";  //LGL
-        //const string MutexName = "V2P-491E1B11-9DC0";    //V2P
+        //const string MutexName = "V2P-33A2FE1F-0891";    //V2P
         mutexControl = new SemaphoreControl();
         mutexControl.Initlize(MutexName, multiRun);
         mutexControl.Get();
         addtionalWait = mutexControl.HasControl == false;
       }
-
 
       //
       //システムチェック

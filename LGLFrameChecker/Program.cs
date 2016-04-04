@@ -7,6 +7,11 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
+/*
+ * avs限定
+ * vpy非対応
+ */
+
 namespace LGLFrameChecker
 {
   class Program
@@ -103,7 +108,7 @@ namespace LGLFrameChecker
         text.AppendLine();
         text.AppendLine("Result");
         text.AppendLine("                     Match( %)                 Match(frame)");
-        text.AppendLine(" No    Time       Main   CM  Not          Main       CM      Not");
+        text.AppendLine(" No    Time       Main   CM  Not          Main       CM       Not");
 
         //frameset
         foreach (var fs in FrameSetList)
@@ -231,17 +236,14 @@ namespace LGLFrameChecker
     /// <summary>
     /// FrameSet作成
     /// </summary>
-    /// <param name="dir"></param>
-    /// <param name="no"></param>
-    /// <returns></returns>
     public static FrameSet Create(string dir, int no)
     {
       var frameset = new FrameSet();
       frameset.No = no;
 
       //ファイル名作成
-      //		*.all.frame.txt				*.all.lwi_0__57628.avs
-      //		*.p1.frame.txt				*.p1.lwi_0__18808.avs
+      //		*.all.frame.txt				*.all.0__57628.avs
+      //		*.p1.frame.txt				*.p1.0__18808.avs
       string partID = (no == -1) ? "all" : "p" + no;
       string frameListName = "*." + partID + ".frame.txt";
       string avsName = "*." + partID + "." + "*__*.avs";
@@ -316,9 +318,8 @@ namespace LGLFrameChecker
       if (files.Count() != 1) return null;		             //見つからない or 多い
 
       //正規表現パターン
-      //TsShortName.p1.d2v_0__2736.avs
-      //TsShortName.p1.lwi_0__2736.avs
-      var regex = new Regex(@".*\.\w+_(?<begin>\d+)__(?<end>\d+)\.avs", RegexOptions.IgnoreCase);
+      //TsShortName.p1.0__2736.avs
+      var regex = new Regex(@".*\.(?<begin>\d+)__(?<end>\d+)\.avs", RegexOptions.IgnoreCase);
       //検索
       Match match = regex.Match(files[0]);
 
@@ -382,4 +383,5 @@ namespace LGLFrameChecker
   }//class FrameSet
 
   #endregion FrameSet
+
 }//namespace

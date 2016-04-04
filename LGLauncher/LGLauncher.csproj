@@ -59,7 +59,7 @@
     <Compile Include="LGL\_2_EditFrame\JLS\Concat_scpos.cs" />
     <Compile Include="LGL\_2_EditFrame\JLS\Convert_JLS.cs" />
     <Compile Include="LGL\_2_EditFrame\EditFrame\ConvertFrame.cs" />
-    <Compile Include="LGL\_2_EditFrame\EditFrame\OutChap.cs" />
+    <Compile Include="LGL\_2_EditFrame\EditFrame\OutChapter.cs" />
     <Compile Include="Setting\Mono.Options\Options.cs" />
     <Compile Include="Setting\Mono.Options\Options_icase.cs" />
     <Compile Include="Setting\Setting_CmdLine.cs" />

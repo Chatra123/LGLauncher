@@ -64,7 +64,7 @@ namespace LGLauncher
     }
 
     /// <summary>
-    /// スクリプト作成
+    /// Trim付きスクリプト作成
     /// </summary>
     public string MakeTrimScript(int[] trimFrame)
     {
@@ -178,10 +178,10 @@ namespace LGLauncher
 
 
 
-    #region GetTrimFrame_fromName
+    #region GetTrimFrame
 
     /// <summary>
-    /// ファイル名からトリムフレーム数取得
+    /// トリムフレーム数取得
     /// </summary>
     public static int[] GetTrimFrame()
     {
@@ -189,7 +189,7 @@ namespace LGLauncher
     }
 
     /// <summary>
-    /// ファイル名から前回のトリムフレーム数取得
+    /// 前回のトリムフレーム数取得
     /// </summary>
     public static int[] GetTrimFrame_previous()
     {
@@ -209,8 +209,8 @@ namespace LGLauncher
       var files = Directory.GetFiles(PathList.LWorkDir, nameKey);
       if (files.Count() != 1)
       {
-        Log.WriteLine(" file Count() = " + files.Count() + "  Could'nt specify trim range.");
-        Log.WriteLine(" nameKey      = " + nameKey);
+        Log.WriteLine("  Could'nt specify trim range." + "  file Count() = " + files.Count());
+        Log.WriteLine("    nameKey = " + nameKey);
         return null;
       }
 

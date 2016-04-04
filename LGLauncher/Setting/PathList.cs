@@ -108,10 +108,9 @@ namespace LGLauncher
     private static bool AutoDetectPartNo;
     private static string SequenceName;                      //作業フォルダ名のMD5作成用
 
-    //コマンドラインに -IsLast 指定があるか？
+    //コマンドラインに -IsLast があるか？
     public static bool HasLastFlag_OnCmdLine { get; private set; }
     //SplitTrim
-    public static bool Enable_SplitTrim { get; private set; }
     public static bool IsLastSplit { get; private set; }
     public static void Set_IsLastSplit(bool islast)
     {
@@ -124,9 +123,9 @@ namespace LGLauncher
     {
       get
       {
-        if (Enable_SplitTrim)
+        if (IsPart)
           return HasLastFlag_OnCmdLine && IsLastSplit;
-        else
+        else//IsAll
           return HasLastFlag_OnCmdLine;
       }
     }
@@ -536,9 +535,6 @@ namespace LGLauncher
 
       //misc
       Detector_MultipleRun = setting.Detector_MultipleRun;
-      const bool enable_SplitTrim = true;      //  true  false
-      Enable_SplitTrim = enable_SplitTrim;
-
       Mode_DeleteWorkItem = setting.DeleteWorkItem;
     }
 
@@ -550,18 +546,15 @@ namespace LGLauncher
     {
       //log
       {
-        var log = new StringBuilder();
-        log.AppendLine("  No  = 【    " + PathList.PartNo + "    】");
+        Log.WriteLine("  No  = 【    " + PathList.PartNo + "    】");
         if (PathList.Is1stPart || PathList.IsAll)
         {
-          log.AppendLine("         " + PathList.TsPath);
-          log.AppendLine("         InputPlugin  :  " + InputPlugin.ToString());
-          log.AppendLine("         LogoDetector :  " + Detector.ToString());
-          log.AppendLine();
+          Log.WriteLine("         " + PathList.TsPath);
+          Log.WriteLine("         InputPlugin  :  " + InputPlugin.ToString());
+          Log.WriteLine("         LogoDetector :  " + Detector.ToString());
         }
         if (HasLastFlag_OnCmdLine)
-          log.AppendLine("         HasLastFlag  :  " + HasLastFlag_OnCmdLine);
-        Log.WriteLine(log.ToString());
+          Log.WriteLine("         HasLastFlag  :  " + HasLastFlag_OnCmdLine);
       }
 
       // error check
