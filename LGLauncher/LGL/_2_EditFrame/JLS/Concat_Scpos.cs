@@ -80,9 +80,9 @@ namespace LGLauncher.EditFrame.JLS
       {
         //次回の参照用
         File.WriteAllLines(catPath, new_CatText, TextEnc.Shift_JIS);
-        //デバッグ用記録
-        string catPath_debug = PathList.WorkPath + ".jls.scpos.cat.txt";
-        File.WriteAllLines(catPath_debug, new_CatText, TextEnc.Shift_JIS);
+        //デバッグ用のコピー
+        string catPath_part = PathList.WorkPath + ".jls.scpos.cat.txt";
+        File.WriteAllLines(catPath_part, new_CatText, TextEnc.Shift_JIS);
       }
     }
 

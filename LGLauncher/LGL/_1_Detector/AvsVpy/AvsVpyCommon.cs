@@ -11,48 +11,24 @@ namespace LGLauncher
   using OctNov.IO;
 
   /// <summary>
-  /// AbstractAvsMaker
-  /// </summary>
-  abstract class AbstractAvsMaker
-  {
-    public abstract int[] GetTrimFrame();
-    public abstract string MakeTrimScript(int[] trimFrame);
-  }
-
-  /// <summary>
   /// AvsVpy作成
   /// </summary>
   class AvsVpyMaker
   {
     AbstractAvsMaker maker;
-    static bool IndexHasFormatted = false;
 
     /// <summary>
     /// constructor
     /// </summary>
     public AvsVpyMaker()
     {
-      //format d2v, lwi　
-      if (IndexHasFormatted == false)
-      {
-        IndexHasFormatted = true;
-        if (PathList.InputPlugin == PluginType.D2v)
-        {
-          D2vFormatter.Format();
-        }
-        else if (PathList.InputPlugin == PluginType.Lwi)
-        {
-          LwiFormatter.Format();
-        }
-      }
+      IndexFormatter.Format();
 
       maker =
         (PathList.AvsVpy == AvsVpyType.Avs) ? new AvsMaker() as AbstractAvsMaker :
         (PathList.AvsVpy == AvsVpyType.Vpy) ? new VpyMaker() as AbstractAvsMaker :
         null;
 
-      if (PathList.AvsVpy == AvsVpyType.Vpy)
-        throw new NotImplementedException();
     }
 
     /// <summary>
@@ -74,6 +50,16 @@ namespace LGLauncher
 
 
 
+  /// <summary>
+  /// AbstractAvsMaker
+  /// </summary>
+  abstract class AbstractAvsMaker
+  {
+    public abstract int[] GetTrimFrame();
+    public abstract string MakeTrimScript(int[] trimFrame);
+  }
+
+
 
   /// <summary>
   /// AvsVpyCommon
@@ -86,6 +72,7 @@ namespace LGLauncher
     /// <summary>
     /// Info取得スクリプトを実行
     /// </summary>
+    [Obsolete]
     public static void RunInfo(Action action)
     {
       try
@@ -102,6 +89,7 @@ namespace LGLauncher
     /// Info取得スクリプトを実行
     ///   mutexを取得して１つずつ実行する
     /// </summary>
+    [Obsolete]
     public static void RunInfo_withMutex(Action action)
     {
       WaitForSystemReady waitForReady = null;
@@ -125,7 +113,6 @@ namespace LGLauncher
       }
       finally
       {
-        Thread.Sleep(3 * 1000);  //連続実行を抑止して負荷分散
         if (waitForReady != null)
           waitForReady.Release();
       }
@@ -135,7 +122,7 @@ namespace LGLauncher
     /// <summary>
     /// *.info.txtからフレーム数を取得
     /// </summary>
-    public static double[] GetInfoText(string infoPath)
+    public static double[] GetInfo_fromText(string infoPath)
     {
       var infoText = new List<string>();
 
@@ -216,6 +203,7 @@ namespace LGLauncher
 
       //正規表現パターン
       //TsShortName.p1.0__1000.avs
+      //TsShortName.all.0__1000.avs
       //  <begin>      0
       //  <end>     1000
       var regex = new Regex(@".*\.(?<begin>\d+)__(?<end>\d+)\.[(avs)|(vpy)]", RegexOptions.IgnoreCase);
@@ -242,7 +230,85 @@ namespace LGLauncher
         return null;
     }
 
-    #endregion GetTrimFrame_fromName
+    #endregion GetTrimFrame
+
+
+
+    #region CalcTrimFrame
+
+    /// <summary>
+    /// トリム用フレーム数　計算
+    /// </summary>
+    /// <param name="totalframe">総フレーム数</param>
+    /// <param name="trimFrame_prv">前回のトリムフレーム数</param>
+    /// <returns>開始、終了フレーム数</returns>
+    [Obsolete]
+    public static int[] CalcTrimFrame_obs(int totalframe, int[] trimFrame_prv)
+    {
+      int beginFrame = 0, endFrame = 0;
+
+
+      if (PathList.Is1stPart)
+      {
+        beginFrame = 0;
+        endFrame = totalframe - 1;
+      }
+      else if (2 <= PathList.PartNo)
+      {
+        if (trimFrame_prv == null)
+          throw new LGLException("previous trim frame is null");
+
+        beginFrame = trimFrame_prv[1] + 1;                  //前回の終端フレーム数＋１
+        endFrame = totalframe - 1;
+      }
+      else if (PathList.IsAll)
+      {
+        beginFrame = 0;
+        endFrame = totalframe - 1;
+      }
+
+      return new int[] { beginFrame, endFrame };
+    }
+
+    #endregion GetTrimFrame
+
+
+
+    #region OutScript
+
+    /// <summary>
+    /// Script出力
+    /// </summary>
+    public static string OutScript(int[] trimFrame, List<string> scriptText,
+                                   string outExt, System.Text.Encoding enc)
+    {
+      //長さチェック
+      //　 30frame以下だと logoGuilloの avs2pipemodがエラーで落ちる。
+      //　120frame以下なら no frame errorと表示されて終了する。
+      //　150frame以上に設定する。
+      int beginFrame = trimFrame[0];
+      int endFrame = trimFrame[1];
+      int len = endFrame - beginFrame + 1;
+
+      //150 frame 以上か？
+      if (30 * 5 <= len)
+      {
+        //書
+        string outPath = string.Format("{0}.{1}__{2}{3}",
+                                          PathList.WorkPath,
+                                          beginFrame,
+                                          endFrame,
+                                          outExt);
+        File.WriteAllLines(outPath, scriptText, enc);
+        return outPath;
+      }
+      else
+      {
+        throw new LGLException("short video length.  -lt 150 frame");
+      }
+    }
+
+    #endregion CreateTrimAvs
 
 
 
@@ -286,82 +352,6 @@ namespace LGLauncher
     }
 
     #endregion CreateDummy_OnError
-
-
-
-    #region CalcTrimFrame
-
-    /// <summary>
-    /// トリム用フレーム数　計算
-    /// </summary>
-    /// <param name="totalframe">総フレーム数</param>
-    /// <param name="trimFrame_prv">前回のトリムフレーム数</param>
-    /// <returns>開始、終了フレーム数</returns>
-    public static int[] CalcTrimFrame(int totalframe, int[] trimFrame_prv)
-    {
-      int beginFrame = 0, endFrame = 0;
-
-      if (PathList.Is1stPart)
-      {
-        beginFrame = 0;
-        endFrame = totalframe - 1;
-      }
-      else if (2 <= PathList.PartNo)
-      {
-        if (trimFrame_prv == null)
-          throw new LGLException("previous trim frame is null");
-
-        beginFrame = trimFrame_prv[1] + 1;                  //前回の終端フレーム数＋１
-        endFrame = totalframe - 1;
-      }
-      else if (PathList.IsAll)
-      {
-        beginFrame = 0;
-        endFrame = totalframe - 1;
-      }
-
-      return new int[] { beginFrame, endFrame };
-    }
-
-    #endregion GetTrimFrame
-
-
-
-    #region OutScript
-
-    /// <summary>
-    /// Script出力
-    /// </summary>
-    public static string OutScript(int[] trimFrame, List<string> scriptText,
-                                   string outExt, System.Text.Encoding enc)
-    {
-      //長さチェック
-      //　 30frame以下だと logoGuilloの avs2pipemodがエラーで落ちる。
-      //　120frame以下なら no frame errorと表示されて終了する。
-      //　150frame以上に設定する。
-      int beginFrame = trimFrame[0];
-      int endFrame = trimFrame[1];
-      int len = endFrame - beginFrame;
-
-      //150 frame 以上か？
-      if (30 * 5 <= len)
-      {
-        //書
-        string outPath = string.Format("{0}.{1}__{2}{3}",
-                                          PathList.WorkPath,
-                                          beginFrame,
-                                          endFrame,
-                                          outExt);
-        File.WriteAllLines(outPath, scriptText, enc);
-        return outPath;
-      }
-      else
-      {
-        throw new LGLException("short video length.  -lt 150 frame");
-      }
-    }
-
-    #endregion CreateTrimAvs
 
 
   }

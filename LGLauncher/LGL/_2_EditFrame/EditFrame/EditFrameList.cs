@@ -13,14 +13,13 @@ namespace LGLauncher.EditFrame
   using OctNov.IO;
 
   /// <summary>
-  /// フレームリストの編集、変換
+  /// フレームリストの編集　＆　各形式への変換
   /// </summary>
-  static class ConvertFrame
+  static class EditFrameList
   {
     /// <summary>
     /// read Frame File  →  List<int>
     /// </summary>
-    /// <param name="framePath">ファイルパス</param>
     /// <returns>
     /// 取得成功　→　List<int>
     /// 　　失敗　→　null
@@ -31,8 +30,6 @@ namespace LGLauncher.EditFrame
       var ConvertToIntList = new Func<List<string>, List<int>>(
         (stringList) =>
         {
-          var intList = new List<int>();
-          int result;
           stringList = stringList.Select(
                                   (line) =>
                                   {
@@ -46,6 +43,8 @@ namespace LGLauncher.EditFrame
                                   .Distinct()                                                   //重複削除
                                   .ToList();
 
+          var intList = new List<int>();
+          int result;
           foreach (var line in stringList)
           {
             if (int.TryParse(line, out result) == false) return null;          //変換失敗
@@ -122,7 +121,6 @@ namespace LGLauncher.EditFrame
       if (frameList.Count % 2 == 1) return null;
       if (frameList.Count <= 2) return frameList;
 
-      var newList = new List<int>();
       //
       //”frameList[i]のフレーム数”と”newListの末尾のフレーム数”の差がcmLength
       //
@@ -130,8 +128,9 @@ namespace LGLauncher.EditFrame
       //　　　　　長ければ newListに本編 frameList[i], frameList[i+1]を加える。
       //
       //ただし、開始直後のＣＭは無視する。
-      //多くの場合、開始直後に数秒のＣＭがあるがこれを本編にいれることはしない。
+      //開始直後に数秒のＣＭがあっても本編にいれない。
       //
+      var newList = new List<int>();
 
       //最初のmainを入れる
       newList.Add(frameList[0]);
@@ -143,13 +142,13 @@ namespace LGLauncher.EditFrame
         if (cmLength < ths_CMsec)
         {
           //短
-          //ＣＭを無視し本編内とする。本編終端を入れ替える
+          //ＣＭを無視し本編内とする。次の本編終端をいれる
           newList[newList.Count - 1] = frameList[i + 1];
         }
         else
         {
           //長
-          //ＣＭを採用し通常の本編＆本編終端をいれる
+          //ＣＭを採用し通常の本編始端＆終端をいれる
           newList.Add(frameList[i]);
           newList.Add(frameList[i + 1]);
         }
@@ -195,11 +194,6 @@ namespace LGLauncher.EditFrame
     /// <summary>
     /// List<int>　→　TvtPlayチャプター
     /// </summary>
-    /// <param name="frameList">元になるフレームリスト</param>
-    /// <returns>
-    ///   成功　→　チャプター形式の string
-    ///   失敗　→　null
-    /// </returns>
     public static string To_TvtPlayChap(List<int> frameList)
     {
       //フレーム数を100msec単位の時間に変換
@@ -229,27 +223,12 @@ namespace LGLauncher.EditFrame
       chapText.Add("0eox-c");                               //close
 
       //１行にする    List<string>  →  string
-      //string oneliner = "";
-      //foreach (var text in chapText)
-      //  oneliner += text;
       string oneliner = "";
       chapText.ForEach((text) => { oneliner += text; });
 
       return oneliner;
     }
-    /*
-     *  ＣＭから開始                      ＣＭで終わり
-     *        0    1    2    3    4    5    6    7    8    9    10
-     * main          ■  ■          ■
-     * cm        □          □  □      □
-     *
-     * 
-     * 　本編から開始                      本編で終わり
-     *        0    1    2    3    4    5    6    7    8    9    10
-     * main      ■  ■  ■          ■  ■
-     * cm                    □  □
-     */
-    /*TvtPlay  ChapterMap.cpp*/
+     /*TvtPlay  ChapterMap.cpp*/
     // [チャプターコマンド仕様]
     // ・ファイルの文字コードはBOM付きUTF-8であること
     // ・Caseはできるだけ保存するが区別しない
@@ -270,7 +249,7 @@ namespace LGLauncher.EditFrame
     //チャプタースキップする[=1]かどうか
     // スキップチャプター(名前が"ix"または"ox"で始まるもの)の間をスキップします。
     //
-   
+
 
 
     /// <summary>
@@ -286,20 +265,17 @@ namespace LGLauncher.EditFrame
       {
         string cnt = i.ToString("00");
         string timecode = timecodelist[i];
-        chapText.AppendLine("Chapter" + cnt + "=" + timecode);
-        chapText.AppendLine("Chapter" + cnt + "Name=" + "chapter " + cnt);
+        chapText.AppendLine(timecode + " " + "chapter " + cnt);
       }
 
       return chapText.ToString();
     }
     /*
      * Ogm Chapter  type1
-     * Chapter00=00:00:00.000
-     * Chapter00Name=chapter 00
-     * Chapter01=00:00:01.935
-     * Chapter01Name=chapter 01
-     * Chapter02=00:03:08.856
-     * Chapter02Name=chapter 02
+     * 00:00:00.000 chapter 00
+     * 00:00:01.935 chapter 01
+     * 00:03:08.856 chapter 02
+     * 00:10:00.000 chapter 03
      */
 
 
@@ -316,18 +292,21 @@ namespace LGLauncher.EditFrame
       {
         string cnt = i.ToString("00");
         string timecode = timecodelist[i];
-        chapText.AppendLine(timecode + " " + "chapter " + cnt);
+        chapText.AppendLine("Chapter" + cnt + "=" + timecode);
+        chapText.AppendLine("Chapter" + cnt + "Name=" + "chapter " + cnt);
       }
 
       return chapText.ToString();
     }
-   /*
-    * Ogm Chapter  type2
-    * 00:00:00.000 chapter 00
-    * 00:00:01.935 chapter 01
-    * 00:03:08.856 chapter 02
-    * 00:10:00.000 chapter 03
-    */
+    /*
+     * Ogm Chapter  type2
+     * Chapter00=00:00:00.000
+     * Chapter00Name=chapter 00
+     * Chapter01=00:00:01.935
+     * Chapter01Name=chapter 01
+     * Chapter02=00:03:08.856
+     * Chapter02Name=chapter 02
+     */
 
 
     /// <summary>

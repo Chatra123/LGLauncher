@@ -44,14 +44,11 @@ LGLauncher.exe  -last  -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
 
     -last
 最後の処理であることを明示します。  
--lastがあればOgm chapterを出力し、  
-join_logo_scpならばJL_標準.txtを使い実行します。  
 
 
     -All  
-ファイル全体を処理します。  
--No -1 と同義  
-
+ファイル全体を処理します。 
+ 
 
     -ts "C:\video.ts"
 tsファイルのパス  
@@ -74,11 +71,6 @@ LogoSelecterに渡すプログラム名
     
 ------------------------------------------------------------------
 #### 引数２
-
-    -No 1
--noを増やすことで前回からの増加分を処理する。  
--1 なら全体を処理します。
-通常は自動で決定するので-Noの指定は必要ありません。  
 
     -d2v "D:\rec\video.ts.d2v"
 d2vファイルパスの個別指定
@@ -104,17 +96,18 @@ srtファイルパスの個別指定
 有効 、無効
 
 
-    Avs_iPlugin  lwi  
-d2v:  d2vで処理  
-lwi:  lwiで処理  
+    InputPlugin  lwi  
+d2v :  d2vで処理  
+lwi :  lwiで処理  
 
 
-    LogoDetector  LogoGuillo  
-JLS          :  Join_Logo_Scpで処理  
-Join_Logo_Scp:  Join_Logo_Scpで処理  
-LG           :  LogoGuilloで処理  
-LogoGuillo   :  LogoGuilloで処理  
+    LogoDetector  LG  
+JLS :  Join_Logo_Scpで処理  
+LG  :  LogoGuilloで処理  
 
+
+    Detector_MultipleRun  1  
+Winsows内での LogoGuillo, logoframe同時実行数
 
 
 ------------------------------------------------------------------
@@ -128,41 +121,36 @@ LogoGuillo   :  LogoGuilloで処理
 ２９．０秒以下の本編部を除去  
     
 
-    Out_tvtp  1  
+    Out_Tvtp  1  
 Tvtplay用チャプターファイルを出力する。  
+短い本編、ＣＭは除去されています。  
 
 
-    Out_ogm  1  
+    Outp_Ogm  1  
 Ogm形式のチャプターファイルを出力する。  
+短い本編、ＣＭは除去されています。  
 
 
-    Out_frame  1  
-短い本編、ＣＭを除去したフレームファイルを出力する。  
+    Out_Frame  1  
+フレームファイルを出力する。  
+短い本編、ＣＭは除去されています。  
 
 
-    Out_rawframe  0  
+    Out_RawFrame  0  
 編集前のフレームファイルを出力する。  
 
 
-    Out_tvtp_toTsDir  1  
-Tvtplay用チャプターファイルをＴＳファイルのフォルダに作成します。  
-
-
-    Out_misc_toTsDir  1  
-Ogm chapter、フレームファイルをＴＳファイルのフォルダに作成します。  
-
-
-    ChapDir_Path  "C:\tvtp_Dir"  
+    DirPath_Tvtp  "C:\Tvtp_Dir"  
 Tvtplay用チャプターファイルを出力するフォルダを指定します。  
-Out_tvtp_toTsDir = 0  にしてください。  
+フォルダが存在しない場合はＴＳと同じ場所に出力します。  
 
 
-    DirPath_misc  "C:\ogm_and_frame_Dir"  
+    DirPath_Misc  "C:\Ogm_and_Frame_Dir"  
 Ogm chapter、フレームファイルを出力するフォルダを指定します。  
-Out_misc_toTsDir = 0  にしてください。  
+フォルダが存在しない場合はＴＳと同じ場所に出力します。  
 
 
-    DeleteWorkItem  3  
+    CleanWorkItem  3  
 3: 古い作業ファイル削除　＆　使い終わったファイル削除  
 2: 古い作業ファイル削除　＆　サイズの大きいファイル削除  
 1: 古い作業ファイル削除  
@@ -176,7 +164,7 @@ Out_misc_toTsDir = 0  にしてください。
 　子フォルダ内も自動的に検索します。
 
 
-##### 必要  AVS Input Plugin  
+##### 必要  Input Plugin  
     DGDecode.dll  
     LSMASHSource.dll  
 
@@ -211,11 +199,9 @@ Out_misc_toTsDir = 0  にしてください。
 してからLogoGuilloを実行します。
 
 
-* Tvtp、ogm chapter、フレームファイルは短い本編、ＣＭを除去してから作成しています。
-
 * 文字コード
- * Tvtp chapter                  UTF-8 bom
- * Ogm chapter, Frame text       Shift-JIS
+ * Tvtp chapter                 : UTF-8 bom
+ * Ogm chapter, Frame text      : Shift-JIS
 
  
 * 作業ファイルのパスが２５５文字を超えると正常に動きません。深いフォルダにおかないでください。
@@ -252,7 +238,6 @@ Out_misc_toTsDir = 0  にしてください。
 - tsとlwiが同じフォルダにある場合はlwiのファイル名をTsName.ts.lwiにしないでください。
 AviSynthのファイル読込時にシステム側で使用します。
 
-
 - 作業ファイルのサイズ
     - １時間番組を
         - １０分ごとに処理したときは　　１５０ＭＢ  
@@ -267,8 +252,8 @@ AviSynthのファイル読込時にシステム側で使用します。
 ### join_logo_scp
 
 - 設定ファイルで  
- ``` Avs_iPluginに lwi ```  
- ``` LogoDetectorに  JLS ```  
+ ``` InputPlugin = lwi ```  
+ ``` LogoDetector = JLS ```  
  を設定する。
 
 - LSystemフォルダに以下のファイルを入れてください。子フォルダでもかまいません。
@@ -279,10 +264,9 @@ AviSynthのファイル読込時にシステム側で使用します。
   - join_logo_scp.exe
   - logoframe.exe
 
-
 - chpater_exe.exeは同梱のものでなくてもかまいません。安定して動くものを使用してください。  
-  テスト環境では終了時にエラーが発生したので、同梱のchpater_exeは終了処理を変更しただけです。
-  
+  テスト環境では終了時にエラーが発生したので、同梱のchpater_exeは終了処理を変更しただけです。  
+
 - JL_標準_Recording.txtは JL_標準.txtから必要なさそうな項目をコメントアウトしただけで、  
   それ以外は同じです。
 
@@ -298,7 +282,7 @@ AviSynthのファイル読込時にシステム側で使用します。
 * DGDecode
 * join_logo_scp
 * LogoGuillo
-* L-SMASH-Works
+* L-SMASH Works
 
 が必要です。各作者にお礼申し上げます。
 

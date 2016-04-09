@@ -8,7 +8,7 @@ namespace LGLauncher.EditFrame
 {
   using OctNov.IO;
 
-  static class OutputChapter
+  static class ConvertToFile
   {
 
     /// <summary>
@@ -25,28 +25,22 @@ namespace LGLauncher.EditFrame
         int main_endframeNo = framelist[framelist.Count - 1];          //本編部の最後のフレーム番号
         string end_is_CM = (main_endframeNo != endFrame) ? "1" : "0";  //(mainの終端！＝avsの終端)
         string is_last_file = PathList.IsLastPart ? "1" : "0";
-
         frameText.AppendLine("//    end_frame=" + endFrame);
         frameText.AppendLine("//    end_is_cm=" + end_is_CM);
         frameText.AppendLine("//      part_no=" + PathList.PartNo);
         frameText.AppendLine("// is_last_file=" + is_last_file);
-        foreach (var f in framelist)
+
+        // copy frame text
+        foreach (int f in framelist)
           frameText.AppendLine(f.ToString());
       }
 
       try
       {
-        string dir = Path.GetDirectoryName(outPath);
-        if (Directory.Exists(dir))
-          File.WriteAllText(outPath, frameText.ToString(), TextEnc.Shift_JIS);
+        File.WriteAllText(outPath, frameText.ToString(), TextEnc.Shift_JIS);
       }
-      catch
-      {
-        Log.WriteLine("write error");
-        Log.WriteLine("      " + outPath);
-      }
+      catch {/* do nothing */ }
     }
-
 
 
     /// <summary>
@@ -78,19 +72,13 @@ namespace LGLauncher.EditFrame
       }
 
 
-      string chapText = ConvertFrame.To_TvtPlayChap(chapList);
+      string chapText = EditFrameList.To_TvtPlayChap(chapList);
 
       try
       {
-        string dir = Path.GetDirectoryName(outPath);
-        if (Directory.Exists(dir))
-          File.WriteAllText(outPath, chapText, TextEnc.UTF8_bom);
+        File.WriteAllText(outPath, chapText, TextEnc.UTF8_bom);
       }
-      catch
-      {
-        Log.WriteLine("write error");
-        Log.WriteLine("      " + outPath);
-      }
+      catch {/* do nothing */ }
     }
 
 
@@ -113,26 +101,20 @@ namespace LGLauncher.EditFrame
           chaplist.Insert(0, 0);
 
         //最後から１秒前にChap追加
-        //　IsLastPart and ３０秒以上のみ
+        //　IsLastPart and ３０秒以上のときのみ
         if (PathList.IsLastPart
           && 30 * 30 <= endFrame)
           chaplist.Add(endFrame - 30 * 1);
       }
 
 
-      string chapText = ConvertFrame.To_OgmChap_type2(chaplist);
+      string chapText = EditFrameList.To_OgmChap_type1(chaplist);
 
       try
       {
-        string dir = Path.GetDirectoryName(outPath);
-        if (Directory.Exists(dir))
-          File.WriteAllText(outPath, chapText.ToString(), TextEnc.Shift_JIS);
+        File.WriteAllText(outPath, chapText.ToString(), TextEnc.Shift_JIS);
       }
-      catch
-      {
-        Log.WriteLine("write error");
-        Log.WriteLine("      " + outPath);
-      }
+      catch {/* do nothing */ }
     }
 
 

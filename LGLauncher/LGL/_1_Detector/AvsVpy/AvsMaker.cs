@@ -15,42 +15,62 @@ namespace LGLauncher
     AvsMakerModule module = new AvsMakerModule();
 
     /// <summary>
-    /// トリム用フレーム数取得
+    /// トリムフレーム数取得
     /// </summary>
     public override int[] GetTrimFrame()
     {
-      //フレーム数取得用スクリプト　作成、実行
+      //総フレーム数取得用スクリプト　作成、実行
       {
         string infoPath = module.CreateInfo_avs();
 
-        var action = new Action(() => { module.RunInfo_avs(infoPath); });
-        AvsVpyCommon.RunInfo(action);
+        //var action = new Action(() => { module.RunInfo_avs(infoPath); });
+        //AvsVpyCommon.RunInfo(action);
+
+        //var action = new Action(() => { module.RunInfo_avs(infoPath); });
+        //LwiFile.Action_withSetLwi(action);
+        try
+        {
+          LwiFile.Set_ifLwi();
+          module.RunInfo_avs(infoPath);
+        }
+        finally
+        {
+          LwiFile.Back_ifLwi();
+        }
+
       }
 
       //総フレーム数取得
       int totalframe = 0;
       {
         string infoText = Path.Combine(PathList.LWorkDir, PathList.WorkName + ".info.txt");
-        var info = AvsVpyCommon.GetInfoText(infoText);
+        var info = AvsVpyCommon.GetInfo_fromText(infoText);
         totalframe = (int)info[0];
       }
 
-      //前回のトリム用フレーム数取得   previous
-      int[] trimFrame_prv = (2 <= PathList.PartNo)
-                                ? AvsVpyCommon.GetTrimFrame_previous()
-                                : null;
+      //開始フレーム　　（＝　直前の終了フレーム　＋　１）
+      int beginFrame;
+      {
+        //if  Is1stPart || IsAll  then  beginFrame = 0
+        //直前のトリム用フレーム数取得   previous
+        int[] trimFrame_prv = (2 <= PathList.PartNo)
+                                  ? AvsVpyCommon.GetTrimFrame_previous()
+                                  : null;
+        int endFrame_prv = (trimFrame_prv != null) ? trimFrame_prv[1] : -1;
+        beginFrame = endFrame_prv + 1;
+      }
 
-      //トリム用フレーム計算
-      int[] trimFrame = AvsVpyCommon.CalcTrimFrame(totalframe, trimFrame_prv);      //Trim付きスクリプト作成
+      int[] trimFrame = new int[] { beginFrame, totalframe - 1 };
       return trimFrame;
     }
+
 
     /// <summary>
     /// Trim付きスクリプト作成
     /// </summary>
     public override string MakeTrimScript(int[] trimFrame)
     {
-      var text = module.CreateTrim_avs(trimFrame);
+      var text = module.CreateTrimText_avs(trimFrame);
       string path = AvsVpyCommon.OutScript(trimFrame, text, ".avs", TextEnc.Shift_JIS);
       return path;
     }
@@ -65,7 +85,7 @@ namespace LGLauncher
   class AvsMakerModule
   {
     /// <summary>
-    /// フレーム数取得用のAVS作成
+    /// 総フレーム数取得用のAvs作成
     /// </summary>
     public string CreateInfo_avs()
     {
@@ -83,7 +103,7 @@ namespace LGLauncher
         {
           line = Regex.Replace(line, "#d2v#", "", RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#DGDecode#", PathList.DGDecode_dll, RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#D2vName#", PathList.D2vNameInWork, RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#D2vName#", PathList.D2vNameInLWork, RegexOptions.IgnoreCase);
         }
         else if (PathList.InputPlugin == PluginType.Lwi)
         {
@@ -99,6 +119,7 @@ namespace LGLauncher
       //書
       string infoPath = PathList.WorkPath + ".info.avs";
       File.WriteAllLines(infoPath, text, TextEnc.Shift_JIS);
+
       return infoPath;
     }
     /*
@@ -141,11 +162,8 @@ namespace LGLauncher
     /// <summary>
     /// TrimAvs作成
     /// </summary>
-    public List<string> CreateTrim_avs(int[] trimFrame)
+    public List<string> CreateTrimText_avs(int[] trimFrame)
     {
-      int beginFrame = trimFrame[0];
-      int endFrame = trimFrame[1];
-
       //読
       var text = FileR.ReadFromResource("LGLauncher.Resource.TrimAvs.avs");
 
@@ -160,7 +178,7 @@ namespace LGLauncher
         {
           line = Regex.Replace(line, "#d2v#", "", RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#DGDecode#", PathList.DGDecode_dll, RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#D2vName#", PathList.D2vNameInWork, RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#D2vName#", PathList.D2vNameInLWork, RegexOptions.IgnoreCase);
         }
         else if (PathList.InputPlugin == PluginType.Lwi)
         {
@@ -178,6 +196,8 @@ namespace LGLauncher
         //Trim
         if (PathList.IsPart)
         {
+          int beginFrame = trimFrame[0];
+          int endFrame = trimFrame[1];
           line = Regex.Replace(line, "#EnableTrim#", "", RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#BeginFrame#", "" + beginFrame, RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#EndFrame#", "" + endFrame, RegexOptions.IgnoreCase);
@@ -187,7 +207,6 @@ namespace LGLauncher
 
       return text;
     }
-
 
 
   }

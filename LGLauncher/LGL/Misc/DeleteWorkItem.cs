@@ -50,7 +50,7 @@ namespace LGLauncher
     public static void Clean_Lastly()
     {
       //使い終わったファイルを削除
-      if (3 <= PathList.Mode_DeleteWorkItem)
+      if (3 <= PathList.Mode_CleanWorkItem)
       {
         //LWorkDir
         //  IsLast 　　　　　→　　全ての作業ファイル削除
@@ -69,7 +69,7 @@ namespace LGLauncher
       }
 
       //ファイルサイズが大きい d2v, lwi, srt削除
-      if (2 <= PathList.Mode_DeleteWorkItem)
+      if (2 <= PathList.Mode_CleanWorkItem)
       {
         Delete_file(0.0, PathList.LWorkDir, PathList.TsShortName + "*.d2v");
         Delete_file(0.0, PathList.LWorkDir, PathList.TsShortName + "*.lwi");
@@ -77,7 +77,7 @@ namespace LGLauncher
       }
 
       //古いファイル削除？
-      if (1 <= PathList.Mode_DeleteWorkItem)
+      if (1 <= PathList.Mode_CleanWorkItem)
       {
         if (PathList.Is1stPart || PathList.IsAll)
         {

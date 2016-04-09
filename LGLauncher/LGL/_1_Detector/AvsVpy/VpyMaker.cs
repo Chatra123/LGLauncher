@@ -17,45 +17,68 @@ namespace LGLauncher
 
 
     /// <summary>
-    /// トリム用フレーム数取得
+    /// トリムフレーム取得
     /// </summary>
     public override int[] GetTrimFrame()
     {
-      //フレーム数取得用スクリプト　作成、実行
+      //総フレーム数取得用スクリプト　作成、実行
       {
         string infoPath = module.CreateInfo_vpy();
-        var action = new Action(() => { module.RunInfo_vpy(infoPath); });
-        AvsVpyCommon.RunInfo(action);
+        //var action = new Action(() => { module.RunInfo_vpy(infoPath); });
+        //AvsVpyCommon.RunInfo(action);
+
+        //var action = new Action(() => { module.RunInfo_vpy(infoPath); });
+        //LwiFile.Action_withSetLwi(action);
+
+        try
+        {
+          LwiFile.Set_ifLwi();
+          module.RunInfo_vpy(infoPath);
+        }
+        finally
+        {
+          LwiFile.Back_ifLwi();
+        }
       }
 
       //総フレーム数取得
       int totalframe;
       {
         string infoText = Path.Combine(PathList.LWorkDir, PathList.WorkName + ".info.txt");
-        var info = AvsVpyCommon.GetInfoText(infoText);
+        var info = AvsVpyCommon.GetInfo_fromText(infoText);
         totalframe = (int)info[0];
       }
 
-      //前回のトリム用フレーム数取得   previous
-      int[] trimFrame_prv = (2 <= PathList.PartNo)
-                                ? AvsVpyCommon.GetTrimFrame_previous()
-                                : null;
 
-      //トリム用フレーム計算
-      int[] trimFrame = AvsVpyCommon.CalcTrimFrame(totalframe, trimFrame_prv);      //Trim付きスクリプト作成
+      //開始フレーム　　（＝　直前の終了フレーム　＋　１）
+      int beginFrame;
+      {
+        //if  Is1stPart || IsAll  then  beginFrame = 0
+        //直前のトリム用フレーム数取得   previous
+        int[] trimFrame_prv = (2 <= PathList.PartNo)
+                                  ? AvsVpyCommon.GetTrimFrame_previous()
+                                  : null;
+        int endFrame_prv = (trimFrame_prv != null) ? trimFrame_prv[1] : -1;
+        beginFrame = endFrame_prv + 1;
+      }
+
+
+      int[] trimFrame = new int[] { beginFrame, totalframe - 1 };
       return trimFrame;
     }
+
 
     /// <summary>
     /// Trim付きスクリプト作成
     /// </summary>
     public override string MakeTrimScript(int[] trimFrame)
     {
-      var text = module.CreateTrim_vpy(trimFrame);
+      var text = module.CreateTrimText_vpy(trimFrame);
       string path = AvsVpyCommon.OutScript(trimFrame, text, ".vpy", TextEnc.UTF8_nobom);
       return path;
     }
-  }//  class VpyMaker
+
+  }
 
 
 
@@ -65,7 +88,7 @@ namespace LGLauncher
   class VpyMakerModule
   {
     /// <summary>
-    /// フレーム数取得用のVpy作成
+    /// 総フレーム数取得用のVpy作成
     /// </summary>
     public string CreateInfo_vpy()
     {
@@ -83,7 +106,7 @@ namespace LGLauncher
         {
           line = Regex.Replace(line, "#d2v#", "", RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#d2vsource#", PathList.d2vsource_dll, RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#D2vName#", PathList.D2vNameInWork, RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#D2vName#", PathList.D2vNameInLWork, RegexOptions.IgnoreCase);
         }
         else if (PathList.InputPlugin == PluginType.Lwi)
         {
@@ -99,6 +122,7 @@ namespace LGLauncher
       //書
       string infoPath = PathList.WorkPath + ".info.vpy";
       File.WriteAllLines(infoPath, text, TextEnc.UTF8_bom);
+
       return infoPath;
     }
 
@@ -140,11 +164,8 @@ namespace LGLauncher
     /// <summary>
     /// TrimVpy作成
     /// </summary>
-    public List<string> CreateTrim_vpy(int[] trimFrame)
+    public List<string> CreateTrimText_vpy(int[] trimFrame)
     {
-      int beginFrame = trimFrame[0];
-      int endFrame = trimFrame[1];
-
       //読
       var text = FileR.ReadFromResource("LGLauncher.Resource.TrimVpy.vpy");
 
@@ -157,7 +178,7 @@ namespace LGLauncher
         {
           line = Regex.Replace(line, "#d2v#", "", RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#d2vsource#", PathList.d2vsource_dll, RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#D2vName#", PathList.D2vNameInWork, RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#D2vName#", PathList.D2vNameInLWork, RegexOptions.IgnoreCase);
         }
         else if (PathList.InputPlugin == PluginType.Lwi)
         {
@@ -175,6 +196,8 @@ namespace LGLauncher
         //Trim
         if (PathList.IsPart)
         {
+          int beginFrame = trimFrame[0];
+          int endFrame = trimFrame[1];
           line = Regex.Replace(line, "#EnableTrim#", "", RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#BeginFrame#", "" + beginFrame, RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#EndFrame_plus1#", "" + (endFrame + 1), RegexOptions.IgnoreCase);
@@ -186,7 +209,7 @@ namespace LGLauncher
     }
 
 
-  }//  class VpyMakerModule
+  }
 }
 
 

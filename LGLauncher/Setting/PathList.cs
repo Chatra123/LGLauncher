@@ -56,16 +56,16 @@ namespace LGLauncher
     public static string D2vPath { get; private set; }
     public static string D2vDir { get { return Path.GetDirectoryName(D2vPath); } }
     public static string D2vName { get { return Path.GetFileName(D2vPath); } }
-    public static string D2vPathInWork { get { return Path.Combine(LWorkDir, D2vNameInWork); } }
-    public static string D2vNameInWork { get { return PathList.TsShortName + ".d2v"; } }
+    public static string D2vPathInLWork { get { return Path.Combine(LWorkDir, D2vNameInLWork); } }
+    public static string D2vNameInLWork { get { return PathList.TsShortName + ".d2v"; } }
 
 
     //    Lwi
     public static string LwiPath { get; private set; }
     public static string LwiDir { get { return Path.GetDirectoryName(LwiPath); } }
     public static string LwiName { get { return Path.GetFileName(LwiPath); } }
-    public static string LwiPathInWork { get { return Path.Combine(LWorkDir, LwiNameInWork); } }
-    public static string LwiNameInWork { get { return PathList.TsShortName + ".lwi"; } }
+    public static string LwiPathInLWork { get { return Path.Combine(LWorkDir, LwiNameInLWork); } }
+    public static string LwiNameInLWork { get { return PathList.TsShortName + ".lwi"; } }
 
     //    LwiFooter
     public static string LwiFooterPath { get; private set; }
@@ -104,21 +104,24 @@ namespace LGLauncher
     public static int PartNo { get; private set; }
     public static bool IsPart { get { return 1 <= PartNo; } }
     public static bool Is1stPart { get { return PartNo == 1; } }
-    public static bool IsAll { get; private set; }
+    public static bool IsAll { get { return PartNo == -1; } }
     private static bool AutoDetectPartNo;
     private static string SequenceName;                      //作業フォルダ名のMD5作成用
 
     //コマンドラインに -IsLast があるか？
     public static bool HasLastFlag_OnCmdLine { get; private set; }
-    //SplitTrim
+
+    //最後の SplitTrimか？
+    //  SplitTrim : avsから有効フレームを取得した後に、さらに分割したTrim()
     public static bool IsLastSplit { get; private set; }
+
+    //IsLastSplit更新
     public static void Set_IsLastSplit(bool islast)
     {
-      //IsLastSplit更新
       IsLastSplit = islast;
     }
 
-    //最終 PartNoか？
+    //最後の PartNoか？
     public static bool IsLastPart
     {
       get
@@ -126,15 +129,15 @@ namespace LGLauncher
         if (IsPart)
           return HasLastFlag_OnCmdLine && IsLastSplit;
         else//IsAll
-          return HasLastFlag_OnCmdLine;
+          return true;
       }
     }
 
-    //PartNo＋＋
-    public static void IncreamentPartNo()
+    //PartNo++
+    public static void IncrementPartNo()
     {
       PartNo++;
-      if (IsAll) throw new Exception();
+      if (IsAll) throw new Exception("cannot increment PartNo at 'IsAll' session");
     }
 
 
@@ -182,19 +185,19 @@ namespace LGLauncher
     public static double Regard_NsecMain_AsCM { get; private set; }
 
     //enable output
-    public static bool Out_tvtp { get; private set; }
-    public static bool Out_ogm { get; private set; }
-    public static bool Out_frame { get; private set; }
-    public static bool Out_rawframe { get; private set; }
+    public static bool Out_Tvtp { get; private set; }
+    public static bool Out_Tgm { get; private set; }
+    public static bool Out_Frame { get; private set; }
+    public static bool Out_RawFrame { get; private set; }
 
     //chap directory
-    public static bool Out_tvtp_toTsDir { get; private set; }
-    public static bool Out_misc_toTsDir { get; private set; }
-    public static string DirPath_tvtp { get; private set; }
-    public static string DirPath_misc { get; private set; }
+    //public static bool Out_tvtp_toTsDir { get; private set; }
+    //public static bool Out_misc_toTsDir { get; private set; }
+    public static string DirPath_Tvtp { get; private set; }
+    public static string DirPath_Misc { get; private set; }
 
     //  [  Delete Work item  ]
-    public static int Mode_DeleteWorkItem { get; private set; }
+    public static int Mode_CleanWorkItem { get; private set; }
 
 
     /// <summary>
@@ -226,8 +229,57 @@ namespace LGLauncher
     /// </summary>
     private static void Copy_FromCommandLine(Setting_CmdLine cmdline)
     {
+      //copy
       PartNo = cmdline.No;
-      IsAll = cmdline.IsAll || cmdline.No == -1;
+      PartNo = (cmdline.IsAll) ? -1 : PartNo;
+      HasLastFlag_OnCmdLine = cmdline.IsLast;
+      SequenceName = cmdline.SequenceName ?? "";
+
+      TsPath = cmdline.TsPath;
+      D2vPath = cmdline.D2vPath;
+      LwiPath = cmdline.LwiPath;
+      SrtPath = cmdline.SrtPath;
+
+      Channel = cmdline.Channel;
+      Program = cmdline.Program;
+
+      //post process
+      AutoDetectPartNo = PartNo == 0;
+
+      //エラーチェック
+      //PartNo
+      if (PartNo <= -2)
+        throw new LGLException("PartNo is less than equal -2");
+
+      //Ts
+      if (File.Exists(TsPath) == false)
+        throw new LGLException("ts does not exist");
+      //D2v  Lwi
+      //  コマンドラインで指定されているときのみチェック
+      //  srtは削除されるている可能性があるのでチェックしない
+      if (D2vPath != null && File.Exists(D2vPath) == false)
+        throw new LGLException("d2v does not exist");
+      if (LwiPath != null && File.Exists(LwiPath) == false)
+        throw new LGLException("lwi does not exist");
+
+      //Extension
+      if (TsPath != null && Path.GetExtension(TsPath).ToLower() != ".ts")
+        throw new LGLException("TsPath has invalid extension");
+
+      if (D2vPath != null && Path.GetExtension(D2vPath).ToLower() != ".d2v")
+        throw new LGLException("D2vPath has invalid extension");
+
+      if (LwiPath != null && Path.GetExtension(LwiPath).ToLower() != ".lwi")
+        throw new LGLException("LwiPath has invalid extension");
+
+      if (SrtPath != null && Path.GetExtension(SrtPath).ToLower() != ".srt")
+        throw new LGLException("SrtPath has invalid extension");
+    }
+
+    private static void Copy_FromCommandLine_obsolete(Setting_CmdLine cmdline)
+    {
+      PartNo = cmdline.No;
+
       HasLastFlag_OnCmdLine = cmdline.IsLast || cmdline.IsAll || cmdline.No == -1;
       SequenceName = cmdline.SequenceName ?? "";
 
@@ -272,7 +324,6 @@ namespace LGLauncher
         throw new LGLException("SrtPath is invalid extension");
     }
 
-
     /// <summary>
     /// 入力ファイルの設定
     /// </summary>
@@ -313,7 +364,11 @@ namespace LGLauncher
 
       //Avs固定 
       {
-        AvsVpy = AvsVpyType.Avs;
+        const AvsVpyType frameServerType = AvsVpyType.Avs;
+        AvsVpy = frameServerType;
+
+        if (AvsVpy == AvsVpyType.Vpy)
+          throw new NotImplementedException();
       }
     }
 
@@ -365,18 +420,18 @@ namespace LGLauncher
           // search *.p2.frame.cat.txt
           var files = Directory.GetFiles(LWorkDir,
                                          TsShortName + ".p*.frame.cat.txt");
-          // not found previous part file. set no 1.
+          // not found previous part file. set PartNo 1.
           if (files.Count() == 0)
             return 1;
 
           //ファイル名  -->  数字抽出
           var strNums = files.Select(fullname =>
           {
-            //"ON&OF.p3.frame.cat.txt"
+            //"ON&OF.p1.frame.cat.txt"
             string name = Path.GetFileName(fullname);
             //  "ON&OF.p"
             int len_1st = (TsShortName + ".p").Length;
-            //     "3"  = "ON&OF.p3.frame.cat.txt"  -  "ON&OF.p"  -  ".frame.cat.txt"
+            //     "1"  = "ON&OF.p1.frame.cat.txt"  -  "ON&OF.p"  -  ".frame.cat.txt"
             int len_num = name.Length - len_1st - ".frame.cat.txt".Length;
             string num = name.Substring(len_1st, len_num);
             return num;
@@ -498,8 +553,8 @@ namespace LGLauncher
       }
 
       //LogoSelector
-      //  SystemDirにあるLogoSelectorを取得。複数ある場合の優先順位は、
-      //　                                     （高）  .exe .vbs .js  （低）
+      //  複数ある場合の優先順位は、
+      //　    （高）  .exe .vbs .js  （低）
       var logoSelector_list = new string[] {
                                               SearchItem_OrEmpty(sysFiles, "LogoSelector.exe"),
                                               SearchItem_OrEmpty(sysFiles, "LogoSelector.vbs"),
@@ -522,20 +577,20 @@ namespace LGLauncher
       Regard_NsecMain_AsCM = 0 < Regard_NsecMain_AsCM ? Regard_NsecMain_AsCM : 0;
 
       //enable output
-      Out_tvtp = 0 < setting.Out_tvtp;
-      Out_ogm = 0 < setting.Out_ogm;
-      Out_frame = 0 < setting.Out_frame;
-      Out_rawframe = 0 < setting.Out_rawframe;
+      Out_Tvtp = 0 < setting.Out_Tvtp;
+      Out_Tgm = 0 < setting.Out_Ogm;
+      Out_Frame = 0 < setting.Out_Frame;
+      Out_RawFrame = 0 < setting.Out_RawFrame;
 
       //chapter directory
-      Out_tvtp_toTsDir = 0 < setting.Out_tvtp_toTsDir;
-      Out_misc_toTsDir = 0 < setting.Out_misc_toTsDir;
-      DirPath_tvtp = setting.DirPath_tvtp;
-      DirPath_misc = setting.DirPath_misc;
+      //Out_tvtp_toTsDir = 0 < setting.Out_tvtp_toTsDir;
+      //Out_misc_toTsDir = 0 < setting.Out_misc_toTsDir;
+      DirPath_Tvtp = setting.DirPath_Tvtp;
+      DirPath_Misc = setting.DirPath_Misc;
 
       //misc
       Detector_MultipleRun = setting.Detector_MultipleRun;
-      Mode_DeleteWorkItem = setting.DeleteWorkItem;
+      Mode_CleanWorkItem = setting.CleanWorkItem;
     }
 
 
@@ -549,15 +604,16 @@ namespace LGLauncher
         Log.WriteLine("  No  = 【    " + PathList.PartNo + "    】");
         if (PathList.Is1stPart || PathList.IsAll)
         {
-          Log.WriteLine("         " + PathList.TsPath);
-          Log.WriteLine("         InputPlugin  :  " + InputPlugin.ToString());
-          Log.WriteLine("         LogoDetector :  " + Detector.ToString());
+          Log.WriteLine("          " + PathList.TsPath);
+          Log.WriteLine("       InputPlugin  :  " + InputPlugin.ToString());
+          Log.WriteLine("       LogoDetector :  " + Detector.ToString());
         }
         if (HasLastFlag_OnCmdLine)
-          Log.WriteLine("         HasLastFlag  :  " + HasLastFlag_OnCmdLine);
+          Log.WriteLine("       HasLastFlag  :  " + HasLastFlag_OnCmdLine);
+        Log.WriteLine();
       }
 
-      // error check
+      //error check
       if (InputPlugin == PluginType.D2v)
       {
         if (File.Exists(D2vPath) == false)
@@ -571,10 +627,10 @@ namespace LGLauncher
       }
 
       if (InputPlugin == PluginType.Unknown)
-        throw new LGLException("Unknown  InputPlugin");
+        throw new LGLException("Unknown InputPlugin");
 
       if (Detector == LogoDetector.Unknown)
-        throw new LGLException("Unknown  LogoDetector");
+        throw new LGLException("Unknown LogoDetector");
 
       if (InputPlugin == PluginType.D2v
         && Detector == LogoDetector.Join_Logo_Scp)

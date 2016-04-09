@@ -9,7 +9,38 @@ namespace LGLauncher
 {
   using OctNov.IO;
 
-  class D2vFormatter
+/*
+ *   　d2v  -->  最終行を削除
+ *   　lwi  -->  最後のindex= 以降を削除 
+ */
+  static class IndexFormatter
+  {
+    static bool HasFormatted = false;
+
+    /// <summary>
+    /// Format  d2v, lwi Index
+    /// </summary>
+    public static void Format()
+    {
+      if (HasFormatted == false)
+      {
+        HasFormatted = true;
+
+        if (PathList.InputPlugin == PluginType.D2v)
+        {
+          D2vFormatter.Format();
+        }
+        else if (PathList.InputPlugin == PluginType.Lwi)
+        {
+          LwiFormatter.Format();
+        }
+
+      }
+    }
+  }
+
+
+  static class D2vFormatter
   {
     /// <summary>
     /// フォーマットを整える
@@ -44,20 +75,18 @@ namespace LGLauncher
         for (int idx = readText.Count - 1; readText.Count - 2 < idx; idx--)
         {
           string line = readText[idx];
-          if (Regex.IsMatch(line, @"FINISHED.*", RegexOptions.IgnoreCase))
+          if (Regex.IsMatch(line, @"^FINISHED  /d.*", RegexOptions.IgnoreCase))
             hasFinished = true;
         }
       }
 
       //終端のフォーマットを整える
-      //  FINISHEDがなければ末尾は切り捨て
       var formatText = readText;
       if (hasFinished == false)
       {
-        //ファイル終端を整える
-        formatText = formatText.GetRange(0, formatText.Count - 3);
-        if (hasFinished == false)
-          formatText[formatText.Count - 1] += " ff";
+        //FINISHEDがなければ末尾２行を切り捨て
+        formatText = formatText.GetRange(0, formatText.Count - 2);
+        formatText[formatText.Count - 1] += " ff";
         //動作に支障がないので、
         //　・Location=0,0,0,0は書き替えない
         //　・FINISHEDは書かない
@@ -65,12 +94,12 @@ namespace LGLauncher
 
       //書
       {
-        string outPath = PathList.LwiPathInWork;
+        string outPath = PathList.D2vNameInLWork;
         File.WriteAllLines(outPath, formatText, TextEnc.Shift_JIS);
 
-        //デバッグ用記録  TsShortName.d2v --> TsShortName.p2.d2v
-        string outPath_debug = PathList.WorkPath + ".d2v";
-        File.Copy(outPath, outPath_debug);
+        //デバッグ用のコピー  TsShortName.d2v  -->  TsShortName.p2.d2v
+        string outPath_part = PathList.WorkPath + ".d2v";
+        File.Copy(outPath, outPath_part);
       }
 
     }

@@ -54,11 +54,13 @@ namespace LGLauncher
 
       while (true)
       {
+        Log.WriteLine();
+
         //分割トリム作成
         int[] splitTrim;
         if (PathList.IsPart)
         {
-          //SplitTrim()　適度に分割して初回のチャプター作成を早くする。
+          //適度に分割して初回のチャプター作成を早くする。
           int EndFrame_Max = trimFrame[1];
           bool isLastSplit;
           splitTrim = module.CreateSplitTrim(EndFrame_Max, out isLastSplit);
@@ -67,6 +69,7 @@ namespace LGLauncher
         else//IsAll
         {
           splitTrim = trimFrame;
+          PathList.Set_IsLastSplit(true);
         }
 
 
@@ -88,7 +91,7 @@ namespace LGLauncher
           * 　　エラーが発生してもチャプター出力は行う。
           * 　　Detect Part No があるので *.p3.frame.cat.txtを作成しなくてはいけない。
           * 　　値は前回のチャプターと同じ値にする。
-          * 　　IsLastPartなら logo_scp_posのlast_batch、ogm chapter出力を実行する。
+          * 　　IsLastPartなら logo_scp_posのlast_batch、ogm chapter出力を実行する必要がある。。
           */
           HasError = true;
           Log.WriteLine();
@@ -102,8 +105,8 @@ namespace LGLauncher
         //チャプター出力
         try
         {
-          var concat = EditFrame.FrameEditor.Edit_ConcatFrame(splitTrim);
-          EditFrame.FrameEditor.Edit_Chapter(concat, splitTrim);
+          var concat = EditFrame.FrameEditor.Edit_Concat(splitTrim);
+          EditFrame.FrameEditor.OutputChapter(concat, splitTrim);
         }
         catch (LGLException e)
         {
@@ -113,10 +116,11 @@ namespace LGLauncher
           Log.WriteLine(cmdline_ToString);
         }
 
+
         if (PathList.IsLastSplit || PathList.IsAll || HasError)
           break;
         else
-          PathList.IncreamentPartNo();   //PartNo++で続行
+          PathList.IncrementPartNo();   //PartNo++で continue
       }
 
       DeleteWorkItem.Clean_Lastly();
@@ -150,10 +154,8 @@ namespace LGLauncher
         DeleteWorkItem.Clean_Beforehand();
 
         if (PathList.Is1stPart || PathList.IsAll)
-        {
           Log.WriteLine(cmdline_ToString);
-          Log.WriteLine();
-        }
+
         return true;
       }
 
@@ -168,15 +170,15 @@ namespace LGLauncher
         /*
          *  適度に分割して初回のチャプター作成を早くする。
          *  
-         *  TrimFrame length =  35min なら、 35m                に分割
-         *  TrimFrame length =  45min なら、 30m, 15m           に分割
-         *  TrimFrame length =  75min なら、 30m, 30m, 15m      に分割
-         *  TrimFrame length = 105min なら、 30m, 30m, 30m, 15m に分割
+         *  length =  35min なら、 35m                に分割
+         *  length =  45min なら、 30m, 15m           に分割
+         *  length =  95min なら、 30m, 30m, 35m      に分割
          */
 
         //開始フレーム　　（＝　直前の終了フレーム　＋　１）
         int beginFrame;
         {
+          //if  Is1stPart || IsAll  then  beginFrame = 0
           //直前のトリム用フレーム数取得   previous
           int[] trimFrame_prv = (2 <= PathList.PartNo)
                                     ? AvsVpyCommon.GetTrimFrame_previous()
@@ -191,7 +193,7 @@ namespace LGLauncher
           const int len_30min = (int)(30.0 * 60.0 * 29.970);
           const int len_40min = (int)(40.0 * 60.0 * 29.970);
 
-          int len = endFrame_Max - beginFrame;
+          int len = endFrame_Max - beginFrame + 1;
           if (len_40min < len)
           {
             splitTrim = new int[] { beginFrame, beginFrame + len_30min };
@@ -206,13 +208,13 @@ namespace LGLauncher
 
         //Log
         {
-          double trim_len_min = 1.0 * (splitTrim[1] - splitTrim[0]) / 29.970 / 60;
+          double len_min = 1.0 * (splitTrim[1] - splitTrim[0]) / 29.970 / 60;
           var log = new StringBuilder();
           log.AppendLine("  [ Split Trim ]");
           log.AppendLine("    PartNo        =  " + PathList.PartNo);
           log.AppendLine("    SplitTrim[0]  =  " + splitTrim[0]);
           log.AppendLine("             [1]  =  " + splitTrim[1]);
-          log.AppendLine("    length        =  " + string.Format("{0:f1}  min", trim_len_min));
+          log.AppendLine("    length        =  " + string.Format("{0:f1}  min", len_min));
           log.AppendLine("    EndFrame_Max  =  " + endFrame_Max);
           log.AppendLine("    isLastSplit   =  " + isLastSplit);
           Log.WriteLine(log.ToString());
@@ -237,7 +239,8 @@ namespace LGLauncher
         //srt
         string srtPath;
         {
-          double shiftSec = 1.0 * trimFrame[0] / 29.970;
+          int beginFrame = trimFrame[0];
+          double shiftSec = 1.0 * beginFrame / 29.970;
           srtPath = TimeShiftSrt.Make(shiftSec);
         }
 
@@ -259,7 +262,7 @@ namespace LGLauncher
           }
         }
 
-        // return : create trim script only 
+        // create trim script only, if return
         //return;
 
 
@@ -277,15 +280,15 @@ namespace LGLauncher
           int timeout_ms;
           {
             //  ”avsの総時間”の３倍
-            double avsTime_sec = 1.0 * (trimFrame[1] - trimFrame[0]) / 29.970;
-            timeout_ms = (int)(avsTime_sec * 3) * 1000;
+            int len_frame = trimFrame[1] - trimFrame[0] + 1;
+            double len_sec = 1.0 * len_frame / 29.970;
+            timeout_ms = (int)(len_sec * 3) * 1000;
             timeout_ms = timeout_ms <= 30 * 1000 ? 90 * 1000 : timeout_ms;
           }
 
           //Bat実行
           LwiFile.Set_ifLwi();
           BatLuncher.Launch(batPath, timeout_ms);
-
         }
         finally
         {

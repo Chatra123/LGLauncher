@@ -17,14 +17,13 @@ namespace LGLauncher
   [Serializable]
   public class Setting_File
   {
-    const double CurrentVer = 11.2;
+    const double CurrentRev = 11.6;
 
-    public double Ver = 0.0;
+    public double Rev = 0.0;
+    public string memo11 = "  Set InputPlugin     d2v  or  lwi  ";
+    public string memo12 = "  Set LogoDetector    JLS  or  LG   ";
+    public string memo13 = "      'cannot set d2v with JLS'     ";
     public int Enable = 1;
-    public string memo1 = "  set InputPlugin     d2v            or  lwi         ";
-    public string memo2 = "  set LogoDetector    Join_Logo_Scp  or  LogoGuillo  ";
-    public string memo3 = "                      JLS            or  LG          ";
-    public string memo4 = "  cannot set d2v with Join_Logo_Scp                  ";
     public string InputPlugin = "  lwi         ";
     public string LogoDetector = "  LogoGuillo  ";
     public int Detector_MultipleRun = 1;
@@ -36,20 +35,20 @@ namespace LGLauncher
     public string space_2 = "";
 
     //output chapter
-    public int Out_tvtp = 1;
-    public int Out_ogm = 1;
-    public int Out_frame = 1;
-    public int Out_rawframe = 0;
+    public int Out_Tvtp = 1;
+    public int Out_Ogm = 1;
+    public int Out_Frame = 1;
+    public int Out_RawFrame = 0;
     public string space_3 = "";
 
     //chapter directory
-    public int Out_tvtp_toTsDir = 1;
-    public int Out_misc_toTsDir = 1;
-    public string DirPath_tvtp = @"   C:\tvtp_Dir               ";
-    public string DirPath_misc = @"   C:\ogm_and_frame_Dir      ";
+    //public int Out_tvtp_toTsDir = 1;
+    //public int Out_misc_toTsDir = 1;
+    public string DirPath_Tvtp = @"   C:\Tvtp_Dir            ";
+    public string DirPath_Misc = @"   C:\Ogm_and_Frame_Dir   ";
     public string space_4 = "";
 
-    public int DeleteWorkItem = 3;
+    public int CleanWorkItem = 3;
 
 
     //設定ファイル名
@@ -80,10 +79,10 @@ namespace LGLauncher
 
       var file = XmlRW.Load<Setting_File>(xmlpath);
 
-      //新たに追加された項目、削除された項目を書き換え。
-      if (file.Ver != CurrentVer)
+      //追加された項目、削除された項目を書き換え。
+      if (file.Rev != CurrentRev)
       {
-        file.Ver = CurrentVer;
+        file.Rev = CurrentRev;
         XmlRW.Save(xmlpath, file);
       }
 

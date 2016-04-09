@@ -1,22 +1,4 @@
-﻿/*
- * AvsWithD2v, AvsWithLwiの動作
- * 
- * 
- * ・作成途中の d2v, Lwi　を読み込む。 
- * 
- * ・フォーマットを整えてd2vとして使用できる形にする。 
- *   　d2v  --> 最終行を削除
- *   　lwi  --> 最後のindex= 以降を削除 
- *   
- * ・d2vを使用してavsを作成し、フレーム数を取得
- * 
- * ・取得フレーム数までをTrim()したavsを作成して完成
- *  
- * 
- */
-
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -27,8 +9,104 @@ namespace LGLauncher
 {
   using OctNov.IO;
 
+
+  #region LwiFile
+  static class LwiFile
+  {
+    private static FileStream lock_lwi;
+
+    /// <summary>
+    /// lwiをTsDirに移動
+    /// </summary>
+    public static void Set_ifLwi()
+    {
+      if (PathList.InputPlugin != PluginType.Lwi) return;
+
+      string srcPath = Path.Combine(PathList.LWorkDir, PathList.TsShortName + ".lwi");
+      string dstPath = PathList.TsPath + ".lwi";
+      bool isSameRoot = Path.GetPathRoot(srcPath).ToLower()
+                           == Path.GetPathRoot(dstPath).ToLower();
+      try
+      {
+        //すでにTsDirにlwiファイルがあるなら削除
+        if (File.Exists(dstPath))
+          File.Delete(dstPath);
+        Thread.Sleep(500);
+
+        if (isSameRoot)
+          File.Move(srcPath, dstPath);
+        else
+          File.Copy(srcPath, dstPath);
+        Thread.Sleep(500);
+
+        lock_lwi = new FileStream(dstPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+      }
+      catch
+      {
+        throw new LGLException("lwi file is locked. fail to delete or move.");
+      }
+    }
+
+    /// <summary>
+    /// lwiをTsDirから戻す
+    /// </summary>
+    public static void Back_ifLwi()
+    {
+      if (PathList.InputPlugin != PluginType.Lwi) return;
+
+      string srcPath = PathList.TsPath + ".lwi";
+      string dstPath = Path.Combine(PathList.LWorkDir, PathList.TsShortName + ".lwi");
+      bool isSameRoot = Path.GetPathRoot(srcPath).ToLower()
+                           == Path.GetPathRoot(dstPath).ToLower();
+      if (File.Exists(srcPath) == false) return;
+
+      try
+      {
+        if (lock_lwi != null)
+        {
+          lock_lwi.Close();
+          lock_lwi = null;
+        }
+
+        if (isSameRoot)
+          File.Move(srcPath, dstPath);
+        else
+          File.Delete(srcPath);
+        Thread.Sleep(500);
+      }
+      catch
+      {
+        throw new LGLException("lwi file is locked. fail to back.");
+      }
+    }
+
+
+    /// <summary>
+    /// LwiファイルにTsDirに移動してから実行
+    /// PluginType.Lwiでない場合はそのままaction()
+    /// </summary>
+    [Obsolete]
+    public static void Action_withSetLwi(Action action)
+    {
+      try
+      {
+        LwiFile.Set_ifLwi();
+        action();
+      }
+      finally
+      {
+        LwiFile.Back_ifLwi();
+      }
+    }
+
+  }
+  #endregion LwiFile
+
+
+
+
   #region LwiFormatter
-  class LwiFormatter
+  static class LwiFormatter
   {
     //lwiの３，４行目
     //
@@ -51,7 +129,7 @@ namespace LGLauncher
     /// </summary>
     public static void Format()
     {
-      string outPath = PathList.LwiPathInWork;
+      string outPath = PathList.LwiPathInLWork;
       var reader = new FileR(PathList.LwiPath);
       var writer = new FileW(outPath);
       writer.SetNewline_n();
@@ -149,9 +227,9 @@ namespace LGLauncher
 
         //コピー
         {
-          //デバッグ用記録  TsShortName.lwi --> TsShortName.p2.lwi
-          string outPath_debug = PathList.WorkPath + ".lwi";
-          File.Copy(outPath, outPath_debug);
+          //デバッグ用のコピー  TsShortName.lwi  -->  TsShortName.p2.lwi
+          string outPath_part = PathList.WorkPath + ".lwi";
+          File.Copy(outPath, outPath_part);
         }
 
       }
@@ -264,78 +342,6 @@ namespace LGLauncher
 
 
 
-  #region LwiFile
-  static class LwiFile
-  {
-    private static FileStream lock_lwi;
 
-    /// <summary>
-    /// lwiをTsDirに移動
-    /// </summary>
-    public static void Set_ifLwi()
-    {
-      if (PathList.InputPlugin != PluginType.Lwi) return;
-
-      string srcPath = Path.Combine(PathList.LWorkDir, PathList.TsShortName + ".lwi");
-      string dstPath = PathList.TsPath + ".lwi";
-      bool isSameRoot = Path.GetPathRoot(srcPath).ToLower()
-                           == Path.GetPathRoot(dstPath).ToLower();
-      try
-      {
-        //すでにTsDirにlwiファイルがあるなら削除
-        if (File.Exists(dstPath))
-          File.Delete(dstPath);
-        Thread.Sleep(500);
-
-        if (isSameRoot)
-          File.Move(srcPath, dstPath);
-        else
-          File.Copy(srcPath, dstPath);
-        Thread.Sleep(500);
-
-        lock_lwi = new FileStream(dstPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-      }
-      catch
-      {
-        throw new LGLException("lwi file is locked. fail to delete or move.");
-      }
-    }
-
-    /// <summary>
-    /// lwiをTsDirから戻す
-    /// </summary>
-    public static void Back_ifLwi()
-    {
-      if (PathList.InputPlugin != PluginType.Lwi) return;
-
-      string srcPath = PathList.TsPath + ".lwi";
-      string dstPath = Path.Combine(PathList.LWorkDir, PathList.TsShortName + ".lwi");
-      bool isSameRoot = Path.GetPathRoot(srcPath).ToLower()
-                           == Path.GetPathRoot(dstPath).ToLower();
-      if (File.Exists(srcPath) == false) return;
-
-      try
-      {
-        if (lock_lwi != null)
-        {
-          lock_lwi.Close();
-          lock_lwi = null;
-        }
-
-        if (isSameRoot)
-          File.Move(srcPath, dstPath);
-        else
-          File.Delete(srcPath);
-        Thread.Sleep(500);
-      }
-      catch
-      {
-        throw new LGLException("lwi file is locked. fail to back.");
-      }
-    }
-
-
-  }
-  #endregion FormatLwi
 
 }
