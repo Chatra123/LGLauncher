@@ -8,27 +8,78 @@ using System.IO;
 
 namespace LGLauncher
 {
-
   /// <summary>
   /// 作業ファイル削除
   /// </summary>
-  static class DeleteWorkItem
+  static class CleanWorkItem
   {
+    static FileCleaner cleaner = new FileCleaner();
+
     /// <summary>
     /// 処理の初回ならLWorkDir内のファイル削除
+    ///   以前の処理のファイルが残っていたら削除する。
     /// </summary>
     public static void Clean_Beforehand()
     {
       //LWorkDir
       if (PathList.Is1stPart)
-      {
-        Delete_file(0.0, PathList.LWorkDir, "*.p?*.*");                                //ワイルドカード指定可
-        Delete_file(0.0, PathList.LWorkDir, PathList.TsShortName + ".frame.cat.txt");  //前回までの合成フレーム
-      }
+        cleaner.Delete_File(0.0, PathList.LWorkDir, "*.p?*.*");                              //ワイルドカード指定可
       else if (PathList.IsAll)
+        cleaner.Delete_File(0.0, PathList.LWorkDir, "*.all.*");
+
+      cleaner.Delete_File(0.0, PathList.LWorkDir, PathList.TsShortName + ".frame.cat.txt");  //前回までの合成フレーム
+      cleaner.Delete_File(0.0, PathList.LWorkDir, PathList.TsShortName + ".jls.*");
+    }
+
+
+    /// <summary>
+    /// 終了処理でのファイル削除
+    /// </summary>
+    public static void Clean_Lastly()
+    {
+      // 2 <= Mode  使い終わったファイルを削除
+      if (2 <= PathList.Mode_CleanWorkItem)
       {
-        Delete_file(0.0, PathList.LWorkDir, "*.all.*");
-        Delete_file(0.0, PathList.LWorkDir, PathList.TsShortName + ".frame.cat.txt");
+        //LWorkDir
+        //  IsLast 　　　　　→　　全ての作業ファイル削除
+        if (PathList.IsLastPart)
+        {
+          cleaner.Delete_File(0.0, PathList.LWorkDir, "_" + PathList.TsShortName + "*.sys.*", ".log");
+          cleaner.Delete_File(0.0, PathList.LWorkDir, PathList.TsShortName + "*");
+        }
+        //  2 <= PartNo  　　→　　１つ前の作業ファイル削除
+        else if (2 <= PathList.PartNo)
+        {
+          //今回作成したTsName.p3.20000__30000.avsは、次回のLGLauncherが使用するので削除しない。
+          //それ以前の作業ファイルを削除
+          for (int no = PathList.PartNo - 1; 1 <= no; no++)
+          {
+            cleaner.Delete_File(0.0, PathList.LWorkDir, PathList.TsShortName + "p" + no + "*");
+          }
+        }
+      }
+
+
+      // 1 <= Mode  古いファイル削除
+      if (1 <= PathList.Mode_CleanWorkItem)
+      {
+        if (PathList.Is1stPart || PathList.IsAll)
+        {
+          const double nDaysBefore = 2.0;
+          //LTopWorkDir                    サブフォルダ内も対象
+          cleaner.Delete_File(nDaysBefore, PathList.LTopWorkDir, "*.frame.cat.txt*");
+          cleaner.Delete_File(nDaysBefore, PathList.LTopWorkDir, "*.jls.*");
+          cleaner.Delete_File(nDaysBefore, PathList.LTopWorkDir, "*.all.*");
+          cleaner.Delete_File(nDaysBefore, PathList.LTopWorkDir, "*.p?*.*");
+          cleaner.Delete_File(nDaysBefore, PathList.LTopWorkDir, "*.sys.*");
+          cleaner.Delete_File(nDaysBefore, PathList.LTopWorkDir, "*.d2v");
+          cleaner.Delete_File(nDaysBefore, PathList.LTopWorkDir, "*.lwi");
+          cleaner.Delete_EmptyDir(PathList.LTopWorkDir);
+          //Windows Temp
+          cleaner.Delete_File(nDaysBefore, Path.GetTempPath(), "logoGuillo_*.avs");
+          cleaner.Delete_File(nDaysBefore, Path.GetTempPath(), "logoGuillo_*.txt");
+          cleaner.Delete_File(nDaysBefore, Path.GetTempPath(), "DGI_pf_tmp_*_*");
+        }
       }
     }
 
@@ -39,76 +90,30 @@ namespace LGLauncher
     public static void Clean_OnError()
     {
       // *.p3.2000__3000.avs 削除
-      Delete_file(0.0, PathList.LWorkDir, PathList.WorkName + ".*__*.avs");
-      Delete_file(0.0, PathList.LWorkDir, PathList.WorkName + ".*__*.vpy");
+      cleaner.Delete_File(0.0, PathList.LWorkDir, PathList.WorkName + ".*__*.avs");
+      cleaner.Delete_File(0.0, PathList.LWorkDir, PathList.WorkName + ".*__*.vpy");
     }
+  }
 
 
+
+  /// <summary>
+  /// 削除処理　実行部
+  /// </summary>
+  class FileCleaner
+  {
     /// <summary>
-    /// 終了処理でのファイル削除
-    /// </summary>
-    public static void Clean_Lastly()
-    {
-      //使い終わったファイルを削除
-      if (3 <= PathList.Mode_CleanWorkItem)
-      {
-        //LWorkDir
-        //  IsLast 　　　　　→　　全ての作業ファイル削除
-        if (PathList.IsLastPart)
-        {
-          Delete_file(0.0, PathList.LWorkDir, PathList.TsShortName + "*");
-          Delete_file(0.0, PathList.LWorkDir, "_" + PathList.TsShortName + "*.sys.*", ".log");
-        }
-        //  2 <= PartNo  　　→　　１つ前の作業ファイル削除
-        else if (2 <= PathList.PartNo)
-        {
-          //今回作成したTsName.p3.20000__30000.avsは、
-          //次回のLGLauncherが使用するので削除しない。
-          Delete_file(0.0, PathList.LWorkDir, PathList.WorkName_prv + "*");
-        }
-      }
-
-      //ファイルサイズが大きい d2v, lwi, srt削除
-      if (2 <= PathList.Mode_CleanWorkItem)
-      {
-        Delete_file(0.0, PathList.LWorkDir, PathList.TsShortName + "*.d2v");
-        Delete_file(0.0, PathList.LWorkDir, PathList.TsShortName + "*.lwi");
-        Delete_file(0.0, PathList.LWorkDir, PathList.TsShortName + "*.srt");
-      }
-
-      //古いファイル削除？
-      if (1 <= PathList.Mode_CleanWorkItem)
-      {
-        if (PathList.Is1stPart || PathList.IsAll)
-        {
-          const double nDaysBefore = 2.0;
-          //LTopWorkDir         サブフォルダ内も対象
-          Delete_file(nDaysBefore, PathList.LTopWorkDir, "*.frame.cat.txt*");
-          Delete_file(nDaysBefore, PathList.LTopWorkDir, "*.all.*");
-          Delete_file(nDaysBefore, PathList.LTopWorkDir, "*.p?*.*");
-          Delete_file(nDaysBefore, PathList.LTopWorkDir, "*.sys.*");
-          Delete_emptydir(PathList.LTopWorkDir);
-          //Windows Temp
-          Delete_file(nDaysBefore, Path.GetTempPath(), "logoGuillo_*.avs");
-          Delete_file(nDaysBefore, Path.GetTempPath(), "logoGuillo_*.txt");
-          Delete_file(nDaysBefore, Path.GetTempPath(), "DGI_pf_tmp_*_*");
-        }
-      }
-    }
-
-
-    /// <summary>
-    /// 削除処理の実行部
+    /// ファイル削除
     /// </summary>
     /// <param name="nDaysBefore">Ｎ日前のファイルを削除対象にする</param>
     /// <param name="directory">ファイルを探すフォルダ。　サブフォルダ内も対象</param>
     /// <param name="searchKey">ファイル名に含まれる文字。ワイルドカード可 * </param>
     /// <param name="ignoreKey">除外するファイルに含まれる文字。ワイルドカード不可 × </param>
-    private static void Delete_file(double nDaysBefore, string directory,
-                                    string searchKey, string ignoreKey = null)
+    public void Delete_File(double nDaysBefore, string directory,
+                                   string searchKey, string ignoreKey = null)
     {
       if (Directory.Exists(directory) == false) return;
-      Thread.Sleep(500);
+      Thread.Sleep(300);
 
       //ファイル取得
       var files = new FileInfo[] { };
@@ -150,7 +155,7 @@ namespace LGLauncher
     /// 空フォルダ削除
     /// </summary>
     /// <param name="parent_directory">親フォルダを指定。空のサブフォルダが削除対象、親フォルダ自身は削除されない。</param>
-    private static void Delete_emptydir(string parent_directory)
+    public void Delete_EmptyDir(string parent_directory)
     {
       if (Directory.Exists(parent_directory) == false) return;
 
@@ -178,9 +183,7 @@ namespace LGLauncher
         }
       }
     }
-
-
-
-
   }
+
+
 }

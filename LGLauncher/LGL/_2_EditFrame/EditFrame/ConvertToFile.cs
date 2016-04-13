@@ -46,10 +46,9 @@ namespace LGLauncher.EditFrame
     /// <summary>
     /// TvtPlay chapterを出力
     /// </summary>
-    public static void To_TvtPlayChap(string outPath, List<int> framelist, int endFrame)
+    public static void To_TvtpChap(string outPath, List<int> framelist, int endFrame)
     {
       if (framelist == null || framelist.Count == 0) return;
-
 
       List<int> chapList;
       {
@@ -72,7 +71,7 @@ namespace LGLauncher.EditFrame
       }
 
 
-      string chapText = EditFrameList.To_TvtPlayChap(chapList);
+      string chapText = EditFrame.To_TvtPlayChap(chapList);
 
       try
       {
@@ -108,7 +107,7 @@ namespace LGLauncher.EditFrame
       }
 
 
-      string chapText = EditFrameList.To_OgmChap_type1(chaplist);
+      string chapText = EditFrame.To_OgmChap_type1(chaplist);
 
       try
       {

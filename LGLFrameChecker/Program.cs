@@ -7,10 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-/*
- * avs限定
- * vpy非対応
- */
+
 
 namespace LGLFrameChecker
 {
@@ -19,21 +16,22 @@ namespace LGLFrameChecker
     private static void Main(string[] args)
     {
       Console.WriteLine("LGLFrameChecker");
-      string checkResult = CheckFrame();
-      Console.WriteLine(checkResult);
+      string result = CheckFrame();
+      Console.WriteLine(result);
 
-      //フレームチェック成功、ファイル書込み
-      if (checkResult.IndexOf("Error") == -1)
+
+      if (result.IndexOf("Error") == -1)
       {
-        File.WriteAllText("__FrameCheckResult.sys.txt", checkResult);
+        //フレームチェック成功、ファイル書込み
+        File.WriteAllText("__FrameCheckResult.sys.txt", result);
       }
       else
       {
         //on error
+        //１０秒後に自動終了
         Console.WriteLine();
         Console.WriteLine();
         Console.WriteLine("auto exit after 10 sec");
-        //１０秒後に自動終了
         Task.Factory.StartNew(() => { Thread.Sleep(10 * 1000); Environment.Exit(0); });
       }
 
@@ -217,7 +215,7 @@ namespace LGLFrameChecker
     public int Match__Not { get { return MatchResult[2]; } }
     public int Match__Sum { get { return MatchResult.Sum(); } }
     public double MatchR_Main { get { return 1.0 * Match_Main / Match__Sum * 100; } }
-    public double MatchR___Cm { get { return 1.0 * Match___CM / Match__Sum * 100; } }
+    public double MatchR___CM { get { return 1.0 * Match___CM / Match__Sum * 100; } }
     public double MatchR__Not { get { return 1.0 * Match__Not / Match__Sum * 100; } }
 
     //Result
@@ -225,7 +223,7 @@ namespace LGLFrameChecker
     {
       string line = string.Format("{0,3:N0}  {1}      {2,3:N0}  {3,3:N0}  {4,3:N0} ,      {5,7:N0}  {6,7:N0}  {7,7:N0}",
                                   No, EndFrameTime.ToString("T"),
-                                  MatchR_Main, MatchR___Cm, MatchR__Not,
+                                  MatchR_Main, MatchR___CM, MatchR__Not,
                                   Match_Main, Match___CM, Match__Not
                                 );
       return line;

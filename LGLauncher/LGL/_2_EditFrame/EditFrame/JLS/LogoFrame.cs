@@ -12,15 +12,14 @@ namespace LGLauncher.EditFrame.JLS
 {
   using OctNov.IO;
 
-  public static class Concat_logoframe
+  public static class LogoFrame
   {
-
     /// <summary>
-    ///  capter_exeのscposを連結
+    ///  LogoFrameのresultを連結
     /// </summary>
     public static void Concat(int[] trimFrame)
     {
-      //パス作成
+      //パス
       //logoframeによって作成されるファイル                *.p3.jls.logoframe.txt
       string add_ScposPath = PathList.WorkPath + ".jls.logoframe.txt";
 
@@ -63,7 +62,7 @@ namespace LGLauncher.EditFrame.JLS
         }
 
         new_CatText.AddRange(add_LogoframeText);
-        //手間がかかるので連結部の繋ぎ目はそのまま
+        //簡略化のため連結部の繋ぎ目はそのまま
       }
 
       //書
@@ -78,7 +77,7 @@ namespace LGLauncher.EditFrame.JLS
 
 
     /// <summary>
-    /// logoframeテキストをオフセット分ずらす    for JLS_Concat_logoframe
+    /// logoframeテキストをオフセット分ずらす
     /// </summary>
     static List<string> ApeendOffset_logoframe(List<string> logoframeText, int frame_offset)
     {
@@ -97,7 +96,7 @@ namespace LGLauncher.EditFrame.JLS
 
 
     /// <summary>
-    /// logoframe１行をオフセットだけずらす    for JLS_Concat_logoframe
+    /// logoframe１行をオフセットだけずらす
     /// </summary>
     static List<string> ApeendOffset_logoframe(string line, int frame_offset)
     {

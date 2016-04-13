@@ -9,7 +9,7 @@ namespace LGLauncher.EditFrame
 {
   using OctNov.IO;
 
-  class Concat_Frame
+  class LogoGuillo
   {
     /// <summary>
     /// 前回までのフレームリストと、今回　生成したリストをつなげる。
@@ -28,12 +28,12 @@ namespace LGLauncher.EditFrame
       //　add_FrameListが見つからなくても処理は継続する。
       List<int> add_FrameList = null, old_CatList = null;
       {
-        add_FrameList = EditFrameList.FrameFile_to_List(add_FramePath);    // from  *.p3.frame.txt
+        add_FrameList = EditFrame.FrameFile_to_List(add_FramePath);    // from  *.p3.frame.txt
 
         //前回までの結合フレームを取得
         if (2 <= PathList.PartNo)
         {
-          old_CatList = EditFrameList.FrameFile_to_List(catPath);          // from  *.frame.cat.txt
+          old_CatList = EditFrame.FrameFile_to_List(catPath);          // from  *.frame.cat.txt
           if (old_CatList == null && add_FrameList == null)
             throw new LGLException("not detect frame file  or  is invalid file");
         }
@@ -56,7 +56,7 @@ namespace LGLauncher.EditFrame
 
         new_CatList.AddRange(add_FrameList);
         //連結部の繋ぎ目をけす。
-        new_CatList = EditFrameList.FlatOut_CM__(new_CatList, 0.5);
+        new_CatList = EditFrame.FlatOut_CM__(new_CatList, 0.5);
       }
 
 

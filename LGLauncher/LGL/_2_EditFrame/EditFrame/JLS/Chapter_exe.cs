@@ -12,15 +12,14 @@ namespace LGLauncher.EditFrame.JLS
 {
   using OctNov.IO;
 
-  public static class Concat_scpos
+  public static class Chapter_exe
   {
-
     /// <summary>
-    ///  capter_exeのscposを連結
+    ///  chapter_exeのscposを連結
     /// </summary>
     public static void Concat(int[] trimFrame)
     {
-      //パス作成
+      //パス
       //chapter_exeによって作成されるファイル              *.p3.jls.scpos.txt
       string add_ScposPath = PathList.WorkPath + ".jls.scpos.txt";
 
@@ -38,10 +37,10 @@ namespace LGLauncher.EditFrame.JLS
         {
           old_CatText = FileR.ReadAllLines(catPath);          // from  *.jls.scpos.cat.txt
           if (old_CatText == null && add_ScposText == null)
-            throw new LGLException("not detect scpos file");
+            throw new LGLException("not detect previous scpos file");
         }
 
-        //最終行の# SCPos:1000 2000 は除去
+        //最終行の # SCPos:1000 2000 は除去
         add_ScposText = add_ScposText ?? new List<string>();
         add_ScposText = add_ScposText.Where(line => line.Trim().IndexOf("#") != 0)
                                      .Where(line => string.IsNullOrWhiteSpace(line) == false)
@@ -61,8 +60,8 @@ namespace LGLauncher.EditFrame.JLS
         if (trimFrame == null)
           throw new LGLException("trimFrame is null");
 
-        int endFrame = trimFrame[1];
         int beginFrame = trimFrame[0];
+        int endFrame = trimFrame[1];
 
         if (PathList.IsPart)
         {
@@ -73,7 +72,7 @@ namespace LGLauncher.EditFrame.JLS
 
         new_CatText.AddRange(add_ScposText);
         new_CatText.Add("# SCPos:" + endFrame + " " + endFrame);
-        //手間がかかるので連結部の繋ぎ目はそのまま
+        //簡略化のため連結部の繋ぎ目はそのまま
       }
 
       //書
@@ -88,7 +87,7 @@ namespace LGLauncher.EditFrame.JLS
 
 
     /// <summary>
-    /// Scposテキストをオフセット分ずらす    for JLS_Concat_Scpos
+    /// Scposテキストをオフセット分ずらす
     /// </summary>
     static List<string> ApeendOffset_Scpos(List<string> scposText, int chapcnt_offset, int frame_offset)
     {
@@ -111,22 +110,22 @@ namespace LGLauncher.EditFrame.JLS
 
 
     /// <summary>
-    /// ”Scposの２行”をオフセットだけずらす    for JLS_Concat_Scpos
+    /// ”Scposの２行”をオフセットだけずらす
     /// </summary>
     static List<string> ApeendOffset_ScposElement(string timecode_line, string name_line, int chapcnt_offset, int frame_offset)
     {
       /*
-      CHAPTER01=00:00:36.303
-      CHAPTER01NAME=28フレーム  SCPos:1112 1111
+      CHAPTER01=00:00:36.303                            <--  timecode_line
+      CHAPTER01NAME=28フレーム  SCPos:1112 1111         <--  name_line
       CHAPTER02=00:01:08.602
-      CHAPTER02NAME=31フレーム ＿ SCPos:2081 2080
+      CHAPTER02NAME=31フレーム ★★ SCPos:2081 2080
       */
 
       //文字抽出
       Match match_timecode, match_name;
       {
         const string timecode_pattern = @"CHAPTER(?<ChapCnt>\d+)=(?<Hour>\d+):(?<Min>\d+):(?<Sec>\d+).(?<MSec>\d+)";
-        const string name_pattern = @"CHAPTER(\d+)Name=(?<Mute>.*)SCPos:(?<SC_End>(\d+))\s+(?<SC_Begin>(\d+))";
+        const string name_pattern = @"CHAPTER(\d+)Name=(?<Mute_Mark>.*)SCPos:(?<SC_End>(\d+))\s+(?<SC_Begin>(\d+))";
         match_timecode = new Regex(timecode_pattern, RegexOptions.IgnoreCase).Match(timecode_line);
         match_name = new Regex(name_pattern, RegexOptions.IgnoreCase).Match(name_line);
 
@@ -137,8 +136,8 @@ namespace LGLauncher.EditFrame.JLS
       //文字列から抽出する値
       int chapCnt;
       TimeSpan timecode;
-      string timetext;
-      string Mute;
+      string timetext;            //00:01:08.602
+      string Mute_and_Mark;       //31フレーム ★★ 
       int SC_End, SC_Begin;
 
       //文字　→　数値
@@ -152,7 +151,7 @@ namespace LGLauncher.EditFrame.JLS
         int msec = int.Parse(match_timecode.Groups["MSec"].Value);
         timecode = new TimeSpan(0, hour, min, sec, msec);
 
-        Mute = match_name.Groups["Mute"].Value;
+        Mute_and_Mark = match_name.Groups["Mute_Mark"].Value;
         SC_End = int.Parse(match_name.Groups["SC_End"].Value);
         SC_Begin = int.Parse(match_name.Groups["SC_Begin"].Value);
       }
@@ -176,7 +175,7 @@ namespace LGLauncher.EditFrame.JLS
       string new_timecode_line = string.Format("Chapter{0:D2}={1}",
                                                chapCnt, timetext);
       string new_name_line = string.Format("Chapter{0:D2}Name={1}SCPos:{2} {3}",
-                                           chapCnt, Mute, SC_End, SC_Begin);
+                                           chapCnt, Mute_and_Mark, SC_End, SC_Begin);
       return new List<string> { new_timecode_line, new_name_line };
     }
 

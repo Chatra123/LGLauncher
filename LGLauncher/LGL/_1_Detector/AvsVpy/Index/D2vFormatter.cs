@@ -45,7 +45,6 @@ namespace LGLauncher
     /// <summary>
     /// フォーマットを整える
     /// </summary>
-    /// <returns>作成したd2vパス</returns>
     public static void Format()
     {
       //読
@@ -72,7 +71,7 @@ namespace LGLauncher
       bool hasFinished = false;
       {
         //末尾を走査
-        for (int idx = readText.Count - 1; readText.Count - 2 < idx; idx--)
+        for (int idx = readText.Count - 1; readText.Count - 3 < idx; idx--)
         {
           string line = readText[idx];
           if (Regex.IsMatch(line, @"^FINISHED  /d.*", RegexOptions.IgnoreCase))

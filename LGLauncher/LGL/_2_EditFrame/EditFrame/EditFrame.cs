@@ -15,7 +15,7 @@ namespace LGLauncher.EditFrame
   /// <summary>
   /// フレームリストの編集　＆　各形式への変換
   /// </summary>
-  static class EditFrameList
+  static class EditFrame
   {
     /// <summary>
     /// read Frame File  →  List<int>
@@ -128,11 +128,11 @@ namespace LGLauncher.EditFrame
       //　　　　　長ければ newListに本編 frameList[i], frameList[i+1]を加える。
       //
       //ただし、開始直後のＣＭは無視する。
-      //開始直後に数秒のＣＭがあっても本編にいれない。
+      //開始直後に短いＣＭがあっても本編にはいれない。
       //
       var newList = new List<int>();
 
-      //最初のmainを入れる
+      //最初のmain
       newList.Add(frameList[0]);
       newList.Add(frameList[1]);
 
@@ -148,7 +148,7 @@ namespace LGLauncher.EditFrame
         else
         {
           //長
-          //ＣＭを採用し通常の本編始端＆終端をいれる
+          //ＣＭを採用し通常の　本編始端＆終端　をいれる
           newList.Add(frameList[i]);
           newList.Add(frameList[i + 1]);
         }
@@ -224,11 +224,11 @@ namespace LGLauncher.EditFrame
 
       //１行にする    List<string>  →  string
       string oneliner = "";
-      chapText.ForEach((text) => { oneliner += text; });
+      chapText.ForEach((line) => { oneliner += line; });
 
       return oneliner;
     }
-     /*TvtPlay  ChapterMap.cpp*/
+    /*TvtPlay  ChapterMap.cpp*/
     // [チャプターコマンド仕様]
     // ・ファイルの文字コードはBOM付きUTF-8であること
     // ・Caseはできるだけ保存するが区別しない
@@ -263,7 +263,7 @@ namespace LGLauncher.EditFrame
       //convert
       for (int i = 0; i < chaplist.Count; i++)
       {
-        string cnt = i.ToString("00");
+        string cnt = (i + 1).ToString("00");
         string timecode = timecodelist[i];
         chapText.AppendLine(timecode + " " + "chapter " + cnt);
       }
@@ -272,10 +272,10 @@ namespace LGLauncher.EditFrame
     }
     /*
      * Ogm Chapter  type1
-     * 00:00:00.000 chapter 00
-     * 00:00:01.935 chapter 01
-     * 00:03:08.856 chapter 02
-     * 00:10:00.000 chapter 03
+     * 00:00:00.000 chapter 01
+     * 00:00:01.935 chapter 02
+     * 00:03:08.856 chapter 03
+     * 00:10:00.000 chapter 04
      */
 
 
@@ -290,7 +290,7 @@ namespace LGLauncher.EditFrame
       //convert
       for (int i = 0; i < chaplist.Count; i++)
       {
-        string cnt = i.ToString("00");
+        string cnt = (i + 1).ToString("00");
         string timecode = timecodelist[i];
         chapText.AppendLine("Chapter" + cnt + "=" + timecode);
         chapText.AppendLine("Chapter" + cnt + "Name=" + "chapter " + cnt);
@@ -300,12 +300,12 @@ namespace LGLauncher.EditFrame
     }
     /*
      * Ogm Chapter  type2
-     * Chapter00=00:00:00.000
-     * Chapter00Name=chapter 00
-     * Chapter01=00:00:01.935
+     * Chapter01=00:00:00.000
      * Chapter01Name=chapter 01
-     * Chapter02=00:03:08.856
+     * Chapter02=00:00:01.935
      * Chapter02Name=chapter 02
+     * Chapter03=00:03:08.856
+     * Chapter03Name=chapter 03
      */
 
 
@@ -320,7 +320,6 @@ namespace LGLauncher.EditFrame
       var timespan = msec.Select(ms => new TimeSpan(0, 0, 0, 0, (int)ms)).ToList();
       // 00:10:20.345  <--  timespan
       var text = timespan.Select(tspan => new DateTime().Add(tspan).ToString("HH:mm:ss.fff")).ToList();
-
       return text;
     }
 

@@ -101,6 +101,10 @@ namespace LGLauncher
     public static string WorkPath_prv { get { return Path.Combine(LWorkDir, WorkName_prv); } }
 
     //PartNo
+    //   1 <= No    IsPart
+    //  No  =  0    uninitialized value, detect No 
+    //  No  = -1    IsAll
+    //  -2 <= No    throw Exception
     public static int PartNo { get; private set; }
     public static bool IsPart { get { return 1 <= PartNo; } }
     public static bool Is1stPart { get { return PartNo == 1; } }
@@ -191,8 +195,6 @@ namespace LGLauncher
     public static bool Out_RawFrame { get; private set; }
 
     //chap directory
-    //public static bool Out_tvtp_toTsDir { get; private set; }
-    //public static bool Out_misc_toTsDir { get; private set; }
     public static string DirPath_Tvtp { get; private set; }
     public static string DirPath_Misc { get; private set; }
 
@@ -276,53 +278,6 @@ namespace LGLauncher
         throw new LGLException("SrtPath has invalid extension");
     }
 
-    private static void Copy_FromCommandLine_obsolete(Setting_CmdLine cmdline)
-    {
-      PartNo = cmdline.No;
-
-      HasLastFlag_OnCmdLine = cmdline.IsLast || cmdline.IsAll || cmdline.No == -1;
-      SequenceName = cmdline.SequenceName ?? "";
-
-      TsPath = cmdline.TsPath;
-      D2vPath = cmdline.D2vPath;
-      LwiPath = cmdline.LwiPath;
-      SrtPath = cmdline.SrtPath;
-
-      Channel = cmdline.Channel;
-      Program = cmdline.Program;
-
-      PartNo = IsAll ? -1 : PartNo;
-      AutoDetectPartNo = PartNo == 0;
-
-      //エラーチェック
-      //PartNo
-      if (PartNo <= -2)
-        throw new LGLException("PartNo is less than equal -2");
-
-      //Ts
-      if (File.Exists(TsPath) == false)
-        throw new LGLException("ts does not exist");
-      //D2v  Lwi
-      //  コマンドラインで指定されているときのみチェック
-      //  srtは削除されるている可能性があるのでチェックしない
-      if (D2vPath != null && File.Exists(D2vPath) == false)
-        throw new LGLException("d2v does not exist");
-      if (LwiPath != null && File.Exists(LwiPath) == false)
-        throw new LGLException("lwi does not exist");
-
-      //Extension
-      if (TsPath != null && Path.GetExtension(TsPath).ToLower() != ".ts")
-        throw new LGLException("TsPath is invalid extension");
-
-      if (D2vPath != null && Path.GetExtension(D2vPath).ToLower() != ".d2v")
-        throw new LGLException("D2vPath is invalid extension");
-
-      if (LwiPath != null && Path.GetExtension(LwiPath).ToLower() != ".lwi")
-        throw new LGLException("LwiPath is invalid extension");
-
-      if (SrtPath != null && Path.GetExtension(SrtPath).ToLower() != ".srt")
-        throw new LGLException("SrtPath is invalid extension");
-    }
 
     /// <summary>
     /// 入力ファイルの設定
@@ -583,8 +538,6 @@ namespace LGLauncher
       Out_RawFrame = 0 < setting.Out_RawFrame;
 
       //chapter directory
-      //Out_tvtp_toTsDir = 0 < setting.Out_tvtp_toTsDir;
-      //Out_misc_toTsDir = 0 < setting.Out_misc_toTsDir;
       DirPath_Tvtp = setting.DirPath_Tvtp;
       DirPath_Misc = setting.DirPath_Misc;
 
@@ -614,20 +567,19 @@ namespace LGLauncher
       }
 
       //error check
-      if (InputPlugin == PluginType.D2v)
-      {
-        if (File.Exists(D2vPath) == false)
-          throw new LGLException(D2vName + " dose not exist");
-      }
+      if (InputPlugin == PluginType.D2v
+        && File.Exists(D2vPath) == false)
+        throw new LGLException("d2v dose not exist: " + D2vName);
 
-      if (InputPlugin == PluginType.Lwi)
-      {
-        if (File.Exists(LwiPath) == false)
-          throw new LGLException(LwiName + " dose not exist");
-      }
+      if (InputPlugin == PluginType.Lwi
+        && File.Exists(LwiPath) == false)
+        throw new LGLException("lwi dose not exist: " + LwiName);
 
       if (InputPlugin == PluginType.Unknown)
         throw new LGLException("Unknown InputPlugin");
+
+      if (AvsVpy == AvsVpyType.Unknown)
+        throw new LGLException("Unknown AvsVpyType");
 
       if (Detector == LogoDetector.Unknown)
         throw new LGLException("Unknown LogoDetector");

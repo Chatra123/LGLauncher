@@ -97,7 +97,7 @@ namespace LGLauncher
           Log.WriteLine();
           Log.WriteLine(e.ToString());
           Log.WriteLine(cmdline_ToString);
-          DeleteWorkItem.Clean_OnError();
+          CleanWorkItem.Clean_OnError();
           AvsVpyCommon.CreateDummy_OnError();
         }
 
@@ -105,7 +105,7 @@ namespace LGLauncher
         //チャプター出力
         try
         {
-          var concat = EditFrame.FrameEditor.Edit_Concat(splitTrim);
+          var concat = EditFrame.FrameEditor.ConcatFrame(splitTrim);
           EditFrame.FrameEditor.OutputChapter(concat, splitTrim);
         }
         catch (LGLException e)
@@ -123,7 +123,7 @@ namespace LGLauncher
           PathList.IncrementPartNo();   //PartNo++で continue
       }
 
-      DeleteWorkItem.Clean_Lastly();
+      CleanWorkItem.Clean_Lastly();
       Log.Close();　　                   //ログは残すのでDeleteWorkItemの後でclose
     }
 
@@ -151,7 +151,7 @@ namespace LGLauncher
         PathList.MakePath(cmdline, setting);
 
         ProhibitFileMove_LGL.Lock();
-        DeleteWorkItem.Clean_Beforehand();
+        CleanWorkItem.Clean_Beforehand();
 
         if (PathList.Is1stPart || PathList.IsAll)
           Log.WriteLine(cmdline_ToString);
@@ -170,15 +170,15 @@ namespace LGLauncher
         /*
          *  適度に分割して初回のチャプター作成を早くする。
          *  
-         *  length =  35min なら、 35m                に分割
-         *  length =  45min なら、 30m, 15m           に分割
-         *  length =  95min なら、 30m, 30m, 35m      に分割
+         *  length = 35min なら、 35m            に分割
+         *  length = 45min なら、 30m, 15m       に分割
+         *  length = 95min なら、 30m, 30m, 35m  に分割
          */
 
         //開始フレーム　　（＝　直前の終了フレーム　＋　１）
+        //  if  Is1stPart || IsAll  then  beginFrame = 0
         int beginFrame;
         {
-          //if  Is1stPart || IsAll  then  beginFrame = 0
           //直前のトリム用フレーム数取得   previous
           int[] trimFrame_prv = (2 <= PathList.PartNo)
                                     ? AvsVpyCommon.GetTrimFrame_previous()
@@ -209,15 +209,15 @@ namespace LGLauncher
         //Log
         {
           double len_min = 1.0 * (splitTrim[1] - splitTrim[0]) / 29.970 / 60;
-          var log = new StringBuilder();
-          log.AppendLine("  [ Split Trim ]");
-          log.AppendLine("    PartNo        =  " + PathList.PartNo);
-          log.AppendLine("    SplitTrim[0]  =  " + splitTrim[0]);
-          log.AppendLine("             [1]  =  " + splitTrim[1]);
-          log.AppendLine("    length        =  " + string.Format("{0:f1}  min", len_min));
-          log.AppendLine("    EndFrame_Max  =  " + endFrame_Max);
-          log.AppendLine("    isLastSplit   =  " + isLastSplit);
-          Log.WriteLine(log.ToString());
+          var text = new StringBuilder();
+          text.AppendLine("  [ Split Trim ]");
+          text.AppendLine("    PartNo        =  " + PathList.PartNo);
+          text.AppendLine("    SplitTrim[0]  =  " + splitTrim[0]);
+          text.AppendLine("             [1]  =  " + splitTrim[1]);
+          text.AppendLine("    length        =  " + string.Format("{0:f1}  min", len_min));
+          text.AppendLine("    EndFrame_Max  =  " + endFrame_Max);
+          text.AppendLine("    isLastSplit   =  " + isLastSplit);
+          Log.WriteLine(text.ToString());
         }
 
         return splitTrim;
@@ -250,9 +250,9 @@ namespace LGLauncher
           if (PathList.Detector == LogoDetector.Join_Logo_Scp)
           {
             var logo = LogoSelector.GetLogo();
-            var jl_cmdPath = PathList.JL_Cmd_OnRec;
+            var jl_cmd = PathList.JL_Cmd_OnRec;
             batPath = Bat_Join_Logo_Scp.Make_OnRec(avsPath,
-                                                   logo[0], jl_cmdPath);
+                                                   logo[0], jl_cmd);
           }
           else if (PathList.Detector == LogoDetector.LogoGuillo)
           {

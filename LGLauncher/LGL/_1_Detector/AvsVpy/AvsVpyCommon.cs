@@ -28,7 +28,6 @@ namespace LGLauncher
         (PathList.AvsVpy == AvsVpyType.Avs) ? new AvsMaker() as AbstractAvsMaker :
         (PathList.AvsVpy == AvsVpyType.Vpy) ? new VpyMaker() as AbstractAvsMaker :
         null;
-
     }
 
     /// <summary>
@@ -70,68 +69,18 @@ namespace LGLauncher
     #region InfoScript
 
     /// <summary>
-    /// Info取得スクリプトを実行
-    /// </summary>
-    [Obsolete]
-    public static void RunInfo(Action action)
-    {
-      try
-      {
-        LwiFile.Set_ifLwi();
-        action();
-      }
-      finally
-      {
-        LwiFile.Back_ifLwi();
-      }
-    }
-    /// <summary>
-    /// Info取得スクリプトを実行
-    ///   mutexを取得して１つずつ実行する
-    /// </summary>
-    [Obsolete]
-    public static void RunInfo_withMutex(Action action)
-    {
-      WaitForSystemReady waitForReady = null;
-      try
-      {
-        //mutex取得
-        {
-          waitForReady = new WaitForSystemReady();
-          waitForReady.GetReady(PathList.DetectorName, 1, false);
-        }
-
-        try
-        {
-          LwiFile.Set_ifLwi();
-          action();
-        }
-        finally
-        {
-          LwiFile.Back_ifLwi();
-        }
-      }
-      finally
-      {
-        if (waitForReady != null)
-          waitForReady.Release();
-      }
-    }
-
-
-    /// <summary>
     /// *.info.txtからフレーム数を取得
     /// </summary>
     public static double[] GetInfo_fromText(string infoPath)
     {
       var infoText = new List<string>();
 
-      for (int retry = 1; retry <= 5; retry++)
+      for (int retry = 1; retry <= 3; retry++)
       {
         //file check
         if (File.Exists(infoPath) == false)
         {
-          Thread.Sleep(1000);
+          Thread.Sleep(2000);
           continue;
         };
 
@@ -243,7 +192,7 @@ namespace LGLauncher
     /// <param name="trimFrame_prv">前回のトリムフレーム数</param>
     /// <returns>開始、終了フレーム数</returns>
     [Obsolete]
-    public static int[] CalcTrimFrame_obs(int totalframe, int[] trimFrame_prv)
+    public static int[] CalcTrimFrame_obsolete(int totalframe, int[] trimFrame_prv)
     {
       int beginFrame = 0, endFrame = 0;
 

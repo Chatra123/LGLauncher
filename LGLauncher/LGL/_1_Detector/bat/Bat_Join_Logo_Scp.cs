@@ -68,7 +68,7 @@ namespace LGLauncher
 
 
     /// <summary>
-    /// Join_Logo_Scp起動用バッチ作成  　最終
+    /// Join_Logo_Scp起動用バッチ作成  　最終 concat
     /// </summary>
     public static string Make_AtLast(string jl_CmdPath)
     {
@@ -85,7 +85,7 @@ namespace LGLauncher
       string logoFrame_catPath = PathList.TsShortName + ".jls.logoframe.cat.txt";
       //join_logo_scp
       string join_logo_scpPath = PathList.Join_Logo_Scp;
-      string jls_resultPath = PathList.TsShortName + ".jls.lastcat.result.txt";
+      string jls_resultPath = PathList.TsShortName + ".jls.last.result.txt";
 
       //置換
       for (int i = 0; i < batText.Count; i++)

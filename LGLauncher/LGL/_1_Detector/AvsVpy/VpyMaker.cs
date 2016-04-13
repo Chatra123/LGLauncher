@@ -24,12 +24,6 @@ namespace LGLauncher
       //総フレーム数取得用スクリプト　作成、実行
       {
         string infoPath = module.CreateInfo_vpy();
-        //var action = new Action(() => { module.RunInfo_vpy(infoPath); });
-        //AvsVpyCommon.RunInfo(action);
-
-        //var action = new Action(() => { module.RunInfo_vpy(infoPath); });
-        //LwiFile.Action_withSetLwi(action);
-
         try
         {
           LwiFile.Set_ifLwi();
@@ -51,9 +45,9 @@ namespace LGLauncher
 
 
       //開始フレーム　　（＝　直前の終了フレーム　＋　１）
+      //  if  Is1stPart || IsAll  then  beginFrame = 0
       int beginFrame;
       {
-        //if  Is1stPart || IsAll  then  beginFrame = 0
         //直前のトリム用フレーム数取得   previous
         int[] trimFrame_prv = (2 <= PathList.PartNo)
                                   ? AvsVpyCommon.GetTrimFrame_previous()

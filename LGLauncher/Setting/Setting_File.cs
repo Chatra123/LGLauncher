@@ -42,8 +42,6 @@ namespace LGLauncher
     public string space_3 = "";
 
     //chapter directory
-    //public int Out_tvtp_toTsDir = 1;
-    //public int Out_misc_toTsDir = 1;
     public string DirPath_Tvtp = @"   C:\Tvtp_Dir            ";
     public string DirPath_Misc = @"   C:\Ogm_and_Frame_Dir   ";
     public string space_4 = "";

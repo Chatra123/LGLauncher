@@ -31,13 +31,13 @@ namespace LGLauncher
         //すでにTsDirにlwiファイルがあるなら削除
         if (File.Exists(dstPath))
           File.Delete(dstPath);
-        Thread.Sleep(500);
+        Thread.Sleep(200);
 
         if (isSameRoot)
           File.Move(srcPath, dstPath);
         else
           File.Copy(srcPath, dstPath);
-        Thread.Sleep(500);
+        Thread.Sleep(200);
 
         lock_lwi = new FileStream(dstPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
       }
@@ -72,7 +72,7 @@ namespace LGLauncher
           File.Move(srcPath, dstPath);
         else
           File.Delete(srcPath);
-        Thread.Sleep(500);
+        Thread.Sleep(200);
       }
       catch
       {
@@ -182,7 +182,7 @@ namespace LGLauncher
         writeBuff.AddRange(readBuff);
 
         //最後の"index=..."行以降を削除
-        //PathList.PartALL でも末尾は切り捨てる。
+        //PathList.IsAll でも末尾は切り捨てる。
         {
           string pattern = @"Index=\d+,Type=\d+,Codec=\d+,";
           var matchLine = writeBuff.LastOrDefault(line => Regex.Match(line, pattern).Success);
