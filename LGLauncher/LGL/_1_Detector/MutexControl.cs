@@ -118,8 +118,7 @@ namespace LGLauncher
       if (HasControl) return HasControl;
       if (string.IsNullOrEmpty(SemaphoreName)) throw new Exception();
 
-      //const int timeout_min = 120;
-      const int timeout_min = 10;
+      const int timeout_min = 120;
       hSemaphore = new Semaphore(MaxCount, MaxCount, SemaphoreName);
       if (hSemaphore.WaitOne(TimeSpan.FromMinutes(timeout_min)))
       {

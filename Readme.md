@@ -42,14 +42,6 @@ LGLauncher.exe  -last  -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
 ------------------------------------------------------------------
 ### 引数１
 
-    -last
-最後の処理であることを明示します。  
-
-
-    -All  
-ファイル全体を処理します。 
- 
-
     -ts "C:\video.ts"
 tsファイルのパス  
 tsファイルのパスを元に各ファイルパスを作成します。  
@@ -60,9 +52,19 @@ tsファイルのパスを元に各ファイルパスを作成します。
 tsと同じフォルダに d2v, lwi, srtをおいてください。  
 
 
+    -last
+最後の処理であることを明示します。  
+チャプター出力や、JL_標準.txtを用いてjoin_logo_scpの再実行などが行われます。
+
+
+    -All  
+ファイル全体を１回で処理します。 
+ 
+ 
     -ch "abc"
     -channel "abc"
 LogoSelecterに渡すチャンネル名  
+
 
     -program "defgh"
 LogoSelecterに渡すプログラム名  
@@ -126,7 +128,7 @@ Tvtplay用チャプターファイルを出力する。
 短い本編、ＣＭは除去されています。  
 
 
-    Outp_Ogm  1  
+    Out_Ogm  1  
 Ogm形式のチャプターファイルを出力する。  
 短い本編、ＣＭは除去されています。  
 
@@ -150,9 +152,8 @@ Ogm chapter、フレームファイルを出力するフォルダを指定しま
 フォルダが存在しない場合はＴＳと同じ場所に出力します。  
 
 
-    CleanWorkItem  3  
-3: 古い作業ファイル削除　＆　使い終わったファイル削除  
-2: 古い作業ファイル削除　＆　サイズの大きいファイル削除  
+    CleanWorkItem  2  
+2: 古い作業ファイル削除　＆　使い終わったファイル削除  
 1: 古い作業ファイル削除  
 0: 削除しない  
 
@@ -188,7 +189,7 @@ Ogm chapter、フレームファイルを出力するフォルダを指定しま
     logoframe.exe  
     join_logo_scp.exe  
     JL__標準.txt  
-    JL_標準_Recording.txt  
+    JL_標準_Rec.txt  
 
 
 
@@ -260,7 +261,7 @@ AviSynthのファイル読込時にシステム側で使用します。
   - avsinp.aui
   - chapter_exe.exe
   - JL_標準.txt
-  - JL_標準_Recording.txt
+  - JL_標準_Rec.txt
   - join_logo_scp.exe
   - logoframe.exe
 

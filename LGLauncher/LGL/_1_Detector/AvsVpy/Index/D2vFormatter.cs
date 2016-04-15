@@ -98,7 +98,7 @@ namespace LGLauncher
 
         //デバッグ用のコピー  TsShortName.d2v  -->  TsShortName.p2.d2v
         string outPath_part = PathList.WorkPath + ".d2v";
-        File.Copy(outPath, outPath_part);
+        File.WriteAllLines(outPath_part, formatText, TextEnc.Shift_JIS);
       }
 
     }

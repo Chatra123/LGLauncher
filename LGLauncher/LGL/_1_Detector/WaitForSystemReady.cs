@@ -106,7 +106,7 @@ namespace LGLauncher
       //  mutexControl.Get();
       //  addtionalWait = mutexControl.HasControl == false;
       //}
-      ////Semaphore取得    LGL V2P
+      //Semaphore取得    LGL V2P
       bool addtionalWait;
       {
         const string MutexName = "LGL-41CDEAC6-6717";  //LGL

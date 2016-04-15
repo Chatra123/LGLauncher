@@ -62,7 +62,7 @@ namespace LGLauncher
       if (File.Exists(batPath) == false)
         throw new LGLException("not exist detector bat");
 
-      int exitCode = 0;
+      int exitCode = -1;
       bool hasExisted = false;
       {
         var prc = new Process();
@@ -73,7 +73,7 @@ namespace LGLauncher
         prc.WaitForExit(timeout_ms);
 
         hasExisted = prc.HasExited;
-        exitCode = prc.ExitCode;
+        exitCode = hasExisted ? prc.ExitCode : -1;
         if (hasExisted == false) prc.Kill();
         prc.Close();
       }

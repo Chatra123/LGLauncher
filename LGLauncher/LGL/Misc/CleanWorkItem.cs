@@ -22,13 +22,18 @@ namespace LGLauncher
     public static void Clean_Beforehand()
     {
       //LWorkDir
-      if (PathList.Is1stPart)
-        cleaner.Delete_File(0.0, PathList.LWorkDir, "*.p?*.*");                              //ワイルドカード指定可
-      else if (PathList.IsAll)
-        cleaner.Delete_File(0.0, PathList.LWorkDir, "*.all.*");
+      if (PathList.Is1stPart || PathList.IsAll)
+      {
+        cleaner.Delete_File(0.0, PathList.LWorkDir, PathList.TsShortName + ".frame.cat.txt");  //前回までの合成フレーム
+        cleaner.Delete_File(0.0, PathList.LWorkDir, PathList.TsShortName + ".jls.*");
+        cleaner.Delete_File(0.0, PathList.LWorkDir, PathList.TsShortName + ".d2v");
+        cleaner.Delete_File(0.0, PathList.LWorkDir, PathList.TsShortName + ".lwi");
 
-      cleaner.Delete_File(0.0, PathList.LWorkDir, PathList.TsShortName + ".frame.cat.txt");  //前回までの合成フレーム
-      cleaner.Delete_File(0.0, PathList.LWorkDir, PathList.TsShortName + ".jls.*");
+        if (PathList.Is1stPart)
+          cleaner.Delete_File(0.0, PathList.LWorkDir, "*.p?*.*");                              //ワイルドカード指定可
+        else if (PathList.IsAll)
+          cleaner.Delete_File(0.0, PathList.LWorkDir, "*.all.*");
+      }
     }
 
 
@@ -52,10 +57,8 @@ namespace LGLauncher
         {
           //今回作成したTsName.p3.20000__30000.avsは、次回のLGLauncherが使用するので削除しない。
           //それ以前の作業ファイルを削除
-          for (int no = PathList.PartNo - 1; 1 <= no; no++)
-          {
+          for (int no = PathList.PartNo - 1; 1 <= no; no--)
             cleaner.Delete_File(0.0, PathList.LWorkDir, PathList.TsShortName + "p" + no + "*");
-          }
         }
       }
 
@@ -113,7 +116,7 @@ namespace LGLauncher
                                    string searchKey, string ignoreKey = null)
     {
       if (Directory.Exists(directory) == false) return;
-      Thread.Sleep(300);
+      Thread.Sleep(500);
 
       //ファイル取得
       var files = new FileInfo[] { };

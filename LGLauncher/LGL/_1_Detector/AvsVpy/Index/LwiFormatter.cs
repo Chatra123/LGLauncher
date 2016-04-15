@@ -118,9 +118,9 @@ namespace LGLauncher
     //問題にはならない。
     /*
      *                       lwiのファイルサイズ
-     * ts  60min  5.68 GB    lwi  40.3 MB  535,345 line
-     *      1min                   6.7 MB    8,922 line
-     *      1sec                   0.1 MB      150 line
+     * ts  60min  8.70 GB    lwi  67.00 MB  867,272 line
+     *      1min                   1.12 MB   14,454 line
+     *      4sec                   0.08 MB    1,000 line
      */
 
 
@@ -139,14 +139,14 @@ namespace LGLauncher
         var readBuff = new List<string>();
         var writeBuff = new List<string>();
 
-        //最初の５００行
-        readBuff = reader.ReadNLines(500);
+        //最初の１０００行
+        readBuff = reader.ReadNLines(1000);
 
         //簡易チェック
         {
           //最低行数
-          if (readBuff.Count < 500)
-            throw new LGLException("lwi text is less than 500 lines");
+          if (readBuff.Count < 1000)
+            throw new LGLException("lwi text is less than 1000 lines");
 
           //フォーマット
           bool isLwi = true;
@@ -158,12 +158,21 @@ namespace LGLauncher
         }
 
         //読
+        var start = DateTime.Now;
         writeBuff = readBuff;
         while (true)
         {
-          readBuff = reader.ReadNLines(500);
+          /*
+           * バックグランドで複数動かすため適度に速度を抑える。
+           *   10 MB/sec程度に抑えるため Sleep()
+           *   10 MB/sec *    1 sec  =    10 MB  130,000 line
+           *   10 MB/sec * 0.10 sec  =   1.0 MB   13,000 line
+           *   10 MB/sec * 0.01 sec  =   0.1 MB    1,300 line
+           */
+          Thread.Sleep(10);
+          readBuff = reader.ReadNLines(1000);
 
-          if (readBuff.Count() == 500)
+          if (readBuff.Count() == 1000)
           {
             writer.WriteText(writeBuff);           //write file
             writeBuff = readBuff;                  //copy reference
@@ -176,6 +185,15 @@ namespace LGLauncher
             break;
           }
         }
+
+        var elapse = (DateTime.Now - start).TotalMilliseconds;
+        FileInfo fi = new FileInfo(PathList.LwiPath);
+        double size = fi.Length / 1024 / 1024;
+
+        Log.WriteLine("read & write lwi  " + string.Format("{0:f1} ms", elapse));
+        Log.WriteLine("                  " + string.Format("{0:f1} MB", size));
+
+
 
         //lwi末尾
         //　writeBuff + readBuffで５００行以上は確実にある。
@@ -229,7 +247,7 @@ namespace LGLauncher
         {
           //デバッグ用のコピー  TsShortName.lwi  -->  TsShortName.p2.lwi
           string outPath_part = PathList.WorkPath + ".lwi";
-          File.Copy(outPath, outPath_part);
+          File.Copy(outPath, outPath_part, true);
         }
 
       }
