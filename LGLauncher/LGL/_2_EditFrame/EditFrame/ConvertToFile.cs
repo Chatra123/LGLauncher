@@ -44,7 +44,7 @@ namespace LGLauncher.EditFrame
 
 
     /// <summary>
-    /// TvtPlay chapterを出力
+    /// TvtPlay Chapterを出力
     /// </summary>
     public static void To_TvtpChap(string outPath, List<int> framelist, int endFrame)
     {
@@ -61,7 +61,7 @@ namespace LGLauncher.EditFrame
         if (PathList.IsLastPart == false)
         {
           int main_endframeNo = chapList[chapList.Count - 1];
-          bool end_is_CM = (main_endframeNo != endFrame);              //(mainの終端！＝avsの終端)
+          bool end_is_CM = (main_endframeNo != endFrame);  //(mainの終端！＝avsの終端)
 
           if (end_is_CM)
             chapList.Add(endFrame);
@@ -83,7 +83,7 @@ namespace LGLauncher.EditFrame
 
 
     /// <summary>
-    /// OgmChapterを出力
+    /// Ogm Chapterを出力
     /// </summary>
     public static void To_OgmChap(string outPath, List<int> framelist, int endFrame)
     {
@@ -94,16 +94,6 @@ namespace LGLauncher.EditFrame
       {
         //本編の開始のみを抽出、ＣＭの開始を除去   　Linqでシャローコピー
         chaplist = framelist.Where((frameNo, index) => index % 2 == 0).ToList();
-
-        //00:00:00 追加
-        if (30 * 3 <= framelist[0])
-          chaplist.Insert(0, 0);
-
-        //最後から１秒前にChap追加
-        //　IsLastPart and ３０秒以上のときのみ
-        if (PathList.IsLastPart
-          && 30 * 30 <= endFrame)
-          chaplist.Add(endFrame - 30 * 1);
       }
 
 

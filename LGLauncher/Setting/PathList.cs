@@ -40,6 +40,17 @@ namespace LGLauncher
 
 
   /// <summary>
+  /// DebugMode
+  /// </summary>
+  static class Debug
+  {
+    /// format lwiを別名で保存するか
+    public const bool DebugMode = true;  // true  false
+  }
+
+
+
+  /// <summary>
   /// パス一覧　＆　アプリ設定
   /// </summary>
   static class PathList
@@ -189,12 +200,12 @@ namespace LGLauncher
     public static double Regard_NsecMain_AsCM { get; private set; }
 
     //enable output
-    public static bool Out_Tvtp { get; private set; }
-    public static bool Out_Tgm { get; private set; }
-    public static bool Out_Frame { get; private set; }
-    public static bool Out_RawFrame { get; private set; }
+    public static int Output_Tvtp { get; private set; }
+    public static int Output_Ogm { get; private set; }
+    public static int Output_Frame { get; private set; }
+    public static int Output_RawFrame { get; private set; }
 
-    //chap directory
+    //chapter directory
     public static string DirPath_Tvtp { get; private set; }
     public static string DirPath_Misc { get; private set; }
 
@@ -532,10 +543,10 @@ namespace LGLauncher
       Regard_NsecMain_AsCM = 0 < Regard_NsecMain_AsCM ? Regard_NsecMain_AsCM : 0;
 
       //enable output
-      Out_Tvtp = 0 < setting.Out_Tvtp;
-      Out_Tgm = 0 < setting.Out_Ogm;
-      Out_Frame = 0 < setting.Out_Frame;
-      Out_RawFrame = 0 < setting.Out_RawFrame;
+      Output_Tvtp = setting.Output_Tvtp;
+      Output_Ogm = setting.Output_Ogm;
+      Output_Frame = setting.Output_Frame;
+      Output_RawFrame = setting.Output_RawFrame;
 
       //chapter directory
       DirPath_Tvtp = setting.DirPath_Tvtp;

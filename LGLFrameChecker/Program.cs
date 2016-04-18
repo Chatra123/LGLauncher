@@ -54,7 +54,7 @@ namespace LGLFrameChecker
       Directory.SetCurrentDirectory(LWorkDir);
 
 
-      //file チェック
+      //file check
       {
         string[] avsfiles = Directory.GetFiles(LWorkDir, "*.*__*.avs");
         if (avsfiles.Count() == 0)
@@ -64,26 +64,25 @@ namespace LGLFrameChecker
 
       //frameset_all取得
       var frameset_all = FrameSet.Create(LWorkDir, -1);
-      if (frameset_all.HaveValidData == false) return frameset_all.ErrMessage;
+      if (frameset_all.HasValidData == false) return frameset_all.ErrMessage;
 
       //FrameSetList
       var FrameSetList = new List<FrameSet>();
 
       //
-      //比較ループ
+      //PartNo
       //
       for (int partNo = 1; partNo <= 200; partNo++)
       {
-        //frameset_one取得
-        var frameset_one = FrameSet.Create(LWorkDir, partNo);
-        if (frameset_one.HaveValidData == false) { FrameSetList.Add(null); continue; }
+        //fset_part取得
+        var fs_part = FrameSet.Create(LWorkDir, partNo);
+        if (fs_part.HasValidData == false) { FrameSetList.Add(null); continue; }
 
         //比較
-        var matchResult = Compare(frameset_all.boolList, frameset_one.boolList, frameset_one.beginEnd);
+        fs_part.MatchResult = Compare(frameset_all.boolList, fs_part.boolList, fs_part.beginEnd);
 
         //結果格納
-        frameset_one.MatchResult = matchResult;
-        FrameSetList.Add(frameset_one);
+        FrameSetList.Add(fs_part);
       }
 
       //後ろからまわしてnullなら削除
@@ -94,7 +93,8 @@ namespace LGLFrameChecker
           FrameSetList.RemoveAt(FrameSetList.Count - 1);
         }
 
-        if (FrameSetList.Count() == 0) return "  Error:  Not found  VideoName.p*.frame.txt";
+        if (FrameSetList.Count() == 0) 
+          return "  Error:  Not found  VideoName.p*.frame.txt";
       }
 
 
@@ -124,7 +124,7 @@ namespace LGLFrameChecker
           double MatchR_Main = 1.0 * Match_Main / Match__Sum * 100;
           double MatchR___Cm = 1.0 * Match___CM / Match__Sum * 100;
           double MatchR__Not = 1.0 * Match__Not / Match__Sum * 100;
-          //make total line
+          //total line
           string line = string.Format("{0,3:N0}  {1}      {2,3:N0}  {3,3:N0}  {4,3:N0} ,      {5,7:N0}  {6,7:N0}  {7,7:N0}",
                                       "total", "      ",
                                       MatchR_Main, MatchR___Cm, MatchR__Not,
@@ -187,7 +187,10 @@ namespace LGLFrameChecker
     }
 
     #endregion Compare
+
   }
+
+
 
   #region FrameSet
 
@@ -203,8 +206,8 @@ namespace LGLFrameChecker
     public int[] beginEnd;
     public int[] MatchResult;
 
-    //データが取得できたか？
-    public bool HaveValidData { get { return List != null && List.Count % 2 == 0 && beginEnd != null; } }
+    //正常なデータが取得できたか？
+    public bool HasValidData { get { return List != null && List.Count % 2 == 0 && beginEnd != null; } }
 
     //endframeの時間
     public TimeSpan EndFrameTime { get { return new TimeSpan(0, 0, (int)(1.0 * beginEnd[1] / 29.970)); } }
@@ -255,7 +258,7 @@ namespace LGLFrameChecker
       }
 
       //FrameList取得
-      frameset.List = GetFrameList(files[0]);
+      frameset.List = FrameFile_to_List(files[0]);
       if (frameset.List == null)
       {
         frameset.ErrMessage = "  Error:  frameList file  " + files[0];
@@ -276,14 +279,10 @@ namespace LGLFrameChecker
       return frameset;
     }
 
-    #region Utility
 
     /// <summary>
     /// List<int>　→　bool[]
     /// </summary>
-    /// <param name="framelist">変換元のフレームリスト</param>
-    /// <param name="beginEnd">開始、終了フレーム数</param>
-    /// <returns></returns>
     private static bool[] ConvertToBoolArray(List<int> framelist, int[] beginEnd)
     {
       int TotalFrame = beginEnd[1] - beginEnd[0] + 1;
@@ -306,80 +305,101 @@ namespace LGLFrameChecker
     /// <summary>
     /// ファイル名からフレーム数取得
     /// </summary>
-    /// <param name="directory"></param>
-    /// <param name="nameKey"></param>
-    /// <returns></returns>
-    public static int[] GetTrimFrame_fromName(string directory, string nameKey)
+    /// <param name="nameKey">対象のファイル名。ワイルドカード指定可</param>
+    /// <returns>開始、終了フレーム数</returns>
+    private static int[] GetTrimFrame_fromName(string directory, string nameKey)
     {
       //ファイル検索
       var files = Directory.GetFiles(directory, nameKey);
-      if (files.Count() != 1) return null;		             //見つからない or 多い
+      if (files.Count() != 1) return null;
 
       //正規表現パターン
-      //TsShortName.p1.0__2736.avs
-      var regex = new Regex(@".*\.(?<begin>\d+)__(?<end>\d+)\.avs", RegexOptions.IgnoreCase);
-      //検索
-      Match match = regex.Match(files[0]);
+      //TsShortName.p1.0__1000.avs
+      //TsShortName.all.0__1000.avs
+      //  <begin>      0
+      //  <end>     1000
+      var regex = new Regex(@".*\.(?<begin>\d+)__(?<end>\d+)\.[(avs)|(vpy)]", RegexOptions.IgnoreCase);
 
-      //検索成功
+      Match match = regex.Match(files[0]);
       if (match.Success)
       {
-        //数値に変換
-        int ibegin, iend;
+        //文字　→　数値
         string sbegin = match.Groups["begin"].Value;
         string send = match.Groups["end"].Value;
-
-        if (int.TryParse(sbegin, out ibegin) == false) return null;  //パース失敗
-        if (int.TryParse(send, out iend) == false) return null;
-        return new int[] { ibegin, iend };
+        try
+        {
+          int ibegin = int.Parse(sbegin);
+          int iend = int.Parse(send);
+          return new int[] { ibegin, iend };
+        }
+        catch
+        {
+          // parse error
+          return null;
+        }
       }
-      else
+      else  // match error
         return null;
     }
+
 
     /// <summary>
     /// *.frame.txtを取得
     /// </summary>
-    /// <param name="framePath"></param>
-    /// <returns></returns>
-    public static List<int> GetFrameList(string framePath)
+    private static List<int> FrameFile_to_List(string framePath)
     {
-      //convert List<string>  to  List<int>
+      //List<string>  -->  List<int>
       var ConvertToIntList = new Func<List<string>, List<int>>(
         (stringList) =>
         {
-          var intList = new List<int>();
-          int result;
+          stringList = stringList.Select(
+                                  (line) =>
+                                  {
+                                    //コメント削除、トリム
+                                    int found = line.IndexOf("//");
+                                    line = (0 <= found) ? line.Substring(0, found) : line;
+                                    line = line.Trim();
+                                    return line;
+                                  })
+                                  .Where((line) => string.IsNullOrWhiteSpace(line) == false)    //空白行削除
+                                  .Distinct()                                                   //重複削除
+                                  .ToList();
 
-          foreach (var str in stringList)
+          var intList = new List<int>();
+          try
           {
-            string line = str.Trim();
-            if (string.IsNullOrWhiteSpace(line)) continue;						         //空白ならスキップ
-            if (int.TryParse(line, out result) == false) return null;	         //変換失敗
-            intList.Add(result);
+            foreach (var line in stringList)
+              intList.Add(int.Parse(line));
           }
+          catch
+          {
+            return null;  //変換失敗
+          }
+
           return intList;
         });
 
-      //読込み
-      if (File.Exists(framePath) == false) return null;								         //ファイルチェック
-      var frameText = File.ReadAllLines(framePath, Encoding.GetEncoding("Shift_JIS")).ToList();	   //List<string>でファイル取得
+      //check
+      if (File.Exists(framePath) == false) return null;
+
+      //読
+      var frameText = File.ReadAllLines(framePath, Encoding.GetEncoding("Shift_JIS")).ToList();
       if (frameText == null) return null;
 
-      //List<int>に変換
+      //List<string>  -->  List<int>
       var frameList = ConvertToIntList(frameText);
+
       //エラーチェック
       if (frameList == null) return null;
-      if (frameList.Count % 2 == 1) return null;
+      if (frameList.Count % 2 == 1) return null;           //奇数ならエラー
       return frameList;
     }
-
-    #endregion Utility
 
     #endregion FrameSet作成
 
   }//class FrameSet
 
   #endregion FrameSet
+
 
 }//namespace

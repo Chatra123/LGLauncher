@@ -78,7 +78,7 @@ namespace LGLauncher.EditFrame
     {
       if (rawFrame == null)
       {
-        Log.WriteLine("rawFrame is null");
+        Log.WriteLine("OutputChapter: rawFrame is null");
         return;
       }
       if (trimFrame.Count() != 2)
@@ -87,10 +87,12 @@ namespace LGLauncher.EditFrame
         return;
       }
 
+
       int endFrame = trimFrame[1];
 
       //raw frame
-      if (PathList.Out_RawFrame)
+      if (PathList.IsPart && 2 <= PathList.Output_RawFrame
+        || PathList.IsLastPart && 1 <= PathList.Output_RawFrame)
       {
         string path;
         {
@@ -115,7 +117,8 @@ namespace LGLauncher.EditFrame
       }
 
       //frame
-      if (PathList.Out_Frame)
+      if (PathList.IsPart && 2 <= PathList.Output_Frame
+        || PathList.IsLastPart && 1 <= PathList.Output_Frame)
       {
         string path;
         {
@@ -132,7 +135,8 @@ namespace LGLauncher.EditFrame
 
 
       //TvtPlay
-      if (PathList.Out_Tvtp)
+      if (PathList.IsPart && 2 <= PathList.Output_Tvtp
+        || PathList.IsLastPart && 1 <= PathList.Output_Tvtp)
       {
         string path;
         {
@@ -145,19 +149,18 @@ namespace LGLauncher.EditFrame
       }
 
 
-      //Ogm Chapter
-      if (PathList.IsLastPart)
-        if (PathList.Out_Tgm)
+      //Ogm
+      if (PathList.IsLastPart && 1 <= PathList.Output_Tvtp)
+      {
+        string path;
         {
-          string path;
-          {
-            string dir = (Directory.Exists(PathList.DirPath_Misc))
-                              ? PathList.DirPath_Misc
-                              : PathList.TsDir;
-            path = Path.Combine(dir, PathList.TsNameWithoutExt + ".ogm.chapter");
-          }
-          ConvertToFile.To_OgmChap(path, editFrame, endFrame);
+          string dir = (Directory.Exists(PathList.DirPath_Misc))
+                            ? PathList.DirPath_Misc
+                            : PathList.TsDir;
+          path = Path.Combine(dir, PathList.TsNameWithoutExt + ".ogm.chapter");
         }
+        ConvertToFile.To_OgmChap(path, editFrame, endFrame);
+      }
     }
 
   }

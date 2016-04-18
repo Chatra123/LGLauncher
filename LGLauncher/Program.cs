@@ -262,8 +262,8 @@ namespace LGLauncher
           }
         }
 
-        // create trim script only, if return
-        //return;
+        ////// create trim script only, if return
+        ////return;
 
 
         WaitForSystemReady waitForReady = null;

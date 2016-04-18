@@ -5,14 +5,15 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 
+
 namespace LGLauncher
 {
   using OctNov.IO;
 
-/*
- *   　d2v  -->  最終行を削除
- *   　lwi  -->  最後のindex= 以降を削除 
- */
+  /*
+   *   　d2v  -->  最終行を削除
+   *   　lwi  -->  最後のindex= 以降を削除 
+   */
   static class IndexFormatter
   {
     static bool HasFormatted = false;

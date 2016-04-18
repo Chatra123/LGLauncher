@@ -44,11 +44,14 @@ namespace LGLauncher.EditFrame
                                   .ToList();
 
           var intList = new List<int>();
-          int result;
-          foreach (var line in stringList)
+          try
           {
-            if (int.TryParse(line, out result) == false) return null;          //変換失敗
-            intList.Add(result);
+            foreach (var line in stringList)
+              intList.Add(int.Parse(line));
+          }
+          catch
+          {
+            return null;  //変換失敗
           }
 
           return intList;
@@ -61,7 +64,7 @@ namespace LGLauncher.EditFrame
       var frameText = FileR.ReadAllLines(framePath);       //List<string>でファイル取得
       if (frameText == null) return null;
 
-      //List<int>に変換
+      //List<string>  -->  List<int>
       var frameList = ConvertToIntList(frameText);
 
       //エラーチェック

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 
+
 namespace LGLauncher
 {
   using OctNov.IO;
@@ -117,10 +118,11 @@ namespace LGLauncher
     //書き換えの途中で読込み、不正なファイルになってもLSMASHSource.dllによって再作成されるだけ。
     //問題にはならない。
     /*
-     *                       lwiのファイルサイズ
-     * ts  60min  8.70 GB    lwi  67.00 MB  867,272 line
-     *      1min                   1.12 MB   14,454 line
-     *      4sec                   0.08 MB    1,000 line
+     *              lwiのファイルサイズ
+     *                    1 hourで 40 - 70 MB                      
+     * ts  60min    lwi  60.00 MB    783,927 line
+     *      1min          1.00 MB     13,065 line
+     *      1sec          0.16 MB        217 line
      */
 
 
@@ -139,14 +141,14 @@ namespace LGLauncher
         var readBuff = new List<string>();
         var writeBuff = new List<string>();
 
-        //最初の１０００行
-        readBuff = reader.ReadNLines(1000);
+        //最初の１００行
+        readBuff = reader.ReadNLines(100);
 
         //簡易チェック
         {
           //最低行数
-          if (readBuff.Count < 1000)
-            throw new LGLException("lwi text is less than 1000 lines");
+          if (readBuff.Count < 100)
+            throw new LGLException("lwi text is less than 100 lines");
 
           //フォーマット
           bool isLwi = true;
@@ -157,22 +159,26 @@ namespace LGLauncher
             throw new LGLException("lwi format error");
         }
 
+
+        /*
+         * バックグラウンドで複数動かすため適度に速度を抑える。
+         *   10 MB/sec * 1.00 sec  =  10.0 MB    130,000 line
+         *   10        * 0.10      =   1.0        13,000 
+         *   10        * 0.01      =   0.1         1,300 
+         *   10        * 0.06      =   0.6         8,000
+         * 
+         * Thread.Sleep(60);
+         * readBuff = reader.ReadNLines(8 * 1000);
+         * で実測 6.0 - 8.0 MB/secほど。
+         */
         //読
-        var start = DateTime.Now;
         writeBuff = readBuff;
         while (true)
         {
-          /*
-           * バックグランドで複数動かすため適度に速度を抑える。
-           *   10 MB/sec程度に抑えるため Sleep()
-           *   10 MB/sec *    1 sec  =    10 MB  130,000 line
-           *   10 MB/sec * 0.10 sec  =   1.0 MB   13,000 line
-           *   10 MB/sec * 0.01 sec  =   0.1 MB    1,300 line
-           */
-          Thread.Sleep(10);
-          readBuff = reader.ReadNLines(1000);
+          Thread.Sleep(60);
+          readBuff = reader.ReadNLines(8 * 1000);
 
-          if (readBuff.Count() == 1000)
+          if (readBuff.Count() == 8 * 1000)
           {
             writer.WriteText(writeBuff);           //write file
             writeBuff = readBuff;                  //copy reference
@@ -186,17 +192,9 @@ namespace LGLauncher
           }
         }
 
-        var elapse = (DateTime.Now - start).TotalMilliseconds;
-        FileInfo fi = new FileInfo(PathList.LwiPath);
-        double size = fi.Length / 1024 / 1024;
-
-        Log.WriteLine("read & write lwi  " + string.Format("{0:f1} ms", elapse));
-        Log.WriteLine("                  " + string.Format("{0:f1} MB", size));
-
-
 
         //lwi末尾
-        //　writeBuff + readBuffで５００行以上は確実にある。
+        //　writeBuff + readBuffで１００行以上は確実にある。
         writeBuff.AddRange(readBuff);
 
         //最後の"index=..."行以降を削除
@@ -243,9 +241,10 @@ namespace LGLauncher
           }
         }
 
-        //コピー
+        //デバッグ用のコピー  TsShortName.lwi  -->  TsShortName.p2.lwi
+        //lwiはサイズが大きいのでDebugMode時のみコピー
+        if (Debug.DebugMode)
         {
-          //デバッグ用のコピー  TsShortName.lwi  -->  TsShortName.p2.lwi
           string outPath_part = PathList.WorkPath + ".lwi";
           File.Copy(outPath, outPath_part, true);
         }
