@@ -17,7 +17,7 @@ namespace LGLauncher
    *    OnUnhandledException()    専用のerrlogを作成　　エラーダイアログを表示する
    */
 
-  internal class LGLException : System.Exception
+  class LGLException : System.Exception
   {
     public LGLException() { }
     public LGLException(string message) : base(message) { }

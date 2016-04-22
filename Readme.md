@@ -42,17 +42,6 @@ LGLauncher.exe  -last  -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
 ------------------------------------------------------------------
 ### 引数１
 
-    -last
-最後の処理であることを明示します。  
--lastがあればOgm chapterを出力し、  
-join_logo_scpならばJL_標準.txtを使い実行します。  
-
-
-    -All  
-ファイル全体を処理します。  
--No -1 と同義  
-
-
     -ts "C:\video.ts"
 tsファイルのパス  
 tsファイルのパスを元に各ファイルパスを作成します。  
@@ -63,9 +52,20 @@ tsファイルのパスを元に各ファイルパスを作成します。
 tsと同じフォルダに d2v, lwi, srtをおいてください。  
 
 
+    -last
+最後の処理であることを明示する。  
+チャプター出力や、JL_標準.txtを用いてjoin_logo_scpの再実行などが行われます。
+
+
+    -all  
+ファイル全体を処理  
+-lastの指定は必要ありません。  
+
+ 
     -ch "abc"
     -channel "abc"
 LogoSelecterに渡すチャンネル名  
+
 
     -program "defgh"
 LogoSelecterに渡すプログラム名  
@@ -74,11 +74,6 @@ LogoSelecterに渡すプログラム名
     
 ------------------------------------------------------------------
 #### 引数２
-
-    -No 1
--noを増やすことで前回からの増加分を処理する。  
--1 なら全体を処理します。
-通常は自動で決定するので-Noの指定は必要ありません。  
 
     -d2v "D:\rec\video.ts.d2v"
 d2vファイルパスの個別指定
@@ -91,9 +86,9 @@ lwiファイルパスの個別指定
     -srt "D:\rec\video.ts.srt"
 srtファイルパスの個別指定
 
-    -SequenceName  abcdef
-作業フォルダ名の一部に使用します。  
-基本的には無くてかまいません。
+    -SequenceName  abcdef012345
+作業フォルダ名の一部に使用  
+基本的には指定無しでも処理できます。
     
     
 
@@ -104,17 +99,18 @@ srtファイルパスの個別指定
 有効 、無効
 
 
-    Avs_iPlugin  lwi  
-d2v:  d2vで処理  
-lwi:  lwiで処理  
+    InputPlugin  lwi  
+d2v :  d2vで処理  
+lwi :  lwiで処理  
 
 
-    LogoDetector  LogoGuillo  
-JLS          :  Join_Logo_Scpで処理  
-Join_Logo_Scp:  Join_Logo_Scpで処理  
-LG           :  LogoGuilloで処理  
-LogoGuillo   :  LogoGuilloで処理  
+    LogoDetector  LG  
+JLS :  Join_Logo_Scpで処理  
+LG  :  LogoGuilloで処理  
 
+
+    Detector_MultipleRun  1  
+Winsows内での chapter_exe, LogoGuillo, logoframe同時実行数
 
 
 ------------------------------------------------------------------
@@ -128,43 +124,49 @@ LogoGuillo   :  LogoGuilloで処理
 ２９．０秒以下の本編部を除去  
     
 
-    Out_tvtp  1  
-Tvtplay用チャプターファイルを出力する。  
+    Output_Tvtp  2  
+Tvtplay用チャプターファイルを出力  
+短い本編、ＣＭは除去されています。  
+0 : 出力しない  
+1 : -lastのみ出力する  
+2 : 毎回出力する  
 
 
-    Out_ogm  1  
-Ogm形式のチャプターファイルを出力する。  
+    Output_Ogm  1  
+Ogm形式のチャプターファイルを出力  
+短い本編、ＣＭは除去されています。  
+0 : 出力しない  
+1 : -lastのみ出力する  
+2 : N/A
 
 
-    Out_frame  1  
-短い本編、ＣＭを除去したフレームファイルを出力する。  
+    Output_Frame  1  
+フレームファイルを出力  
+短い本編、ＣＭは除去されています。  
+0 : 出力しない  
+1 : -lastのみ出力する  
+2 : 毎回出力する  
 
 
-    Out_rawframe  0  
-編集前のフレームファイルを出力する。  
+    Output_RawFrame  0  
+編集前のフレームファイルを出力  
+0 : 出力しない  
+1 : -lastのみ出力する  
+2 : 毎回出力する  
 
 
-    Out_tvtp_toTsDir  1  
-Tvtplay用チャプターファイルをＴＳファイルのフォルダに作成します。  
+    DirPath_Tvtp  "C:\Tvtp_Dir"  
+Tvtplay用チャプターファイルを出力するフォルダを指定  
+フォルダが存在しない場合はＴＳと同じ場所に出力します。  
 
 
-    Out_misc_toTsDir  1  
-Ogm chapter、フレームファイルをＴＳファイルのフォルダに作成します。  
+    DirPath_Misc  "C:\Ogm_and_Frame_Dir"  
+Ogm chapter、フレームファイルを出力するフォルダを指定  
+フォルダが存在しない場合はＴＳと同じ場所に出力します。  
 
 
-    ChapDir_Path  "C:\tvtp_Dir"  
-Tvtplay用チャプターファイルを出力するフォルダを指定します。  
-Out_tvtp_toTsDir = 0  にしてください。  
-
-
-    DirPath_misc  "C:\ogm_and_frame_Dir"  
-Ogm chapter、フレームファイルを出力するフォルダを指定します。  
-Out_misc_toTsDir = 0  にしてください。  
-
-
-    DeleteWorkItem  3  
-3: 古い作業ファイル削除　＆　使い終わったファイル削除  
-2: 古い作業ファイル削除　＆　サイズの大きいファイル削除  
+    CleanWorkItem  2  
+2: 古い作業ファイル削除　＆　使い終わったファイル削除  
 1: 古い作業ファイル削除  
 0: 削除しない  
 
@@ -176,7 +178,7 @@ Out_misc_toTsDir = 0  にしてください。
 　子フォルダ内も自動的に検索します。
 
 
-##### 必要  AVS Input Plugin  
+##### 必要  Input Plugin  
     DGDecode.dll  
     LSMASHSource.dll  
 
@@ -200,7 +202,7 @@ Out_misc_toTsDir = 0  にしてください。
     logoframe.exe  
     join_logo_scp.exe  
     JL__標準.txt  
-    JL_標準_Recording.txt  
+    JL_標準_Rec.txt  
 
 
 
@@ -211,11 +213,9 @@ Out_misc_toTsDir = 0  にしてください。
 してからLogoGuilloを実行します。
 
 
-* Tvtp、ogm chapter、フレームファイルは短い本編、ＣＭを除去してから作成しています。
-
 * 文字コード
- * Tvtp chapter                  UTF-8 bom
- * Ogm chapter, Frame text       Shift-JIS
+ * Tvtp chapter                 : UTF-8 bom
+ * Ogm chapter, Frame text      : Shift-JIS
 
  
 * 作業ファイルのパスが２５５文字を超えると正常に動きません。深いフォルダにおかないでください。
@@ -226,8 +226,8 @@ Out_misc_toTsDir = 0  にしてください。
 
 * LogoGuillo実行間隔による差
     * フレーム認識  
-        - 5min to 1minはＣＭが本編として組み込まれる量が多くなっていく。
-        - 10minならほぼ差が出ない。
+        - １分から５分はＣＭが本編として組み込まれる量が多くなっていく。
+        - １０分ならほぼ差が出ない。
         
     * 処理時間の増加率  
 
@@ -252,38 +252,20 @@ Out_misc_toTsDir = 0  にしてください。
 - tsとlwiが同じフォルダにある場合はlwiのファイル名をTsName.ts.lwiにしないでください。
 AviSynthのファイル読込時にシステム側で使用します。
 
-
-- 作業ファイルのサイズ
-    - １時間番組を
-        - １０分ごとに処理したときは　　１５０ＭＢ  
-        - 　１分ごとに処理したときは　　　　１ＧＢ  
-    - ２時間番組を
-        - １０分ごとに処理したときは　　５５０ＭＢ  
-        - 　１分ごとに処理したときは　　　　５ＧＢ  
-
         
     
 ------------------------------------------------------------------
 ### join_logo_scp
 
-- 設定ファイルで  
- ``` Avs_iPluginに lwi ```  
- ``` LogoDetectorに  JLS ```  
+- 設定ファイルに  
+ ``` <InputPlugin>    lwi    </InputPlugin> ```  
+ ``` <LogoDetector>    JLS    </LogoDetector> ```  
  を設定する。
 
-- LSystemフォルダに以下のファイルを入れてください。子フォルダでもかまいません。
-  - avsinp.aui
-  - chapter_exe.exe
-  - JL_標準.txt
-  - JL_標準_Recording.txt
-  - join_logo_scp.exe
-  - logoframe.exe
-
-
 - chpater_exe.exeは同梱のものでなくてもかまいません。安定して動くものを使用してください。  
-  テスト環境では終了時にエラーが発生したので、同梱のchpater_exeは終了処理を変更しただけです。
-  
-- JL_標準_Recording.txtは JL_標準.txtから必要なさそうな項目をコメントアウトしただけで、  
+  テスト環境では終了時にエラーが発生したので、同梱のchpater_exeは終了処理を変更しただけです。  
+
+- JL_標準_Rec.txtは JL_標準.txtから必要なさそうな項目をコメントアウトしただけで、  
   それ以外は同じです。
 
 
@@ -298,7 +280,7 @@ AviSynthのファイル読込時にシステム側で使用します。
 * DGDecode
 * join_logo_scp
 * LogoGuillo
-* L-SMASH-Works
+* L-SMASH Works
 
 が必要です。各作者にお礼申し上げます。
 

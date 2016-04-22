@@ -16,7 +16,7 @@ namespace LGLauncher
 {
   using OctNov.IO;
 
-  internal static class TimeShiftSrt
+  static class TimeShiftSrt
   {
     /// <summary>
     /// TimeShiftSrtファイルを作成
@@ -24,10 +24,10 @@ namespace LGLauncher
     /// <returns>作成したsrtファイルのパス</returns>
     public static string Make(double shiftSec)
     {
-      //　srtは削除されている可能性がある。
+      //rtは削除されている可能性がある。
       if (File.Exists(PathList.SrtPath) == false) return "";
 
-      //  IsAllPartならsrtファイルをコピーしてreturn
+      //IsAllならsrtファイルをコピーしてreturn
       if (PathList.IsAll)
       {
         string copyDstPath = Path.Combine(PathList.LWorkDir, PathList.SrtName);

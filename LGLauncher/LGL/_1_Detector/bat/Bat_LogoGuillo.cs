@@ -9,7 +9,7 @@ namespace LGLauncher
 {
   using OctNov.IO;
 
-  internal static class Bat_LogoGuillo
+  static class Bat_LogoGuillo
   {
     /// <summary>
     /// LogoGuillo起動用バッチ作成
@@ -38,8 +38,9 @@ namespace LGLauncher
         catch { /*do nothing*/}
       }
 
+      //読
       var batText = new List<string>();
-      batText = FileR.ReadFromResource("LGLauncher.Resource.Base_LogoGuillo.bat");
+      batText = FileR.ReadFromResource("LGLauncher.Resource.LogoGuillo.bat");
 
       //#LOGOG_PATH#
       string LOGOG_PATH = PathList.LogoGuillo;
@@ -56,8 +57,7 @@ namespace LGLauncher
       //#OUTPUT_PATH#
       string OUTPUT_PATH = PathList.WorkName + ".frame.txt";
 
-      
-      //bat置換
+      //bat
       for (int i = 0; i < batText.Count; i++)
       {
         var line = batText[i];
@@ -75,7 +75,7 @@ namespace LGLauncher
         batText[i] = line;
       }
 
-      //書込み
+      //書
       string outBatPath = PathList.WorkPath + ".LG.bat";
       File.WriteAllLines(outBatPath, batText, TextEnc.Shift_JIS);
       return outBatPath;

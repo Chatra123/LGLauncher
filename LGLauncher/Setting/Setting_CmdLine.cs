@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace LGLauncher
 {
   using Mono.Options;
@@ -11,7 +12,7 @@ namespace LGLauncher
   /// <summary>
   /// コマンドライン引数を処理
   /// </summary>
-  internal class Setting_CmdLine
+  class Setting_CmdLine
   {
     public int No { get; private set; }
     public bool IsLast { get; private set; }
@@ -40,7 +41,7 @@ namespace LGLauncher
     /// 引数解析
     /// </summary>
     /// <param name="args">解析する引数</param>
-    public void Parse(string[] args)
+    private void Parse(string[] args)
     {
       //    /*Mono.Options*/
       //case insensitive
@@ -48,7 +49,6 @@ namespace LGLauncher
       //OptionSet_icaseに渡すオプションは小文字で記述し、
       //オプションの最後に=をつける。 bool型ならつけない。
       var optionset = new OptionSet_icase();
-
       optionset
         .Add("no=", "Sequence no", (int v) => this.No = v)
         .Add("all", "Is etire part", (v) => this.IsAll = v != null)
@@ -76,7 +76,6 @@ namespace LGLauncher
         Log.WriteLine("CommandLine parse error");
         Log.WriteLine("  " + e.Message);
         Log.WriteLine();
-        return;
       }
     }
 
@@ -87,22 +86,21 @@ namespace LGLauncher
     /// </summary>
     public new string ToString()
     {
-      var sb = new StringBuilder();
-      sb.AppendLine("  App Command Line");
-      sb.AppendLine("    No       = " + No);
-      sb.AppendLine("    Last     = " + IsLast);
-      sb.AppendLine("    All      = " + IsAll);
-      sb.AppendLine("    Sequence = " + SequenceName);
+      var text = new StringBuilder();
+      text.AppendLine("  [ App Command Line ]");
+      text.AppendLine("    No       = " + No);
+      text.AppendLine("    Last     = " + IsLast);
+      text.AppendLine("    All      = " + IsAll);
+      text.AppendLine("    Sequence = " + SequenceName);
 
-      sb.AppendLine("    TsPath   = " + TsPath);
-      sb.AppendLine("    D2vPath  = " + D2vPath);
-      sb.AppendLine("    LwiPath  = " + LwiPath);
-      sb.AppendLine("    SrtPath  = " + SrtPath);
+      text.AppendLine("    TsPath   = " + TsPath);
+      text.AppendLine("    D2vPath  = " + D2vPath);
+      text.AppendLine("    LwiPath  = " + LwiPath);
+      text.AppendLine("    SrtPath  = " + SrtPath);
 
-      sb.AppendLine("    Channel  = " + Channel);
-      sb.AppendLine("    Program  = " + Program);
-      
-      return sb.ToString();
+      text.AppendLine("    Channel  = " + Channel);
+      text.AppendLine("    Program  = " + Program);      
+      return text.ToString();
     }
 
 

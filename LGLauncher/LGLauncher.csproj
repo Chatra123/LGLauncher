@@ -42,21 +42,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LGL\Misc\MutexControl.cs" />
+    <Compile Include="LGL\_1_Detector\MutexControl.cs" />
     <Compile Include="Exception\LGLException.cs" />
     <Compile Include="LGL\Misc\ProhibitFileMove_LGL.cs" />
-    <Compile Include="LGL\_1_Avs_Bat\WaitForSystemReady.cs" />
-    <Compile Include="LGL\_1_Avs_Bat\bat\Bat_Join_Logo_Scp.cs" />
-    <Compile Include="LGL\_1_Avs_Bat\bat\LogoSelector.cs" />
-    <Compile Include="LGL\_1_Avs_Bat\bat\BatLuncher.cs" />
-    <Compile Include="LGL\Misc\DeleteWorkItem.cs" />
-    <Compile Include="LGL\_1_Avs_Bat\avs\AvsWithLwi.cs" />
-    <Compile Include="LGL\_1_Avs_Bat\avs\AvsCommon.cs" />
-    <Compile Include="LGL\_2_EditFrame\JLS\Concat_logoframe.cs" />
-    <Compile Include="LGL\_2_EditFrame\JLS\Concat_Scpos.cs" />
-    <Compile Include="LGL\_2_EditFrame\JLS\Convert_JLS.cs" />
-    <Compile Include="LGL\_2_EditFrame\EditFrame_core\EditFrame_Convert.cs" />
-    <Compile Include="LGL\_2_EditFrame\EditFrame_core\EditFrame_OutChap.cs" />
+    <Compile Include="LGL\_1_Detector\AvsVpy\VpyMaker.cs" />
+    <Compile Include="LGL\_1_Detector\AvsVpy\AvsMaker.cs" />
+    <Compile Include="LGL\_1_Detector\AvsVpy\Index\D2vFormatter.cs" />
+    <Compile Include="LGL\_1_Detector\AvsVpy\Index\LwiFormatter.cs" />
+    <Compile Include="LGL\_1_Detector\WaitForSystemReady.cs" />
+    <Compile Include="LGL\_1_Detector\bat\Bat_Join_Logo_Scp.cs" />
+    <Compile Include="LGL\_1_Detector\bat\LogoSelector.cs" />
+    <Compile Include="LGL\_1_Detector\bat\BatLuncher.cs" />
+    <Compile Include="LGL\Misc\CleanWorkItem.cs" />
+    <Compile Include="LGL\_1_Detector\AvsVpy\AvsVpyCommon.cs" />
+    <Compile Include="LGL\_2_EditFrame\EditFrame\LogoGuillo.cs" />
+    <Compile Include="LGL\_2_EditFrame\EditFrame\JLS\LogoFrame.cs" />
+    <Compile Include="LGL\_2_EditFrame\EditFrame\JLS\Chapter_exe.cs" />
+    <Compile Include="LGL\_2_EditFrame\EditFrame\JLS\JLS.cs" />
+    <Compile Include="LGL\_2_EditFrame\EditFrame\EditFrame.cs" />
+    <Compile Include="LGL\_2_EditFrame\EditFrame\ConvertToFile.cs" />
     <Compile Include="Setting\Mono.Options\Options.cs" />
     <Compile Include="Setting\Mono.Options\Options_icase.cs" />
     <Compile Include="Setting\Setting_CmdLine.cs" />
@@ -66,22 +70,23 @@
     <Compile Include="Text\FileRW.cs" />
     <Compile Include="Text\Log.cs" />
     <Compile Include="Setting\PathList.cs" />
-    <Compile Include="LGL\_1_Avs_Bat\avs\AvsWithD2v.cs" />
-    <Compile Include="LGL\_1_Avs_Bat\TimeShiftSrt.cs" />
-    <Compile Include="LGL\_1_Avs_Bat\bat\Bat_LogoGuillo.cs" />
+    <Compile Include="LGL\_1_Detector\TimeShiftSrt.cs" />
+    <Compile Include="LGL\_1_Detector\bat\Bat_LogoGuillo.cs" />
     <Compile Include="LGL\_2_EditFrame\FrameEditor.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <EmbeddedResource Include="Resource\Base_LogoGuillo.bat" />
-    <EmbeddedResource Include="Resource\Base_TrimAvs.avs" />
-    <EmbeddedResource Include="Resource\Base_JLS_InRec.bat" />
-    <EmbeddedResource Include="Resource\Base_JLS_Last.bat" />
+    <EmbeddedResource Include="Resource\LogoGuillo.bat" />
+    <EmbeddedResource Include="Resource\TrimAvs.avs" />
+    <EmbeddedResource Include="Resource\JLS_OnRec.bat" />
+    <EmbeddedResource Include="Resource\JLS_Last.bat" />
+    <EmbeddedResource Include="Resource\GetInfo_vpy.vpy" />
+    <EmbeddedResource Include="Resource\TrimVpy.vpy" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resource\Base_GetInfo.avs" />
+    <EmbeddedResource Include="Resource\GetInfo_avs.avs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
