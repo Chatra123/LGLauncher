@@ -45,7 +45,7 @@ namespace LGLauncher
   static class Debug
   {
     /// format lwiを別名で保存するか
-    public const bool DebugMode = true;  // true  false
+    public const bool DebugMode = false;  // true  false
   }
 
 
@@ -328,8 +328,9 @@ namespace LGLauncher
           : LogoDetector.Unknown;
       }
 
-      //Avs固定 
+      //FrameServer
       {
+        //Avs固定 
         const AvsVpyType frameServerType = AvsVpyType.Avs;
         AvsVpy = frameServerType;
 
