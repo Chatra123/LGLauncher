@@ -53,13 +53,14 @@ tsと同じフォルダに d2v, lwi, srtをおいてください。
 
 
     -last
-最後の処理であることを明示します。  
+最後の処理であることを明示する。  
 チャプター出力や、JL_標準.txtを用いてjoin_logo_scpの再実行などが行われます。
 
 
-    -All  
-ファイル全体を１回で処理します。 
- 
+    -all  
+ファイル全体を処理  
+-lastの指定は必要ありません。  
+
  
     -ch "abc"
     -channel "abc"
@@ -85,9 +86,9 @@ lwiファイルパスの個別指定
     -srt "D:\rec\video.ts.srt"
 srtファイルパスの個別指定
 
-    -SequenceName  abcdef
-作業フォルダ名の一部に使用します。  
-基本的には無くてかまいません。
+    -SequenceName  abcdef012345
+作業フォルダ名の一部に使用  
+基本的には指定無しでも処理できます。
     
     
 
@@ -109,7 +110,7 @@ LG  :  LogoGuilloで処理
 
 
     Detector_MultipleRun  1  
-Winsows内での LogoGuillo, logoframe同時実行数
+Winsows内での chapter_exe, LogoGuillo, logoframe同時実行数
 
 
 ------------------------------------------------------------------
@@ -123,44 +124,44 @@ Winsows内での LogoGuillo, logoframe同時実行数
 ２９．０秒以下の本編部を除去  
     
 
-    Out_Tvtp  2  
-Tvtplay用チャプターファイルを出力する。  
+    Output_Tvtp  2  
+Tvtplay用チャプターファイルを出力  
 短い本編、ＣＭは除去されています。  
 0 : 出力しない  
 1 : -lastのみ出力する  
 2 : 毎回出力する  
 
 
-    Out_Ogm  1  
-Ogm形式のチャプターファイルを出力する。  
+    Output_Ogm  1  
+Ogm形式のチャプターファイルを出力  
 短い本編、ＣＭは除去されています。  
 0 : 出力しない  
 1 : -lastのみ出力する  
 2 : N/A
 
 
-    Out_Frame  1  
-フレームファイルを出力する。  
+    Output_Frame  1  
+フレームファイルを出力  
 短い本編、ＣＭは除去されています。  
 0 : 出力しない  
 1 : -lastのみ出力する  
 2 : 毎回出力する  
 
 
-    Out_RawFrame  0  
-編集前のフレームファイルを出力する。  
+    Output_RawFrame  0  
+編集前のフレームファイルを出力  
 0 : 出力しない  
 1 : -lastのみ出力する  
 2 : 毎回出力する  
 
 
     DirPath_Tvtp  "C:\Tvtp_Dir"  
-Tvtplay用チャプターファイルを出力するフォルダを指定します。  
+Tvtplay用チャプターファイルを出力するフォルダを指定  
 フォルダが存在しない場合はＴＳと同じ場所に出力します。  
 
 
     DirPath_Misc  "C:\Ogm_and_Frame_Dir"  
-Ogm chapter、フレームファイルを出力するフォルダを指定します。  
+Ogm chapter、フレームファイルを出力するフォルダを指定  
 フォルダが存在しない場合はＴＳと同じ場所に出力します。  
 
 
@@ -225,8 +226,8 @@ Ogm chapter、フレームファイルを出力するフォルダを指定しま
 
 * LogoGuillo実行間隔による差
     * フレーム認識  
-        - 5min to 1minはＣＭが本編として組み込まれる量が多くなっていく。
-        - 10minならほぼ差が出ない。
+        - １分から５分はＣＭが本編として組み込まれる量が多くなっていく。
+        - １０分ならほぼ差が出ない。
         
     * 処理時間の増加率  
 
@@ -251,36 +252,20 @@ Ogm chapter、フレームファイルを出力するフォルダを指定しま
 - tsとlwiが同じフォルダにある場合はlwiのファイル名をTsName.ts.lwiにしないでください。
 AviSynthのファイル読込時にシステム側で使用します。
 
-- 作業ファイルのサイズ
-    - １時間番組を
-        - １０分ごとに処理したときは　　１５０ＭＢ  
-        - 　１分ごとに処理したときは　　　　１ＧＢ  
-    - ２時間番組を
-        - １０分ごとに処理したときは　　５５０ＭＢ  
-        - 　１分ごとに処理したときは　　　　５ＧＢ  
-
         
     
 ------------------------------------------------------------------
 ### join_logo_scp
 
-- 設定ファイルで  
- ``` InputPlugin = lwi ```  
- ``` LogoDetector = JLS ```  
+- 設定ファイルに  
+ ``` <InputPlugin>    lwi    </InputPlugin> ```  
+ ``` <LogoDetector>    JLS    </LogoDetector> ```  
  を設定する。
-
-- LSystemフォルダに以下のファイルを入れてください。子フォルダでもかまいません。
-  - avsinp.aui
-  - chapter_exe.exe
-  - JL_標準.txt
-  - JL_標準_Rec.txt
-  - join_logo_scp.exe
-  - logoframe.exe
 
 - chpater_exe.exeは同梱のものでなくてもかまいません。安定して動くものを使用してください。  
   テスト環境では終了時にエラーが発生したので、同梱のchpater_exeは終了処理を変更しただけです。  
 
-- JL_標準_Recording.txtは JL_標準.txtから必要なさそうな項目をコメントアウトしただけで、  
+- JL_標準_Rec.txtは JL_標準.txtから必要なさそうな項目をコメントアウトしただけで、  
   それ以外は同じです。
 
 
