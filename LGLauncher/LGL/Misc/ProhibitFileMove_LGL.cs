@@ -13,20 +13,20 @@ namespace LGLauncher
   /// </summary>
   class ProhibitFileMove_LGL
   {
-    private static List<FileStream> lock_items;
+    private static List<FileStream> LockItems;
 
     /// <summary>
     /// ファイルの移動禁止
     /// </summary>
     public static void Lock()
     {
-      lock_items = lock_items ?? new List<FileStream>();
+      LockItems = LockItems ?? new List<FileStream>();
 
       //ts
       try
       {
         var ts = new FileStream(PathList.TsPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-        lock_items.Add(ts);
+        LockItems.Add(ts);
       }
       catch { throw new LGLException("cant lock ts file"); }
 
@@ -35,7 +35,7 @@ namespace LGLauncher
         try
         {
           var d2v = new FileStream(PathList.D2vPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-          lock_items.Add(d2v);
+          LockItems.Add(d2v);
         }
         catch { throw new LGLException("cant lock d2v file"); }
 
@@ -44,12 +44,12 @@ namespace LGLauncher
         try
         {
           var lwi = new FileStream(PathList.LwiPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-          lock_items.Add(lwi);
+          LockItems.Add(lwi);
 
           if (File.Exists(PathList.LwiFooterPath))  //lwifooterファイルは無いときもある
           {
             var footer = new FileStream(PathList.LwiFooterPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            lock_items.Add(footer);
+            LockItems.Add(footer);
           }
         }
         catch { throw new LGLException("cant lock lwi file"); }
@@ -57,14 +57,14 @@ namespace LGLauncher
       //srt
       try
       {
-        //srtはテキストが書き込まれて無いとCaption2Ass_PCR_pfによって削除される可能性がある。
+        //テキストが書き込まれている場合のみロック
         if (File.Exists(PathList.SrtPath))
         {
-          var filesize = new FileInfo(PathList.SrtPath).Length;
-          if (3 < filesize)  // -gt 3byte bom
+          var size = new FileInfo(PathList.SrtPath).Length;
+          if (3 < size)  // -gt 3byte bom
           {
             var srt = new FileStream(PathList.SrtPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-            lock_items.Add(srt);
+            LockItems.Add(srt);
           }
         }
       }
@@ -77,8 +77,10 @@ namespace LGLauncher
     /// </summary>
     public static void Unlock()
     {
-      foreach (var item in lock_items)
-        item.Close();
+      foreach (var fstream in LockItems)
+        fstream.Close();
+
+      LockItems = new List<FileStream>();
     }
 
   }
