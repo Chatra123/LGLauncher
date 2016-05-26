@@ -123,8 +123,8 @@ namespace LGLauncher
           PathList.IncrementPartNo();   //PartNo++で continue
       }
 
+      Log.Close();
       CleanWorkItem.Clean_Lastly();
-      Log.Close();　　                   //ログは残すのでDeleteWorkItemの後でclose
     }
 
 
@@ -175,16 +175,16 @@ namespace LGLauncher
          *  length = 95min なら、 30m, 30m, 35m  に分割
          */
 
-        //開始フレーム　　（＝　直前の終了フレーム　＋　１）
-        //  if  Is1stPart || IsAll  then  beginFrame = 0
+        //開始フレーム　　（　直前の終了フレーム　＋　１　）
         int beginFrame;
         {
           //直前のトリム用フレーム数取得   previous
+          //  trimFrame_prv[0] : previous begin frame
+          //  trimFrame_prv[1] : previous end frame
           int[] trimFrame_prv = (2 <= PathList.PartNo)
                                     ? AvsVpyCommon.GetTrimFrame_previous()
                                     : null;
-          int endFrame_prv = (trimFrame_prv != null) ? trimFrame_prv[1] : -1;
-          beginFrame = endFrame_prv + 1;
+          beginFrame = (trimFrame_prv != null) ? trimFrame_prv[1] + 1 : 0;
         }
 
         //splitTrim作成
@@ -247,24 +247,20 @@ namespace LGLauncher
         //bat
         string batPath = "";
         {
-          if (PathList.Detector == LogoDetector.Join_Logo_Scp)
+          if (PathList.Detector == DetectorType.Join_Logo_Scp)
           {
             var logo = LogoSelector.GetLogo();
             var jl_cmd = PathList.JL_Cmd_OnRec;
             batPath = Bat_Join_Logo_Scp.Make_OnRec(avsPath,
                                                    logo[0], jl_cmd);
           }
-          else if (PathList.Detector == LogoDetector.LogoGuillo)
+          else if (PathList.Detector == DetectorType.LogoGuillo)
           {
             var logo_param = LogoSelector.GetLogo_and_Param();
             batPath = Bat_LogoGuillo.Make(avsPath, srtPath,
                                           logo_param[0], logo_param[1]);
           }
         }
-
-        ////// create trim script only, if return
-        ////return;
-
 
         WaitForSystemReady waitForReady = null;
         try
@@ -288,7 +284,7 @@ namespace LGLauncher
 
           //Bat実行
           LwiFile.Set_ifLwi();
-          BatLuncher.Launch(batPath, timeout_ms);
+          BatLauncher.Launch(batPath, timeout_ms);
         }
         finally
         {

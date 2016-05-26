@@ -17,15 +17,15 @@ namespace LGLauncher
   [Serializable]
   public class Setting_File
   {
-    const double CurrentRev = 11.8;
+    const double CurrentRev = 12.0;
 
     public double Rev = 0.0;
-    public string memo11 = "  Set InputPlugin     d2v  or  lwi  ";
-    public string memo12 = "  Set LogoDetector    JLS  or  LG   ";
-    public string memo13 = "      'cannot set d2v with JLS'     ";
+    public string memo21 = "  Set InputPlugin     d2v  or  lwi  ";
+    public string memo22 = "  Set Detector        JLS  or  LG   ";
+    public string memo23 = "      'cannot set d2v with JLS'     ";
     public int Enable = 1;
     public string InputPlugin = "  lwi         ";
-    public string LogoDetector = "  LogoGuillo  ";
+    public string Detector = "  LogoGuillo  ";
     public int Detector_MultipleRun = 1;
     public string space_1 = "";
 

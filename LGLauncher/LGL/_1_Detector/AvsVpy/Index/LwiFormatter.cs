@@ -242,11 +242,12 @@ namespace LGLauncher
         }
 
         //デバッグ用のコピー  TsShortName.lwi  -->  TsShortName.p2.lwi
-        //lwiはサイズが大きいのでDebugMode時のみコピー
         if (Debug.DebugMode)
         {
+#pragma warning disable 0162           //警告0162：到達できないコード
           string outPath_part = PathList.WorkPath + ".lwi";
           File.Copy(outPath, outPath_part, true);
+#pragma warning restore 0162
         }
 
       }
