@@ -32,9 +32,10 @@ LGLauncher.exe  -last  -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
 1. LSystemフォルダに  
    logoGuillo.exe  
    avs2pipemod.exe  
+   LSMASHSource.dll  
    を入れる。
 
-2. LogoSelector.exe を実行し設定ファイルを生成  
+2. LogoSelector.exe を実行し設定ファイルを生成、  
    LogoSelector.txtの"[LogoDir]"にlgd,paramファイルのあるフォルダを指定する。
 
 
@@ -167,14 +168,14 @@ Ogm chapter、フレームファイルを出力するフォルダを指定
     CleanWorkItem  2  
 0: 削除しない  
 1: 古い作業ファイル削除  
-2: 古い作業ファイル削除　＆　使い終わったファイル削除  
+2: 古い作業ファイル削除　＆　使用済みのファイル削除  
 
 
 
 ------------------------------------------------------------------
 ### LSystemフォルダ
 　フォルダ以下に各バイナリファイルを置いてください。  
-　子フォルダ内も自動的に検索します。
+　サブフォルダ内も自動的に検索します。
 
 
 ##### 必要  
