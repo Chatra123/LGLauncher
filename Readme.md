@@ -256,8 +256,8 @@ AviSynthのファイル読込時にシステム側で使用します。
 
 - 設定ファイルで  
  ``` <InputPlugin>    lwi    </InputPlugin> ```  
- ``` <LogoDetector>    JLS    </LogoDetector> ```  
- を設定する。
+ ``` <Detector>    JLS    </Detector> ```  
+ に設定する。
 
 - chpater_exe.exeは同梱のものでなくてもかまいません。安定して動くものを使用してください。  
   テスト環境では終了時にエラーが発生したので、同梱のchpater_exeは終了処理を変更しただけです。  
