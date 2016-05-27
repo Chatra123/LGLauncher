@@ -42,31 +42,30 @@ namespace LGLauncher
     /// </summary>
     public static void Clean_Lastly()
     {
-      // 2 <= Mode  使い終わったファイルを削除
+      // Mode = 2  使い終わったファイルを削除
       if (2 <= PathList.Mode_CleanWorkItem)
       {
         //LWorkDir
         //  IsLast 　　　　　→　　全ての作業ファイル削除
         if (PathList.IsLastPart)
         {
-          cleaner.Delete_File(0.0, PathList.LWorkDir, "_" + PathList.TsShortName + "*.sys.*", ".log");
+          cleaner.Delete_File(0.0, PathList.LWorkDir, "_" + PathList.TsShortName + "*.sys.*");
           cleaner.Delete_File(0.0, PathList.LWorkDir, PathList.TsShortName + "*");
         }
         //  2 <= PartNo  　　→　　１つ前の作業ファイル削除
         else if (2 <= PathList.PartNo)
         {
-          //今回作成したTsName.p3.20000__30000.avsは、次回のLGLauncherが使用するので削除しない。
-          //それ以前の作業ファイルを削除
+          //今回作成したTsName.p3.20000__30000.avsは次回のLGLauncherが使用する。
           for (int no = PathList.PartNo - 1; 1 <= no; no--)
             cleaner.Delete_File(0.0, PathList.LWorkDir, PathList.TsShortName + "p" + no + "*");
         }
       }
 
 
-      // 1 <= Mode  古いファイル削除
+      // Mode = 1  古いファイル削除
       if (1 <= PathList.Mode_CleanWorkItem)
       {
-        if (PathList.Is1stPart || PathList.IsAll)
+        if (PathList.IsLastPart)
         {
           const double nDaysBefore = 2.0;
           //LTopWorkDir                    サブフォルダ内も対象
@@ -84,6 +83,7 @@ namespace LGLauncher
           cleaner.Delete_File(nDaysBefore, Path.GetTempPath(), "DGI_pf_tmp_*_*");
         }
       }
+
     }
 
 
@@ -113,7 +113,7 @@ namespace LGLauncher
     /// <param name="searchKey">ファイル名に含まれる文字。ワイルドカード可 * </param>
     /// <param name="ignoreKey">除外するファイルに含まれる文字。ワイルドカード不可 × </param>
     public void Delete_File(double nDaysBefore, string directory,
-                                   string searchKey, string ignoreKey = null)
+                            string searchKey, string ignoreKey = null)
     {
       if (Directory.Exists(directory) == false) return;
       Thread.Sleep(500);
@@ -142,7 +142,7 @@ namespace LGLauncher
         if (onefile.Exists == false) continue;
         if (ignoreKey != null && 0 <= onefile.Name.IndexOf(ignoreKey)) continue;
 
-        //nDaysBeforeより前のファイル？
+        //古いファイル？
         bool over_creation = nDaysBefore < (DateTime.Now - onefile.CreationTime).TotalDays;
         bool over_lastwrite = nDaysBefore < (DateTime.Now - onefile.LastWriteTime).TotalDays;
         if (over_creation && over_lastwrite)

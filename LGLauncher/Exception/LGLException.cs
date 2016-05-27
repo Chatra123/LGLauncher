@@ -30,7 +30,6 @@ namespace LGLauncher
       text.AppendLine("▽    Message    ▽");
       text.AppendLine(base.Message);
       text.AppendLine("△    Message    △");
-
       return text.ToString();
     }
 

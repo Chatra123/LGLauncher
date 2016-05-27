@@ -43,19 +43,17 @@ namespace LGLauncher
         totalframe = (int)info[0];
       }
 
-
-      //開始フレーム　　（＝　直前の終了フレーム　＋　１）
-      //  if  Is1stPart || IsAll  then  beginFrame = 0
+      //開始フレーム　　（　直前の終了フレーム　＋　１　）
       int beginFrame;
       {
         //直前のトリム用フレーム数取得   previous
+        //  trimFrame_prv[0] : previous begin frame
+        //  trimFrame_prv[1] : previous end frame
         int[] trimFrame_prv = (2 <= PathList.PartNo)
                                   ? AvsVpyCommon.GetTrimFrame_previous()
                                   : null;
-        int endFrame_prv = (trimFrame_prv != null) ? trimFrame_prv[1] : -1;
-        beginFrame = endFrame_prv + 1;
+        beginFrame = (trimFrame_prv != null) ? trimFrame_prv[1] + 1 : 0;
       }
-
 
       int[] trimFrame = new int[] { beginFrame, totalframe - 1 };
       return trimFrame;
@@ -182,9 +180,9 @@ namespace LGLauncher
         }
 
         //Detector
-        //if (PathList.Detector == LogoDetector.Join_Logo_Scp)
+        //if (PathList.Detector == DetectorType.Join_Logo_Scp)
         //  line = Regex.Replace(line, "#Join_Logo_Scp#", "", RegexOptions.IgnoreCase);
-        //else if (PathList.Detector == LogoDetector.LogoGuillo)
+        //else if (PathList.Detector == DetectorType.LogoGuillo)
         //  line = Regex.Replace(line, "#LogoGuillo#", "", RegexOptions.IgnoreCase);
 
         //Trim

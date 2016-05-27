@@ -9,10 +9,10 @@ using System.IO;
 
 namespace LGLauncher
 {
-  static class BatLuncher
+  static class BatLauncher
   {
     /// <summary>
-    /// LogoDetector実行
+    /// Detector実行
     /// </summary>
     public static void Launch(string batPath, int timeout_ms = -1)
     {
@@ -22,7 +22,7 @@ namespace LGLauncher
         try
         {
           var startTime = DateTime.Now;
-          Launch_Detector(batPath, timeout_ms);
+          Launch_core(batPath, timeout_ms);
 
           //Windows Sleepが原因のタイムアウト
           //  timeout_msから１０秒以上経過している。
@@ -40,7 +40,7 @@ namespace LGLauncher
         {
           if (retry == 2)
           {
-            throw e;
+            throw;
           }
           else
           {
@@ -55,9 +55,9 @@ namespace LGLauncher
 
 
     /// <summary>
-    /// LogoDetector実行
+    /// Detector実行
     /// </summary>
-    private static void Launch_Detector(string batPath, int timeout_ms)
+    private static void Launch_core(string batPath, int timeout_ms)
     {
       if (File.Exists(batPath) == false)
         throw new LGLException("not exist detector bat");
@@ -92,11 +92,11 @@ namespace LGLauncher
       }
 
       //異常終了
-      if (PathList.Detector == LogoDetector.Join_Logo_Scp)
+      if (PathList.Detector == DetectorType.Join_Logo_Scp)
       {
         throw new LGLException("★ ExitCode = " + exitCode + "");
       }
-      else if (PathList.Detector == LogoDetector.LogoGuillo)
+      else if (PathList.Detector == DetectorType.LogoGuillo)
       {
         if (exitCode == -9)
         {

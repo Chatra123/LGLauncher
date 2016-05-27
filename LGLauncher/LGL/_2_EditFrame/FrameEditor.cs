@@ -39,7 +39,7 @@ namespace LGLauncher.EditFrame
     {
       //JLSの出力をLogoGuilloの出力と同じ形式にする。
       //  JLS Result Avs Trim   -->  frame
-      if (PathList.Detector == LogoDetector.Join_Logo_Scp)
+      if (PathList.Detector == DetectorType.Join_Logo_Scp)
       {
         // *.p1.jls.result.avs  -->  *.p1.frame.txt
         JLS.JLS.Result_to_Frame(false);
@@ -58,7 +58,7 @@ namespace LGLauncher.EditFrame
         {
           var jl_cmd = PathList.JL_Cmd_Standard;
           var batPath = Bat_Join_Logo_Scp.Make_AtLast(jl_cmd);
-          BatLuncher.Launch(batPath);
+          BatLauncher.Launch(batPath);
           List<int> jls_last_frame = JLS.JLS.Result_to_Frame(true);
           return jls_last_frame;
         }

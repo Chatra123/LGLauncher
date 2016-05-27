@@ -183,46 +183,6 @@ namespace LGLauncher
 
 
 
-    #region CalcTrimFrame
-
-    /// <summary>
-    /// トリム用フレーム数　計算
-    /// </summary>
-    /// <param name="totalframe">総フレーム数</param>
-    /// <param name="trimFrame_prv">前回のトリムフレーム数</param>
-    /// <returns>開始、終了フレーム数</returns>
-    [Obsolete]
-    public static int[] CalcTrimFrame_obsolete(int totalframe, int[] trimFrame_prv)
-    {
-      int beginFrame = 0, endFrame = 0;
-
-
-      if (PathList.Is1stPart)
-      {
-        beginFrame = 0;
-        endFrame = totalframe - 1;
-      }
-      else if (2 <= PathList.PartNo)
-      {
-        if (trimFrame_prv == null)
-          throw new LGLException("previous trim frame is null");
-
-        beginFrame = trimFrame_prv[1] + 1;                  //前回の終端フレーム数＋１
-        endFrame = totalframe - 1;
-      }
-      else if (PathList.IsAll)
-      {
-        beginFrame = 0;
-        endFrame = totalframe - 1;
-      }
-
-      return new int[] { beginFrame, endFrame };
-    }
-
-    #endregion GetTrimFrame
-
-
-
     #region OutScript
 
     /// <summary>
