@@ -18,7 +18,7 @@ namespace LGLauncher
     /// </summary>
     private static StreamWriter CreateWriter()
     {
-      string LogDir = null, LogName = null;
+      string LogPath = null;
       {
         //Dirの使用想定
         //　LWorkDir    　　通常
@@ -27,32 +27,24 @@ namespace LGLauncher
         var AppPath = Assembly.GetExecutingAssembly().Location;
         var AppDir = Path.GetDirectoryName(AppPath);
         var AppName = Path.GetFileNameWithoutExtension(AppPath);
+        string LogDir = null;
+        LogDir = string.IsNullOrEmpty(LogDir) ? PathList.LWorkDir : LogDir;
+        LogDir = string.IsNullOrEmpty(LogDir) ? PathList.LTopWorkDir : LogDir;
+        LogDir = string.IsNullOrEmpty(LogDir) ? AppDir : LogDir;
+        string LogName = string.IsNullOrEmpty(PathList.TsShortName)
+          ? AppName : PathList.TsShortName;
 
-        LogDir = null;
-        LogDir = (string.IsNullOrEmpty(LogDir)) ? PathList.LWorkDir : LogDir;
-        LogDir = (string.IsNullOrEmpty(LogDir)) ? PathList.LTopWorkDir : LogDir;
-        LogDir = (string.IsNullOrEmpty(LogDir)) ? AppDir : LogDir;
-
-        LogName = string.IsNullOrEmpty(PathList.TsShortName)
-                                   ? AppName : PathList.TsShortName;
+        LogPath = Path.Combine(LogDir, "_" + LogName + ".sys.log");
       }
 
-
-      //ライター作成
-      //　*.sys.1.log ～ *.sys.4.logを割り当てる。
-      //  基本的に *.sys.1.logのみ使用する。
-      for (int i = 1; i <= 4; i++)
+      try
       {
-        try
-        {
-          var path = Path.Combine(LogDir, "_" + LogName + ".sys." + i + ".log");
-          writer = new StreamWriter(path, true, Encoding.UTF8);       //追記、UTF-8 bom
-          break;
-        }
-        catch { /*ファイル使用中*/ }
+        writer = new StreamWriter(LogPath, true, Encoding.UTF8);       //追記、UTF-8 bom
       }
+      catch { /*失敗*/ }
 
-      //作成成功、ヘッダー書込み
+
+      //成功、ヘッダー書込み
       if (writer != null)
       {
         writer.AutoFlush = true;
