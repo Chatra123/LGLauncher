@@ -29,7 +29,7 @@ echo ERRORLEVEL = %ERRORLEVEL%
 echo ----------------------------------------------------------------------
 echo .
 ::  pause
-::  exit
+::  exit /b
 
 
 
@@ -46,7 +46,7 @@ echo ERRORLEVEL = %ERRORLEVEL%
 echo ----------------------------------------------------------------------
 echo .
 ::  pause
-::  exit
+::  exit /b
 
 
 
@@ -61,7 +61,7 @@ echo ERRORLEVEL = %ERRORLEVEL%
 echo ----------------------------------------------------------------------
 echo .
 ::  pause
-::  exit
+::  exit /b
 
 
 
@@ -77,7 +77,7 @@ echo #PartNo#	%begin%		%end%>>"_#TsShortName#_ˆ—ŠÔ.sys.txt"
 endlocal
 ::  TIMEOUT /T 5 /NOBREAK
 ::  pause
-  exit
+::  exit /b
 
 
 

@@ -19,7 +19,7 @@ echo ERRORLEVEL = %ERRORLEVEL%
 endlocal
 ::  TIMEOUT /T 5 /NOBREAK
 ::  pause
-  exit
+::  exit /b
 
 
 
