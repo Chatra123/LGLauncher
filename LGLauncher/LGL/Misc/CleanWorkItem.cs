@@ -42,29 +42,17 @@ namespace LGLauncher
     /// </summary>
     public static void Clean_Lastly()
     {
-      // Mode = 2  使い終わったファイルを削除
+      // Mode = 2    使用済みのファイル削除
       if (2 <= PathList.Mode_CleanWorkItem)
-      {
-        //LWorkDir
-        //  IsLast 　　　　　→　　全ての作業ファイル削除
         if (PathList.IsLastPart)
         {
+          //LWorkDir
           cleaner.Delete_File(0.0, PathList.LWorkDir, "_" + PathList.TsShortName + "*.sys.*");
           cleaner.Delete_File(0.0, PathList.LWorkDir, PathList.TsShortName + "*");
         }
-        //  2 <= PartNo  　　→　　１つ前の作業ファイル削除
-        else if (2 <= PathList.PartNo)
-        {
-          //今回作成したTsName.p3.20000__30000.avsは次回のLGLauncherが使用する。
-          for (int no = PathList.PartNo - 1; 1 <= no; no--)
-            cleaner.Delete_File(0.0, PathList.LWorkDir, PathList.TsShortName + "p" + no + "*");
-        }
-      }
 
-
-      // Mode = 1  古いファイル削除
+      // Mode = 1    古いファイル削除
       if (1 <= PathList.Mode_CleanWorkItem)
-      {
         if (PathList.IsLastPart)
         {
           const double nDaysBefore = 2.0;
@@ -82,8 +70,6 @@ namespace LGLauncher
           cleaner.Delete_File(nDaysBefore, Path.GetTempPath(), "logoGuillo_*.txt");
           cleaner.Delete_File(nDaysBefore, Path.GetTempPath(), "DGI_pf_tmp_*_*");
         }
-      }
-
     }
 
 
