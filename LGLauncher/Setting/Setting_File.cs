@@ -24,7 +24,7 @@ namespace LGLauncher
     public string memo22 = "  Set Detector        JLS  or  LG   ";
     public string memo23 = "      'cannot set d2v with JLS'     ";
     public int Enable = 1;
-    public string InputPlugin = "  lwi         ";
+    public string InputPlugin = "  lwi  ";
     public string Detector = "  LogoGuillo  ";
     public int Detector_MultipleRun = 1;
     public string space_1 = "";
