@@ -4,14 +4,15 @@
 作成中の d2v, lwi, srtファイルを元にLogoGuilloを実行します。
 
 
+
 ------------------------------------------------------------------
 ### 使い方　　コマンドライン
 
-LGLauncher.exe         -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
+LGLauncher.exe         -ts "C:\Video.ts"  -channel "abc"  
 
 
 最後のみ  
-LGLauncher.exe  -last  -ts "C:\Video.ts"  -channel "abc"  -program "defgh"
+LGLauncher.exe  -last  -ts "C:\Video.ts"  -channel "abc"  
 
 
 
@@ -86,7 +87,7 @@ lwiファイルパスの個別指定
     -srt "D:\rec\video.ts.srt"
 srtファイルパスの個別指定
 
-    -SequenceName  abcdef012345
+    -SequenceName  20160701_2000
 作業フォルダ名の一部に使用  
 基本的には指定無しでも処理できます。
     
@@ -149,19 +150,20 @@ Ogm形式のチャプターファイルを出力
 
 
     Output_RawFrame  0  
-編集前のフレームファイルを出力  
+フレームファイルを出力  
+短い本編、ＣＭは除去していません。  
 0 : 出力しない  
 1 : -lastのみ出力する  
 2 : 毎回出力する  
 
 
     DirPath_Tvtp  "C:\Tvtp_Dir"  
-Tvtplay用チャプターファイルを出力するフォルダを指定  
+Tvtplayチャプターの出力フォルダ
 フォルダが存在しない場合はＴＳと同じ場所に出力します。  
 
 
     DirPath_Misc  "C:\Ogm_and_Frame_Dir"  
-Ogm chapter、フレームファイルを出力するフォルダを指定  
+Ogm chapter、フレームファイルの出力フォルダ
 フォルダが存在しない場合はＴＳと同じ場所に出力します。  
 
 
@@ -175,7 +177,7 @@ Ogm chapter、フレームファイルを出力するフォルダを指定
 ------------------------------------------------------------------
 ### LSystemフォルダ
 　フォルダ以下に各バイナリファイルを置いてください。  
-　サブフォルダ内も自動的に検索します。
+　サブフォルダ内も自動で検索します。
 
 
 ##### 必要  
@@ -219,7 +221,7 @@ Ogm chapter、フレームファイルを出力するフォルダを指定
 * 作業ファイルのパスが２５０文字を超えると正常に動きません。深いフォルダにおかないでください。
 
 
-* LogoGuillo, avs2pipemod側でエラーが発生しても自動で再実行するので、多少のエラーなら無視できます。
+* LogoGuillo, avs2pipemod側でエラーが発生しても再実行するので、多少のエラーなら無視できます。
 
 
 * LogoGuillo実行間隔による差
