@@ -8,28 +8,25 @@ using System.Linq;
 namespace LGLauncher.EditFrame
 {
   using OctNov.IO;
-
   /*
    * 変換の流れ
    * 
-   *   Edit_ConcatFrame(int[] trimFrame)
+   *   static List<int> ConcatFrame(int[] trimFrame)
    *   {
    *     Join_Logo_Scp
-   *         *.p1.jls.result.txt  -->  *.p1.frame.txt  -->  List<int>  -->  concat List<int>
+   *         *.p1.jls.result.txt  -->  *.p1.frame.txt  -->  List<int> frame  -->  List<int> concat
    *         
    *     LogoGuillo
-   *                                   *.p1.frame.txt  -->  List<int>  -->  concat List<int>
+   *                                   *.p1.frame.txt  -->  List<int> frame  -->  List<int> concat
    *   }
    * 
    * 
-   *   OutputChapter(List<int> rawFrame, int[] trimFrame)
+   *   static void OutputChapter(List<int> rawFrame, int[] trimFrame)
    *   {
-   *     concat List<int>  -->  chapter file
+   *     List<int> concat  -->  chapter file
    *   }
    *   
    */
-
-
   static class FrameEditor
   {
     /// <summary>
@@ -37,23 +34,24 @@ namespace LGLauncher.EditFrame
     /// </summary>
     public static List<int> ConcatFrame(int[] trimFrame)
     {
-      //JLSの出力をLogoGuilloの出力と同じ形式にする。
-      //  JLS Result Avs Trim   -->  frame
+      //JLSの出力をLogoGuilloと同じ形式にする。
+      //  Join_Logo_Scp
+      //     *.p1.jls.result.txt  -->  *.p1.frame.txt
       if (PathList.Detector == DetectorType.Join_Logo_Scp)
       {
-        // *.p1.jls.result.avs  -->  *.p1.frame.txt
         JLS.JLS.Result_to_Frame(false);
 
-        //合成
-        //  catファイルはIsLastで使用する。
+        //Concat
+        //  Chapter_exe, LogoFrame
+        //    scpos.cat, logoframe.catはIsLastで使用する。
         if (PathList.IsPart)
         {
           JLS.Chapter_exe.Concat(trimFrame);
           JLS.LogoFrame.Concat(trimFrame);
         }
 
-        //only last
-        //  re-execute JLS with scpos.cat, logoframe.cat and JL_Cmd_Standard
+        //Re-execute JLS with *.cat and JL_Cmd_Standard
+        //  Join_Logo_Scp
         if (PathList.IsPart && PathList.IsLastPart)
         {
           var jl_cmd = PathList.JL_Cmd_Standard;
@@ -65,7 +63,8 @@ namespace LGLauncher.EditFrame
       }
 
       //フレームテキスト合成
-      //Join_Logo_Scp  &  LogoGuillo
+      //  Join_Logo_Scp  &  LogoGuillo
+      //    *.p1.frame.txt  -->  List<int> frame  -->  List<int> concat
       List<int> concat = LogoGuillo.Concat(trimFrame);
       return concat;
     }
@@ -91,8 +90,8 @@ namespace LGLauncher.EditFrame
       int endFrame = trimFrame[1];
 
       //raw frame
-      if (PathList.IsPart && 2 <= PathList.Output_RawFrame
-        || PathList.IsLastPart && 1 <= PathList.Output_RawFrame)
+      if ((PathList.IsPart && 2 <= PathList.Output_RawFrame)
+        || (PathList.IsLastPart && 1 <= PathList.Output_RawFrame))
       {
         string path;
         {
@@ -104,6 +103,7 @@ namespace LGLauncher.EditFrame
                              : PathList.TsNameWithoutExt + ".part.rawframe.txt";
           path = Path.Combine(dir, name);
         }
+
         ConvertToFile.To_FrameFile(path, rawFrame, endFrame);
       }
 
@@ -116,9 +116,10 @@ namespace LGLauncher.EditFrame
         editFrame = EditFrame.FlatOut_Main(editFrame, PathList.Regard_NsecMain_AsCM);
       }
 
+
       //frame
-      if (PathList.IsPart && 2 <= PathList.Output_Frame
-        || PathList.IsLastPart && 1 <= PathList.Output_Frame)
+      if ((PathList.IsPart && 2 <= PathList.Output_Frame)
+        || (PathList.IsLastPart && 1 <= PathList.Output_Frame))
       {
         string path;
         {
@@ -130,13 +131,13 @@ namespace LGLauncher.EditFrame
                              : PathList.TsNameWithoutExt + ".part.frame.txt";
           path = Path.Combine(dir, name);
         }
-        ConvertToFile.To_FrameFile(path, editFrame, endFrame);
+
+        ConvertToFile.To_FrameFile(path, rawFrame, endFrame);
       }
 
-
       //TvtPlay
-      if (PathList.IsPart && 2 <= PathList.Output_Tvtp
-        || PathList.IsLastPart && 1 <= PathList.Output_Tvtp)
+      if ((PathList.IsPart && 2 <= PathList.Output_Tvtp)
+        || (PathList.IsLastPart && 1 <= PathList.Output_Tvtp))
       {
         string path;
         {
@@ -145,9 +146,9 @@ namespace LGLauncher.EditFrame
                             : PathList.TsDir;
           path = Path.Combine(dir, PathList.TsNameWithoutExt + ".chapter");
         }
+
         ConvertToFile.To_TvtpChap(path, editFrame, endFrame);
       }
-
 
       //Ogm
       if (PathList.IsLastPart && 1 <= PathList.Output_Tvtp)
@@ -159,14 +160,10 @@ namespace LGLauncher.EditFrame
                             : PathList.TsDir;
           path = Path.Combine(dir, PathList.TsNameWithoutExt + ".ogm.chapter");
         }
+
         ConvertToFile.To_OgmChap(path, editFrame, endFrame);
       }
     }
 
-  }
-
-
-
-
-
+  }//class
 }

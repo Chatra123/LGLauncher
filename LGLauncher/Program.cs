@@ -14,6 +14,7 @@ namespace LGLauncher
   {
     static MainMethod_Module module = new MainMethod_Module();
 
+
     private static void Main(string[] args)
     {
       ///*テスト用引数*/
@@ -22,7 +23,7 @@ namespace LGLauncher
       //                                    "-ts",
       //                                    @".\cap8s.ts",
       //                                    "-ch", "A", 
-      //                                    "-SequenceName", "pfA233740427248"
+      //                                    "-SequenceName", "160601200000122337"
       //                                  };
       //args = testArgs.ToArray();
 
@@ -63,7 +64,7 @@ namespace LGLauncher
           //適度に分割して初回のチャプター作成を早くする。
           int EndFrame_Max = trimFrame[1];
           bool isLastSplit;
-          splitTrim = module.CreateSplitTrim(EndFrame_Max, out isLastSplit);
+          splitTrim = module.MakeSplitTrim(EndFrame_Max, out isLastSplit);
           PathList.Set_IsLastSplit(isLastSplit);
         }
         else//IsAll
@@ -89,9 +90,9 @@ namespace LGLauncher
           * 
           * チャプター出力について
           * 　　エラーが発生してもチャプター出力は行う。
-          * 　　Detect Part No があるので *.p3.frame.cat.txtを作成しなくてはいけない。
+          * 　　Detect PartNo があるので *.p3.frame.cat.txtを作成しなくてはいけない。
           * 　　値は前回のチャプターと同じ値にする。
-          * 　　IsLastPartなら logo_scp_posのlast_batch、ogm chapter出力を実行する必要がある。。
+          * 　　IsLastPartなら join_logo_scpのlast_batch、chapter出力を実行する必要がある。。
           */
           HasError = true;
           Log.WriteLine();
@@ -148,7 +149,7 @@ namespace LGLauncher
         if (args.Count() == 0) return false;               //”引数無し”なら設定ファイル作成後に終了
 
         //パス作成
-        PathList.MakePath(cmdline, setting);
+        PathList.Initialize(cmdline, setting);
 
         ProhibitFileMove_LGL.Lock();
         CleanWorkItem.Clean_Beforehand();
@@ -165,7 +166,7 @@ namespace LGLauncher
       /// </summary>
       /// <param name="endFrame_Max">作成可能な最大の終了フレーム</param>
       /// <param name="isLastSplit">分割トリムの最後か？</param>
-      public int[] CreateSplitTrim(int endFrame_Max, out bool isLastSplit)
+      public int[] MakeSplitTrim(int endFrame_Max, out bool isLastSplit)
       {
         /*
          *  適度に分割して初回のチャプター作成を早くする。
@@ -180,7 +181,7 @@ namespace LGLauncher
         {
           //直前のトリム用フレーム数取得   previous
           //  trimFrame_prv[0] : previous begin frame
-          //  trimFrame_prv[1] : previous end frame
+          //  trimFrame_prv[1] : previous end   frame
           int[] trimFrame_prv = (2 <= PathList.PartNo)
                                     ? AvsVpyCommon.GetTrimFrame_previous()
                                     : null;

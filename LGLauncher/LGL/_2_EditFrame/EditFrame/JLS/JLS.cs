@@ -15,8 +15,8 @@ namespace LGLauncher.EditFrame.JLS
   public static class JLS
   {
     /// <summary>
-    ///  JLS  .p1.result.txt　→　List<int>　→　.p1.frame.txt
-    ///  JLSの出力をLogoGuilloの出力と同じ形式にする。
+    ///  JLSの出力をLogoGuilloと同じ形式にする。
+    ///    JLS  .p1.jls.result.txt　→　List<int>　→　.p1.frame.txt
     /// </summary>
     public static List<int> Result_to_Frame(bool islast_jls)
     {
