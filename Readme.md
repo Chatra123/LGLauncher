@@ -44,7 +44,7 @@ LGLauncher.exe  -last  -ts "C:\Video.ts"  -channel "abc"
 ### 引数１
 
     -ts "C:\video.ts"
-tsファイルのパス  
+tsファイルのフルパス  
 tsファイルのパスを元に各ファイルパスを作成します。  
 "C:\video.ts.pp.d2v"  
 "C:\video.ts.pp.lwi"  
@@ -68,28 +68,29 @@ tsと同じフォルダに d2v, lwi, srtをおいてください。
 LogoSelecterに渡すチャンネル名  
 
 
-    -program "defgh"
-LogoSelecterに渡すプログラム名  
-
-
     
 ------------------------------------------------------------------
 #### 引数２
 
-    -d2v "D:\rec\video.ts.d2v"
-d2vファイルパスの個別指定
+    -program "defgh"
+LogoSelecterに渡すプログラム名  
 
-
-    -lwi "D:\rec\video.ts.lwi"
-lwiファイルパスの個別指定
-
-
-    -srt "D:\rec\video.ts.srt"
-srtファイルパスの個別指定
 
     -SequenceName  20160701_2000
 作業フォルダ名の一部に使用  
-基本的には指定無しでも処理できます。
+基本的に無くても処理できます。
+
+
+    -d2v "D:\rec\video.ts.d2v"
+d2vパスの個別指定
+
+
+    -lwi "D:\rec\video.ts.lwi"
+lwiパスの個別指定
+
+
+    -srt "D:\rec\video.ts.srt"
+srtパスの個別指定
     
     
 
@@ -113,9 +114,6 @@ LG  :  LogoGuilloで処理
     Detector_MultipleRun  1  
 Winsows内での chapter_exe, LogoGuillo, logoframe同時実行数
 
-
-------------------------------------------------------------------
-####  設定２　チャプター出力
 
     Regard_NsecCM_AsMain  14.0  
 １４．０秒以下のＣＭ部を除去  
