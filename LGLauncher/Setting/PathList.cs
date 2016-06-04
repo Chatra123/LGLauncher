@@ -9,6 +9,15 @@ using System.Text.RegularExpressions;
 namespace LGLauncher
 {
   /// <summary>
+  /// DebugMode
+  /// </summary>
+  static class Debug
+  {
+    // format lwiをデバッグ用に別名で保存するか？
+    public const bool DebugMode = false;  // true  false
+  }
+
+  /// <summary>
   /// 入力プラグイン
   /// </summary>
   enum PluginType
@@ -37,17 +46,6 @@ namespace LGLauncher
     Join_Logo_Scp,
     LogoGuillo,
   }
-
-
-  /// <summary>
-  /// DebugMode
-  /// </summary>
-  static class Debug
-  {
-    // format lwiをデバッグ用に別名で保存するか？
-    public const bool DebugMode = false;  // true  false
-  }
-
 
 
   /// <summary>
@@ -112,14 +110,14 @@ namespace LGLauncher
     public static string WorkPath_prv { get { return Path.Combine(LWorkDir, WorkName_prv); } }
 
     //PartNo
-    //   1 <= No    IsPart
-    //  No  =  0    uninitialized value and detect No 
-    //  No  = -1    IsAll
-    //  -2 <= No    throw Exception
+    //   1 <= No  IsPart
+    //  No  =  0  uninitialized value and detect No 
+    //  No  = -1  IsAll
+    //  -2 <= No  throw Exception
     public static int PartNo { get; private set; }
-    public static bool IsPart { get { return 1 <= PartNo; } }
     public static bool Is1stPart { get { return PartNo == 1; } }
-    public static bool IsAll { get { return PartNo == -1; } }
+    public static bool IsPart { get { return 1 <= PartNo; } }
+    public static bool IsAll { get; private set; }
     private static string SequenceName;                      //作業フォルダ名のMD5に使用
 
     //コマンドラインに -IsLast があるか？
@@ -215,22 +213,19 @@ namespace LGLauncher
     /// <summary>
     /// パス作成
     /// </summary>
-    public static void MakePath(Setting_CmdLine cmdline, Setting_File setting)
+    public static void Initialize(Setting_CmdLine cmdline, Setting_File setting)
     {
-      //command line
-      Copy_FromCommandLine(cmdline);
+      Copy_fromCommandLine(cmdline);
 
-      //ts path
       Make_InputPath(setting);
 
-      //work dir
-      Make_WorkDir_and_DetectPartNo();
+      Make_WorkDir();
 
-      //get System binary
-      Make_SystemFile(setting);
+      Detect_PartNo();
 
-      //chapter
-      Make_Chap_and_Misc(setting);
+      Get_BinaryFile(setting);
+
+      Set_Chap_and_Misc(setting);
 
       Log_and_ErrorCheck();
     }
@@ -239,11 +234,10 @@ namespace LGLauncher
     /// <summary>
     /// コマンドラインから設定をコピー
     /// </summary>
-    private static void Copy_FromCommandLine(Setting_CmdLine cmdline)
+    private static void Copy_fromCommandLine(Setting_CmdLine cmdline)
     {
       //copy
-      PartNo = cmdline.No;
-      PartNo = (cmdline.IsAll) ? -1 : PartNo;
+      IsAll = cmdline.IsAll;
       HasLastFlag_OnCmdLine = cmdline.IsLast;
       SequenceName = cmdline.SequenceName ?? "";
 
@@ -252,14 +246,10 @@ namespace LGLauncher
       LwiPath = cmdline.LwiPath;
       SrtPath = cmdline.SrtPath;
 
-      Channel = cmdline.Channel;
-      Program = cmdline.Program;
+      Channel = cmdline.Channel ?? "";
+      Program = cmdline.Program ?? "";
 
       //エラーチェック
-      //PartNo
-      if (PartNo <= -2)
-        throw new LGLException("PartNo is less than equal -2");
-
       //Ts
       if (File.Exists(TsPath) == false)
         throw new LGLException("ts does not exist");
@@ -340,7 +330,7 @@ namespace LGLauncher
     /// <summary>
     /// WorkDirの設定
     /// </summary>
-    private static void Make_WorkDir_and_DetectPartNo()
+    private static void Make_WorkDir()
     {
       //App
       AppPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
@@ -369,50 +359,7 @@ namespace LGLauncher
       if (Directory.Exists(LWorkDir) == false)
         Directory.CreateDirectory(LWorkDir);
       //LWorkDirが作成されたので、ここからのログはLWorkDir内に書き出される。
-
-
-      //PartNo検出
-      if (PartNo == 0)
-        PartNo = new Func<int>(() =>
-      {
-        //TsShortName, LWorkDirの設定前だとこのFunc<int>()は処理できない。
-        //通常のExceptionを投げる
-        if (TsShortName == null) throw new Exception();
-        if (LWorkDir == null) throw new Exception();
-
-        // search *.p2.frame.cat.txt
-        var files = Directory.GetFiles(LWorkDir,
-                                       TsShortName + ".p*.frame.cat.txt");
-        // not found previous part file. set PartNo 1.
-        if (files.Count() == 0)
-          return 1;
-
-        //ファイル名  -->  PartNo抽出
-        var strNums = files.Select(fullname =>
-        {
-          //"ON&OF.p1.frame.cat.txt"
-          string name = Path.GetFileName(fullname);
-          //  "ON&OF.p"
-          int len_ts = (TsShortName + ".p").Length;
-          //     "1"  = "ON&OF.p1.frame.cat.txt"  -  "ON&OF.p"  -  ".frame.cat.txt"
-          int len_no = name.Length - len_ts - ".frame.cat.txt".Length;
-          string no = name.Substring(len_ts, len_no);
-          return no;
-        });
-
-        // string --> int
-        var intNums = strNums.Select(strnum =>
-        {
-          try { return int.Parse(strnum); }
-          catch { throw new LGLException("PartNo parse error"); }
-        }).ToList();
-
-        intNums.Sort();
-        intNums.Reverse();
-        return intNums[0] + 1;
-      })();
     }
-
 
 
     class Hash
@@ -433,9 +380,64 @@ namespace LGLauncher
 
 
     /// <summary>
-    /// LSystemフォルダ内の各バイナリを取得、設定
+    /// PartNo検出
     /// </summary>
-    private static void Make_SystemFile(Setting_File setting)
+    private static void Detect_PartNo()
+    {
+      // *.p2.frame.cat.txtを探し、ファイル名からPartNoを検出する
+ 
+      //検出用関数
+      var func_DetectPartNo = new Func<int>(() =>
+      {
+        // search *.p2.frame.cat.txt
+        var files = Directory.GetFiles(LWorkDir,
+                                       TsShortName + ".p*.frame.cat.txt");
+        // not found previous part file. set PartNo 1.
+        if (files.Count() == 0)
+          return 1;
+
+        //ファイル名  -->  PartNo抽出
+        var strNums = files.Select(fullname =>
+        {
+          //"movie.p1.frame.cat.txt"
+          string name = Path.GetFileName(fullname);
+          //  "movie.p"
+          int len_ts = (TsShortName + ".p").Length;
+          //     "1"  = "movie.p1.frame.cat.txt"  -  "movie.p"  -  ".frame.cat.txt"
+          int len_no = name.Length - len_ts - ".frame.cat.txt".Length;
+          string no = name.Substring(len_ts, len_no);
+          return no;
+        });
+
+        // string  -->  int
+        var intNums = strNums.Select(strnum =>
+        {
+          try { return int.Parse(strnum); }
+          catch { throw new LGLException("PartNo parse error"); }
+        }).ToList();
+
+        intNums.Sort();
+        intNums.Reverse();
+        return intNums[0] + 1;
+      });
+
+
+      //LWorkDir, TsShortNameの設定前だと func_DetectPartNo() は処理できない。
+      if (LWorkDir == null) throw new Exception();
+      if (TsShortName == null) throw new Exception();
+      
+      //検出
+      PartNo = IsAll ? -1 : func_DetectPartNo();
+
+      if (PartNo <= -2 || PartNo == 0)
+        throw new LGLException("Invalid PartNo.  PartNo = " + PartNo);
+    }
+
+
+    /// <summary>
+    /// LSystemフォルダ内の各バイナリを取得
+    /// </summary>
+    private static void Get_BinaryFile(Setting_File setting)
     {
       //ファイルリストから対象のフルパス取得
       var SearchItem_OrEmpty = new Func<FileInfo[], string, string>(
@@ -460,7 +462,7 @@ namespace LGLauncher
         });
 
 
-      //LSystemDirのファイル一覧を取得してから、各バイナリ検索
+      //ファイル一覧を取得
       var dirInfo = new DirectoryInfo(LSystemDir);
       var files = dirInfo.GetFiles("*", SearchOption.AllDirectories);
 
@@ -518,6 +520,7 @@ namespace LGLauncher
       //LogoSelector
       //  複数ある場合の優先順位は、
       //　    （高）  .exe .vbs .js  （低）
+      //   .vbs .jsは使用していないので削除してもいい
       var logoSelector_list = new string[] {
                                               SearchItem_OrEmpty(files, "LogoSelector.exe"),
                                               SearchItem_OrEmpty(files, "LogoSelector.vbs"),
@@ -531,7 +534,7 @@ namespace LGLauncher
     /// <summary>
     /// チャプター出力の設定
     /// </summary>
-    private static void Make_Chap_and_Misc(Setting_File setting)
+    private static void Set_Chap_and_Misc(Setting_File setting)
     {
       //edit chapter
       Regard_NsecCM_AsMain = setting.Regard_NsecCM_AsMain;
