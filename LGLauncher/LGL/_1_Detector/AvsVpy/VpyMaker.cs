@@ -46,9 +46,9 @@ namespace LGLauncher
       //開始フレーム　　（　直前の終了フレーム　＋　１　）
       int beginFrame;
       {
-        //直前のトリム用フレーム数取得   previous
+        //直前のトリム用フレーム数取得
         //  trimFrame_prv[0] : previous begin frame
-        //  trimFrame_prv[1] : previous end frame
+        //  trimFrame_prv[1] : previous end   frame
         int[] trimFrame_prv = (2 <= PathList.PartNo)
                                   ? AvsVpyCommon.GetTrimFrame_previous()
                                   : null;
@@ -127,18 +127,16 @@ namespace LGLauncher
     {
       var prc = new Process();
       {
-        var psi = new ProcessStartInfo();
-        psi.FileName = "python";
-        psi.Arguments = " \"" + vpyPath + "\"";
-        psi.CreateNoWindow = true;
-        psi.UseShellExecute = false;
-        prc.StartInfo = psi;
+        prc.StartInfo.FileName = "python";
+        prc.StartInfo.Arguments = " \"" + vpyPath + "\"";
+        prc.StartInfo.CreateNoWindow = true;
+        prc.StartInfo.UseShellExecute = false;
       }
 
       try
       {
         prc.Start();
-        prc.WaitForExit(6 * 1000);
+        prc.WaitForExit(60 * 1000);
         if (prc.HasExited && prc.ExitCode == 0)
           return;  //正常終了
       }
@@ -149,6 +147,7 @@ namespace LGLauncher
 
       Log.WriteLine("RunInfo process error");
       Log.WriteLine("  prc.ExitCode  =  " + prc.ExitCode);
+      Log.WriteLine("  prc.HasExited =  " + prc.HasExited);
     }
 
 

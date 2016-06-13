@@ -124,9 +124,11 @@ namespace LGLauncher
           PathList.IncrementPartNo();   //PartNo++で continue
       }
 
-      Log.Close();
+
       CleanWorkItem.Clean_Lastly();
+      Log.Close();                   /* Logは残すのでClean_Lastly()の後 */
     }
+
 
 
     #region MainMethod_Module
@@ -179,7 +181,7 @@ namespace LGLauncher
         //開始フレーム　　（　直前の終了フレーム　＋　１　）
         int beginFrame;
         {
-          //直前のトリム用フレーム数取得   previous
+          //直前のトリム用フレーム数取得
           //  trimFrame_prv[0] : previous begin frame
           //  trimFrame_prv[1] : previous end   frame
           int[] trimFrame_prv = (2 <= PathList.PartNo)

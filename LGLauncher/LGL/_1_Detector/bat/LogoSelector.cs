@@ -20,9 +20,9 @@ namespace LGLauncher
       var getdata = RunLogoSelector();
 
       if (getdata == null)
-        throw new LGLException("LogoSelector ret data is null");
+        throw new LGLException("LogoSelector return data is null");
       if (getdata.Count < 2)
-        throw new LGLException("LogoSelector ret data is -lt 2 lines");
+        throw new LGLException("LogoSelector return data is -lt 2 lines");
 
       string logoPath = getdata[0];
       string paramPath = getdata[1];
@@ -38,9 +38,9 @@ namespace LGLauncher
       var getdata = RunLogoSelector();
 
       if (getdata == null)
-        throw new LGLException("LogoSelector ret data is null");
+        throw new LGLException("LogoSelector return data is null");
       if (getdata.Count < 1)
-        throw new LGLException("LogoSelector ret data is -lt 1 lines");
+        throw new LGLException("LogoSelector return data is -lt 1 lines");
 
       string logoPath = getdata[0];
       return new List<string> { logoPath };
@@ -61,7 +61,7 @@ namespace LGLauncher
         exepath = PathList.LogoSelector;
         args = string.Format("  \"{0}\"   \"{1}\"   \"{2}\"  ",
                               PathList.Channel, PathList.Program, PathList.TsPath);
-        SetScriptLoader(ref exepath, ref args);
+        SetVbsScript(ref exepath, ref args);
       }
 
       //実行
@@ -86,17 +86,29 @@ namespace LGLauncher
 
 
     /// <summary>
-    /// vbsがセットされていたらcscript.exeに変更
+    /// vbsがセットされていたらcscript.exeに変更。
     /// batは変更しなくても処理できる。
     /// </summary>
-    private static void SetScriptLoader(ref string exepath, ref string args)
+    /// <returns>
+    ///       vbs &     exist  -->  true
+    ///           & not exist  -->  false
+    ///   not vbs              -->  false
+    /// </returns>
+    private static bool SetVbsScript(ref string exepath, ref string args)
     {
       var ext = System.IO.Path.GetExtension(exepath).ToLower();
-      if (ext == ".vbs" || ext == ".js")
+      var isVBS = (ext == ".vbs" || ext == ".js");
+
+      if (isVBS)
       {
-        string scriptPath = exepath;
+        string vbsPath = exepath;
         exepath = "cscript.exe";
-        args = string.Format(" \"{0}\"  {1} ", scriptPath, args);
+        args = string.Format(" \"{0}\"  {1} ", vbsPath, args);
+        return File.Exists(vbsPath);
+      }
+      else
+      {
+        return false;
       }
     }
 
@@ -106,24 +118,24 @@ namespace LGLauncher
     /// </summary>
     private static string Start_GetStdout(string exepath, string arg)
     {
-      var Process = new Process();
+      var prc = new Process();
       {
-        Process.StartInfo.FileName = exepath;
-        Process.StartInfo.Arguments = arg;
+        prc.StartInfo.FileName = exepath;
+        prc.StartInfo.Arguments = arg;
 
         //シェルコマンドを無効に、入出力をリダイレクトするなら必ずfalseに設定
-        Process.StartInfo.UseShellExecute = false;
+        prc.StartInfo.UseShellExecute = false;
         //入出力のリダイレクト
-        Process.StartInfo.RedirectStandardOutput = true;
+        prc.StartInfo.RedirectStandardOutput = true;
       }
 
       try
       {
-        //標準出力を取得、プロセス終了まで待機
-        Process.Start();
-        string result = Process.StandardOutput.ReadToEnd();
-        Process.WaitForExit();
-        Process.Close();
+        //標準出力を取得
+        prc.Start();
+        string result = prc.StandardOutput.ReadToEnd();
+        prc.WaitForExit();
+        prc.Close();
         return result;
       }
       catch (Exception exc)

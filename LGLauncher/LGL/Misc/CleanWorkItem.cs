@@ -17,7 +17,7 @@ namespace LGLauncher
 
     /// <summary>
     /// 処理の初回ならLWorkDir内のファイル削除
-    ///   以前の処理のファイルが残っていたら削除する。
+    ///   以前の処理のファイルが残っていたら削除。
     /// </summary>
     public static void Clean_Beforehand()
     {
@@ -47,7 +47,7 @@ namespace LGLauncher
         if (PathList.IsLastPart)
         {
           //LWorkDir
-          cleaner.Delete_File(0.0, PathList.LWorkDir, "_" + PathList.TsShortName + "*.sys.*");
+          cleaner.Delete_File(0.0, PathList.LWorkDir, "_" + PathList.TsShortName + "*.sys.*", ".log");
           cleaner.Delete_File(0.0, PathList.LWorkDir, PathList.TsShortName + "*");
         }
 
