@@ -8,14 +8,16 @@
 ------------------------------------------------------------------
 ### 使い方　　コマンドライン
 
-LGLauncher.exe         -ts "C:\Video.ts"  -channel "abc"  
+録画中のＴＳファイル
+    LGLauncher.exe         -ts "C:\Video.ts"  -channel "abc"  
+  最後のみ  
+    LGLauncher.exe  -last  -ts "C:\Video.ts"  -channel "abc"  
 
 
-最後のみ  
-LGLauncher.exe  -last  -ts "C:\Video.ts"  -channel "abc"  
+録画終了後のＴＳファイル
+    LGLauncher.exe  -all   -ts "C:\Video.ts"  -channel "abc"  
 
-
-
+  
 ------------------------------------------------------------------
 ### 必要なソフト
 
@@ -36,8 +38,8 @@ LGLauncher.exe  -last  -ts "C:\Video.ts"  -channel "abc"
    LSMASHSource.dll  
    を入れる。
 
-2. LogoSelector.exe を実行し設定ファイルを生成、  
-   LogoSelector.txtの"[LogoDir]"にlgd,paramファイルのあるフォルダを指定する。
+2. LSystemフォルダのLogoSelector.exe を実行し設定ファイルを生成。  
+   LogoSelector.txtの"[LogoDir]"に lgd, paramファイルのあるフォルダを指定する。
 
 
 ------------------------------------------------------------------
@@ -59,7 +61,7 @@ tsと同じフォルダに d2v, lwi, srtをおいてください。
 
 
     -all  
-ファイル全体を処理  
+録画終了後のＴＳファイルを処理  
 -lastの指定は必要ありません。  
 
  
@@ -256,9 +258,16 @@ AviSynthのファイル読込時にシステム側で使用します。
 
 - 設定ファイルで  
  ``` <InputPlugin>    lwi    </InputPlugin> ```  
- ``` <Detector>    JLS    </Detector> ```  
+ ``` <Detector>       JLS    </Detector> ```  
  に設定する。
-
+ 
+- LSystemフォルダに  
+   * avs2pipemod.exe
+   * avsinp.aui  
+   * join_logo_scp.exe  
+   * logoframe.exe  
+   を入れる。   
+ 
 - chpater_exe.exeは同梱のものでなくてもかまいません。安定して動くものを使用してください。  
   テスト環境では終了時にエラーが発生したので、同梱のchpater_exeは終了処理を変更しただけです。  
 
