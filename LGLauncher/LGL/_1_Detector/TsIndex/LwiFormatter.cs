@@ -23,7 +23,7 @@ namespace LGLauncher
     {
       if (PathList.InputPlugin != PluginType.Lwi) return;
 
-      string srcPath = Path.Combine(PathList.LWorkDir, PathList.TsShortName + ".lwi");
+      string srcPath = Path.Combine(PathList.LWorkDir, PathList.LwiPathInLWork);
       string dstPath = PathList.TsPath + ".lwi";
       bool isSameRoot = Path.GetPathRoot(srcPath).ToLower()
                            == Path.GetPathRoot(dstPath).ToLower();
@@ -55,7 +55,7 @@ namespace LGLauncher
     {
       if (PathList.InputPlugin != PluginType.Lwi) return;
 
-      string srcPath = PathList.TsPath + ".lwi";
+      string srcPath = PathList.LwiPathInLWork;
       string dstPath = Path.Combine(PathList.LWorkDir, PathList.TsShortName + ".lwi");
       bool isSameRoot = Path.GetPathRoot(srcPath).ToLower()
                            == Path.GetPathRoot(dstPath).ToLower();
@@ -81,25 +81,6 @@ namespace LGLauncher
       }
     }
 
-
-    /// <summary>
-    /// LwiファイルにTsDirに移動してから実行
-    /// PluginType.Lwiでない場合はそのままaction()
-    /// </summary>
-    [Obsolete]
-    public static void Action_withSetLwi(Action action)
-    {
-      try
-      {
-        LwiFile.Set_ifLwi();
-        action();
-      }
-      finally
-      {
-        LwiFile.Back_ifLwi();
-      }
-    }
-
   }
   #endregion LwiFile
 
@@ -118,22 +99,27 @@ namespace LGLauncher
     //書き換えの途中で読込み、不正なファイルになってもLSMASHSource.dllによって再作成されるだけ。
     //問題にはならない。
     /*
-     *              lwiのファイルサイズ
-     *                    1 hourで 40 - 70 MB                      
+     *lwiのファイルサイズ
+     *     60minで 40 - 70 MB                      
      * ts  60min    lwi  60.00 MB    783,927 line
      *      1min          1.00 MB     13,065 line
      *      1sec          0.16 MB        217 line
      */
-
 
     /// <summary>
     /// lwiのフォーマットを整える
     /// </summary>
     public static void Format()
     {
-      string outPath = PathList.LwiPathInLWork;
+      if (PathList.IsAll)
+      {
+        File.Copy(PathList.LwiPath, PathList.LwiPathInLWork, true);
+        return;
+      }
+
+      //IsPart
       var reader = new FileR(PathList.LwiPath);
-      var writer = new FileW(outPath);
+      var writer = new FileW(PathList.LwiPathInLWork);
       writer.SetNewline_n();
 
       try
@@ -146,7 +132,6 @@ namespace LGLauncher
 
         //簡易チェック
         {
-          //最低行数
           if (readBuff.Count < 100)
             throw new LGLException("lwi text is less than 100 lines");
 
@@ -192,13 +177,12 @@ namespace LGLauncher
           }
         }
 
-
         //lwi末尾
         //　writeBuff + readBuffで１００行以上は確実にある。
         writeBuff.AddRange(readBuff);
 
+
         //最後の"index=..."行以降を削除
-        //PathList.IsAll でも末尾は切り捨てる。
         {
           string pattern = @"Index=\d+,Type=\d+,Codec=\d+,";
           var matchLine = writeBuff.LastOrDefault(line => Regex.Match(line, pattern).Success);
@@ -215,30 +199,27 @@ namespace LGLauncher
         }
 
         //lwi末尾、フッター書込
+        var footer_bin = ReadFile_footer();         //footerファイル読込み bin
+        if (footer_bin != null)
         {
-          var footer_bin = ReadFile_footer();         //footerファイル読込み bin
+          //footer読込成功
+          //lwiの残りを書込み
+          writer.WriteText(writeBuff);
+          writer.Close();
 
-          if (footer_bin != null)
-          {
-            //footer読込成功
-            //lwiの残りを書込み
-            writer.WriteText(writeBuff);
-            writer.Close();
+          //footerをバイナリーモードで書込み
+          FileW.AppendBytes(PathList.LwiPathInLWork, footer_bin);
+        }
+        else
+        {
+          //読込失敗、footer作成
+          var footer_text = Create_footer(writeBuff);
+          if (footer_text == null)
+            throw new LGLException("fail to create footer_text");
 
-            //footerをバイナリーモードで書込み
-            FileW.AppendBytes(outPath, footer_bin);
-          }
-          else
-          {
-            //読込失敗、footer作成
-            var footer_text = Create_footer(writeBuff);
-            if (footer_text == null)
-              throw new LGLException("fail to create footer_text");
-
-            writer.WriteText(writeBuff);
-            writer.WriteText(footer_text);
-            writer.Close();
-          }
+          writer.WriteText(writeBuff);
+          writer.WriteText(footer_text);
+          writer.Close();
         }
 
         //デバッグ用のコピー  TsShortName.lwi  -->  TsShortName.p2.lwi
@@ -246,7 +227,7 @@ namespace LGLauncher
         {
 #pragma warning disable 0162           //警告0162：到達できないコード
           string outPath_part = PathList.WorkPath + ".lwi";
-          File.Copy(outPath, outPath_part, true);
+          File.Copy(PathList.LwiPathInLWork, outPath_part, true);
 #pragma warning restore 0162
         }
 
@@ -261,7 +242,7 @@ namespace LGLauncher
 
 
     /// <summary>
-    /// footerファイル読込    binaryモードで読み込む
+    /// footerファイル読込    バイナリーモードで読み込む
     /// </summary>
     /// <returns>
     /// 読込成功　→　byte[]
@@ -276,18 +257,16 @@ namespace LGLauncher
       const string Tag = "</LibavReaderIndexFile>\n";
       byte[] footer = null;
 
-      //footerは数秒間隔でファイル全体が更新されるので、
+      //footerは数秒間隔でファイル全体が更新されるので
       //</LibavReaderIndexFile>を確認するまで繰り返す。
       for (int i = 0; i < 3; i++)
       {
         if (File.Exists(PathList.LwiFooterPath) == false) return null;
 
-        //read
         footer = FileR.ReadBytes(PathList.LwiFooterPath);
 
         if (footer != null)
         {
-          //テキスト末尾の Tagを確認
           var footer_ascii = System.Text.Encoding.ASCII.GetString(footer);
           bool hasTag = footer_ascii.IndexOf(Tag) == (footer_ascii.Length - Tag.Length);
           if (hasTag)
@@ -311,6 +290,7 @@ namespace LGLauncher
       //lwiText line sample
       //  Key=0,Pic=3,POC=0,Repeat=1,Field=1,Width=1440,Height=1080,Format=yuv420p,ColorSpace=1
       //
+
       //Width, Height, Format取得
       string Width = "", Height = "", Format = "";
       var pattern = @"Key=\d+,.*,Width=(\d+),Height=(\d+),Format=([\w\d]+),.*";

@@ -47,8 +47,8 @@
     <Compile Include="LGL\Misc\ProhibitFileMove_LGL.cs" />
     <Compile Include="LGL\_1_Detector\AvsVpy\VpyMaker.cs" />
     <Compile Include="LGL\_1_Detector\AvsVpy\AvsMaker.cs" />
-    <Compile Include="LGL\_1_Detector\AvsVpy\Index\D2vFormatter.cs" />
-    <Compile Include="LGL\_1_Detector\AvsVpy\Index\LwiFormatter.cs" />
+    <Compile Include="LGL\_1_Detector\TsIndex\D2vFormatter.cs" />
+    <Compile Include="LGL\_1_Detector\TsIndex\LwiFormatter.cs" />
     <Compile Include="LGL\_1_Detector\WaitForSystemReady.cs" />
     <Compile Include="LGL\_1_Detector\bat\Bat_Join_Logo_Scp.cs" />
     <Compile Include="LGL\_1_Detector\bat\LogoSelector.cs" />

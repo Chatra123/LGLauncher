@@ -54,7 +54,6 @@ namespace LGLauncher
 
       //簡易チェック
       {
-        //最低行数
         if (readText.Count < 30)
           throw new LGLException("d2v text is less than 30 lines");
 
@@ -94,8 +93,7 @@ namespace LGLauncher
 
       //書
       {
-        string outPath = PathList.D2vNameInLWork;
-        File.WriteAllLines(outPath, formatText, TextEnc.Shift_JIS);
+        File.WriteAllLines(PathList.D2vPathInLWork, formatText, TextEnc.Shift_JIS);
 
         //デバッグ用のコピー  TsShortName.d2v  -->  TsShortName.p2.d2v
         if (Debug.DebugMode)

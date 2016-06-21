@@ -13,7 +13,7 @@ namespace LGLauncher
   /// </summary>
   static class Debug
   {
-    // format lwiをデバッグ用に別名で保存するか？
+    // format d2v, lwiをデバッグ用に別名で保存するか？
     public const bool DebugMode = false;  // true  false
   }
 
