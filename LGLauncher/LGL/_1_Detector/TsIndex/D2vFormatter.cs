@@ -95,14 +95,14 @@ namespace LGLauncher
       {
         File.WriteAllLines(PathList.D2vPathInLWork, formatText, TextEnc.Shift_JIS);
 
-        //デバッグ用のコピー  TsShortName.d2v  -->  TsShortName.p2.d2v
-        if (Debug.DebugMode)
-        {
 #pragma warning disable 0162           //警告0162：到達できないコード
+        //デバッグ用のコピー  TsShortName.d2v  -->  TsShortName.p2.d2v
+        if (Debug.CopyInxex)
+        {
           string outPath_part = PathList.WorkPath + ".d2v";
           File.WriteAllLines(outPath_part, formatText, TextEnc.Shift_JIS);
-#pragma warning restore 0162
         }
+#pragma warning restore 0162
       }
 
     }

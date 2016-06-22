@@ -23,18 +23,17 @@ namespace LGLauncher
     {
       if (PathList.InputPlugin != PluginType.Lwi) return;
 
-      string srcPath = Path.Combine(PathList.LWorkDir, PathList.LwiPathInLWork);
+      string srcPath = PathList.LwiPathInLWork;
       string dstPath = PathList.TsPath + ".lwi";
-      bool isSameRoot = Path.GetPathRoot(srcPath).ToLower()
+      bool hasSameRoot = Path.GetPathRoot(srcPath).ToLower()
                            == Path.GetPathRoot(dstPath).ToLower();
       try
       {
-        //すでにTsDirにlwiファイルがあるなら削除
-        if (File.Exists(dstPath))
-          File.Delete(dstPath);
+        //すでにファイルがあるなら削除
+        if (File.Exists(dstPath)) File.Delete(dstPath);
         Thread.Sleep(200);
 
-        if (isSameRoot)
+        if (hasSameRoot)
           File.Move(srcPath, dstPath);
         else
           File.Copy(srcPath, dstPath);
@@ -55,9 +54,9 @@ namespace LGLauncher
     {
       if (PathList.InputPlugin != PluginType.Lwi) return;
 
-      string srcPath = PathList.LwiPathInLWork;
-      string dstPath = Path.Combine(PathList.LWorkDir, PathList.TsShortName + ".lwi");
-      bool isSameRoot = Path.GetPathRoot(srcPath).ToLower()
+      string srcPath = PathList.TsPath + ".lwi";
+      string dstPath = PathList.LwiPathInLWork;
+      bool hasSameRoot = Path.GetPathRoot(srcPath).ToLower()
                            == Path.GetPathRoot(dstPath).ToLower();
       if (File.Exists(srcPath) == false) return;
 
@@ -69,7 +68,7 @@ namespace LGLauncher
           lock_lwi = null;
         }
 
-        if (isSameRoot)
+        if (hasSameRoot)
           File.Move(srcPath, dstPath);
         else
           File.Delete(srcPath);
@@ -111,6 +110,7 @@ namespace LGLauncher
     /// </summary>
     public static void Format()
     {
+      //IsAll
       if (PathList.IsAll)
       {
         File.Copy(PathList.LwiPath, PathList.LwiPathInLWork, true);
@@ -199,37 +199,34 @@ namespace LGLauncher
         }
 
         //lwi末尾、フッター書込
-        var footer_bin = ReadFile_footer();         //footerファイル読込み bin
+        var footer_bin = ReadFile_footer();         //footerファイル読込み binary
         if (footer_bin != null)
         {
-          //footer読込成功
-          //lwiの残りを書込み
+          //残りを書込み
           writer.WriteText(writeBuff);
           writer.Close();
 
-          //footerをバイナリーモードで書込み
           FileW.AppendBytes(PathList.LwiPathInLWork, footer_bin);
         }
         else
         {
           //読込失敗、footer作成
-          var footer_text = Create_footer(writeBuff);
-          if (footer_text == null)
-            throw new LGLException("fail to create footer_text");
+          var footer_new = Create_footer(writeBuff);
 
           writer.WriteText(writeBuff);
-          writer.WriteText(footer_text);
+          writer.WriteText(footer_new);
           writer.Close();
         }
 
-        //デバッグ用のコピー  TsShortName.lwi  -->  TsShortName.p2.lwi
-        if (Debug.DebugMode)
-        {
 #pragma warning disable 0162           //警告0162：到達できないコード
+        //デバッグ用のコピー  TsShortName.lwi  -->  TsShortName.p2.lwi
+        if (Debug.CopyInxex)
+        {
           string outPath_part = PathList.WorkPath + ".lwi";
           File.Copy(PathList.LwiPathInLWork, outPath_part, true);
-#pragma warning restore 0162
         }
+#pragma warning restore 0162
+
 
       }
       finally
@@ -313,8 +310,8 @@ namespace LGLauncher
         throw new LGLException("regex not match");
       }
 
-      //footerの置換
-      const string footer_const =
+      //footer作成
+      const string template =
                   @"</LibavReaderIndex>
                     <StreamDuration=0,0>-1</StreamDuration>
                     <StreamDuration=1,1>-1</StreamDuration>
@@ -328,7 +325,7 @@ namespace LGLauncher
                     </ExtraDataList>
                     </LibavReaderIndexFile>";
 
-      string footer = footer_const;
+      string footer = template;
       footer = Regex.Replace(footer, @"[ \t　]", "", RegexOptions.IgnoreCase);         //VisualStudio上での表示用スペース削除
       footer = Regex.Replace(footer, @"#Width#", Width, RegexOptions.IgnoreCase);
       footer = Regex.Replace(footer, @"#Height#", Height, RegexOptions.IgnoreCase);
