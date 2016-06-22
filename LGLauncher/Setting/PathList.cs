@@ -14,7 +14,7 @@ namespace LGLauncher
   static class Debug
   {
     // format d2v, lwiをデバッグ用に別名で保存するか？
-    public const bool DebugMode = false;  // true  false
+    public const bool CopyInxex = false;  // true  false
   }
 
   /// <summary>
@@ -101,13 +101,13 @@ namespace LGLauncher
 
     //  WorkPath                example
     //    current  work path      C:\EDCB\Write\Write_PF\LGLauncher\LWork\010101_ショップジ_0a1b308c1\ショップジ.p3
-    //                            ショップジ.p3
+    //                  name      ショップジ.p3
     //    previous work path      C:\EDCB\Write\Write_PF\LGLauncher\LWork\010101_ショップジ_0a1b308c1\ショップジ.p2
-    //                            ショップジ.p2
-    public static string WorkName { get { return (IsAll) ? TsShortName + ".all" : TsShortName + ".p" + PartNo; } }
+    //                  name      ショップジ.p2
     public static string WorkPath { get { return Path.Combine(LWorkDir, WorkName); } }
-    public static string WorkName_prv { get { return TsShortName + ".p" + (PartNo - 1); } }
+    public static string WorkName { get { return (IsAll) ? TsShortName + ".all" : TsShortName + ".p" + PartNo; } }
     public static string WorkPath_prv { get { return Path.Combine(LWorkDir, WorkName_prv); } }
+    public static string WorkName_prv { get { return TsShortName + ".p" + (PartNo - 1); } }
 
     //PartNo
     //   1 <= No  IsPart
@@ -196,7 +196,7 @@ namespace LGLauncher
     public static double Regard_NsecCM_AsMain { get; private set; }
     public static double Regard_NsecMain_AsCM { get; private set; }
 
-    //enable output
+    //chapter output mode
     public static int Output_Tvtp { get; private set; }
     public static int Output_Ogm { get; private set; }
     public static int Output_Frame { get; private set; }
@@ -206,12 +206,12 @@ namespace LGLauncher
     public static string DirPath_Tvtp { get; private set; }
     public static string DirPath_Misc { get; private set; }
 
-    //  [  Clean Work item  ]
+    //  [  Clean Work Item  ]
     public static int Mode_CleanWorkItem { get; private set; }
 
 
     /// <summary>
-    /// パス作成
+    /// 初期化、パス作成
     /// </summary>
     public static void Initialize(Setting_CmdLine cmdline, Setting_File setting)
     {
@@ -249,7 +249,7 @@ namespace LGLauncher
       Channel = cmdline.Channel ?? "";
       Program = cmdline.Program ?? "";
 
-      //エラーチェック
+      //ファイルチェック
       //Ts
       if (File.Exists(TsPath) == false)
         throw new LGLException("ts does not exist");
@@ -384,18 +384,28 @@ namespace LGLauncher
     /// </summary>
     private static void Detect_PartNo()
     {
-      // *.p2.frame.cat.txtを探し、ファイル名からPartNoを検出する
- 
-      //検出用関数
-      var func_DetectPartNo = new Func<int>(() =>
-      {
-        // search *.p2.frame.cat.txt
-        var files = Directory.GetFiles(LWorkDir,
-                                       TsShortName + ".p*.frame.cat.txt");
-        // not found previous part file. set PartNo 1.
-        if (files.Count() == 0)
-          return 1;
+      //LWorkDir, TsShortNameの設定前だと処理できない。
+      if (LWorkDir == null) throw new Exception();
+      if (TsShortName == null) throw new Exception();
 
+      //IsAll
+      if (IsAll)
+      {
+        PartNo = -1;
+        return;
+      }
+
+      //IsPart
+      //  search *.p2.frame.cat.txt  ファイル名からPartNoを決定する
+      var files = Directory.GetFiles(LWorkDir,
+                                     TsShortName + ".p*.frame.cat.txt");
+      if (files.Count() == 0)
+      {
+        // not found previous part file. set PartNo 1.
+        PartNo = 1;
+      }
+      else
+      {
         //ファイル名  -->  PartNo抽出
         var strNums = files.Select(fullname =>
         {
@@ -418,20 +428,13 @@ namespace LGLauncher
 
         intNums.Sort();
         intNums.Reverse();
-        return intNums[0] + 1;
-      });
-
-
-      //LWorkDir, TsShortNameの設定前だと func_DetectPartNo() は処理できない。
-      if (LWorkDir == null) throw new Exception();
-      if (TsShortName == null) throw new Exception();
-      
-      //検出
-      PartNo = IsAll ? -1 : func_DetectPartNo();
+        PartNo = intNums[0] + 1;
+      }
 
       if (PartNo <= -2 || PartNo == 0)
         throw new LGLException("Invalid PartNo.  PartNo = " + PartNo);
     }
+
 
 
     /// <summary>
