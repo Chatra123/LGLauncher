@@ -32,11 +32,11 @@ namespace LGLauncher
       AppDomain.CurrentDomain.UnhandledException += OctNov.Excp.ExceptionInfo.OnUnhandledException;
 
 
+      //初期設定
       string cmdline_ToString = "";  //ログ用のコマンドライン情報
       int[] trimFrame = null;        //avsの有効フレーム範囲
       try
       {
-        //初期設定
         bool initialized = module.Initialize(args, out cmdline_ToString);
         if (initialized == false) return;
 
@@ -78,7 +78,8 @@ namespace LGLauncher
         bool HasError = false;
         try
         {
-          module.DetectFrame(splitTrim);
+          string batpath = module.MakeDetecotrBat(splitTrim);
+          module.RunDetectorBat(splitTrim, batpath);
         }
         catch (LGLException e)
         {
@@ -92,7 +93,7 @@ namespace LGLauncher
           * 　　エラーが発生してもチャプター出力は行う。
           * 　　Detect PartNo があるので *.p3.frame.cat.txtを作成しなくてはいけない。
           * 　　値は前回のチャプターと同じ値にする。
-          * 　　IsLastPartなら join_logo_scpのlast_batch、chapter出力を実行する必要がある。。
+          * 　　IsLastPartならば join_logo_scpのlast_batch、chapter出力を実行する必要がある。
           */
           HasError = true;
           Log.WriteLine();
@@ -121,12 +122,12 @@ namespace LGLauncher
         if (PathList.IsLastSplit || PathList.IsAll || HasError)
           break;
         else
-          PathList.IncrementPartNo();   //PartNo++で continue
+          PathList.IncrementPartNo();  //PartNo++で continue
       }
 
 
       CleanWorkItem.Clean_Lastly();
-      Log.Close();                   /* Logは残すのでClean_Lastly()の後 */
+      Log.Close();                     //Logは残すのでClean_Lastly()の後
     }
 
 
@@ -142,13 +143,9 @@ namespace LGLauncher
         var cmdline = new Setting_CmdLine(args);
         cmdline_ToString = cmdline.ToString();
 
-        string AppPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-        string AppDir = System.IO.Path.GetDirectoryName(AppPath);
-        Directory.SetCurrentDirectory(AppDir);
-
         var setting = Setting_File.LoadFile();
         if (setting.Enable <= 0) return false;
-        if (args.Count() == 0) return false;               //”引数無し”なら設定ファイル作成後に終了
+        if (args.Count() == 0) return false;               //”引数０”なら設定ファイル作成後に終了
 
         //パス作成
         PathList.Initialize(cmdline, setting);
@@ -228,9 +225,9 @@ namespace LGLauncher
 
 
       /// <summary>
-      /// フレーム検出
+      /// フレーム検出　bat作成
       /// </summary>
-      public void DetectFrame(int[] trimFrame)
+      public string MakeDetecotrBat(int[] trimFrame)
       {
         //avs
         string avsPath;
@@ -264,40 +261,59 @@ namespace LGLauncher
                                           logo_param[0], logo_param[1]);
           }
         }
+        return batPath;
+      }
 
-        WaitForSystemReady waitForReady = null;
-        try
+
+      /// <summary>
+      /// フレーム検出　bat実行
+      /// </summary>
+      public void RunDetectorBat(int[] trimFrame, string batPath)
+      {
+        //retry
+        //  Windows sleep でタイムアウトしたらリトライする。
+        for (int retry = 0; retry <= 2; retry++)
         {
-          //Mutex取得
+          WaitForSystemReady waitForReady = null;
+          try
           {
-            waitForReady = new WaitForSystemReady();
-            bool isReady = waitForReady.GetReady(PathList.DetectorName, PathList.Detector_MultipleRun);
-            if (isReady == false) return;
-          }
+            //Semaphore取得
+            {
+              waitForReady = new WaitForSystemReady();
+              bool isReady = waitForReady.GetReady(PathList.DetectorName, PathList.Detector_MultipleRun);
+              if (isReady == false) return;
+            }
 
-          //timeout
-          int timeout_ms;
+            int timeout_ms;
+            {
+              //  ”avsの総時間”の３倍
+              int len_frame = trimFrame[1] - trimFrame[0] + 1;
+              double len_sec = 1.0 * len_frame / 29.970;
+              timeout_ms = (int)(len_sec * 3) * 1000;
+              timeout_ms = timeout_ms <= 30 * 1000 ? 90 * 1000 : timeout_ms;
+            }
+
+            //Bat実行
+            bool need_retry;
+            LwiFile.Set_ifLwi();
+            BatLauncher.Launch(batPath, out need_retry, timeout_ms);
+            if (need_retry)
+              continue;
+            else
+              break;
+          }
+          finally
           {
-            //  ”avsの総時間”の３倍
-            int len_frame = trimFrame[1] - trimFrame[0] + 1;
-            double len_sec = 1.0 * len_frame / 29.970;
-            timeout_ms = (int)(len_sec * 3) * 1000;
-            timeout_ms = timeout_ms <= 30 * 1000 ? 90 * 1000 : timeout_ms;
+            LwiFile.Back_ifLwi();
+
+            //Semaphore解放
+            if (waitForReady != null)
+              waitForReady.Release();
           }
-
-          //Bat実行
-          LwiFile.Set_ifLwi();
-          BatLauncher.Launch(batPath, timeout_ms);
-        }
-        finally
-        {
-          LwiFile.Back_ifLwi();
-
-          //Mutex解放
-          if (waitForReady != null)
-            waitForReady.Release();
         }
       }
+
+
     } //class MainMethod_Module 
     #endregion
 

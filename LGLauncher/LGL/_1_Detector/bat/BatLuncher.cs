@@ -7,63 +7,54 @@ using System.Threading;
 using System.Diagnostics;
 using System.IO;
 
+
 namespace LGLauncher
 {
   static class BatLauncher
   {
     /// <summary>
-    /// Detector実行
+    /// Bat実行　タイムアウト無し
     /// </summary>
-    public static void Launch(string batPath, int timeout_ms = -1)
+    public static void Launch(string batPath)
     {
-      //LogoGuilloでエラーが発生しても一度だけリトライする
-      for (int retry = 1; retry <= 2; retry++)
+      bool timeout_byWin;
+      Launch(batPath, out timeout_byWin, -1);
+    }
+
+    /// <summary>
+    /// Bat実行　タイムアウト検出
+    /// </summary>
+    public static void Launch(string batPath, out bool timeout_byWin, int timeout_ms = -1)
+    {
+      if (File.Exists(batPath) == false) throw new LGLException("not exist detector bat");
+
+      var startTime = DateTime.Now;
+      Launch_core(batPath, timeout_ms);
+
+      var elapse_ms = (DateTime.Now - startTime).TotalMilliseconds;
+      if (timeout_ms + 5 * 1000 < elapse_ms)
       {
-        try
-        {
-          var startTime = DateTime.Now;
-          Launch_core(batPath, timeout_ms);
-
-          //Windows Sleepが原因のタイムアウト
-          //  timeout_msから１０秒以上経過している。
-          var elapse_ms = (DateTime.Now - startTime).TotalMilliseconds;
-          if (timeout_ms + 10 * 1000 < elapse_ms)
-          {
-            Log.WriteLine("bat timeout by windows sleep");
-            retry--;
-            continue;
-          }
-
-          break;//正常終了
-        }
-        catch (LGLException e)
-        {
-          if (retry == 2)
-          {
-            throw;
-          }
-          else
-          {
-            Log.WriteLine();
-            Log.WriteLine(e.Message);
-            Log.WriteLine("Retry BatLuncher");
-            continue;
-          }
-        }
+        //Windows Sleepが原因のタイムアウト
+        Log.WriteLine("    timeout by windows sleep");
+        timeout_byWin = true;
+        return;
+      }
+      else
+      {
+        //正常終了
+        timeout_byWin = false;
+        return;
       }
     }
 
 
     /// <summary>
-    /// Detector実行
+    /// Bat実行　　プロセス実行
     /// </summary>
     private static void Launch_core(string batPath, int timeout_ms)
     {
-      if (File.Exists(batPath) == false)
-        throw new LGLException("not exist detector bat");
-
-      int exitCode = -1;
-      bool hasExisted = false;
+      int exitCode;
+      bool hasExisted;
       {
         var prc = new Process();
         prc.StartInfo.FileName = batPath;
@@ -73,7 +64,7 @@ namespace LGLauncher
         prc.WaitForExit(timeout_ms);
 
         hasExisted = prc.HasExited;
-        exitCode = hasExisted ? prc.ExitCode : -1;
+        exitCode = hasExisted ? prc.ExitCode : -100;
         if (hasExisted == false) prc.Kill();
         prc.Close();
       }
