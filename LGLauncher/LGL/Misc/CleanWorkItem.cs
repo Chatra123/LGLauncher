@@ -16,7 +16,7 @@ namespace LGLauncher
     static FileCleaner cleaner = new FileCleaner();
 
     /// <summary>
-    /// 処理の初回ならLWorkDir内のファイル削除
+    /// LWorkDir内のファイル削除
     ///   以前の処理のファイルが残っていたら削除。
     /// </summary>
     public static void Clean_Beforehand()
@@ -24,10 +24,10 @@ namespace LGLauncher
       //LWorkDir
       if (PathList.Is1stPart || PathList.IsAll)
       {
-        cleaner.Delete_File(0.0, PathList.LWorkDir, PathList.TsShortName + ".frame.cat.txt");  //前回までの合成フレーム
-        cleaner.Delete_File(0.0, PathList.LWorkDir, PathList.TsShortName + ".jls.*");
-        cleaner.Delete_File(0.0, PathList.LWorkDir, PathList.TsShortName + ".d2v");
-        cleaner.Delete_File(0.0, PathList.LWorkDir, PathList.TsShortName + ".lwi");
+        cleaner.Delete_File(0.0, PathList.LWorkDir, "*.frame.cat.txt");  //前回までの合成フレーム
+        cleaner.Delete_File(0.0, PathList.LWorkDir, "*.jls.*");
+        cleaner.Delete_File(0.0, PathList.LWorkDir, "*.d2v");
+        cleaner.Delete_File(0.0, PathList.LWorkDir, "*.lwi");
 
         if (PathList.Is1stPart)
           cleaner.Delete_File(0.0, PathList.LWorkDir, "*.p?*.*");                              //ワイルドカード指定可
@@ -94,7 +94,7 @@ namespace LGLauncher
     /// <summary>
     /// ファイル削除
     /// </summary>
-    /// <param name="nDaysBefore">Ｎ日前のファイルを削除対象にする</param>
+    /// <param name="nDaysBefore">Ｎ日前のファイルを削除対象にする。</param>
     /// <param name="directory">ファイルを探すフォルダ。　サブフォルダ内も対象</param>
     /// <param name="searchKey">ファイル名に含まれる文字。ワイルドカード可 * </param>
     /// <param name="ignoreKey">除外するファイルに含まれる文字。ワイルドカード不可 × </param>
