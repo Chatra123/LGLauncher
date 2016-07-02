@@ -343,6 +343,7 @@ namespace LGLauncher
       if (Directory.Exists(LSystemDir) == false)
         Directory.CreateDirectory(LSystemDir);
 
+
       //
       //WorkDir
       //    衝突は考えない、重複チェックはしてない。
@@ -388,21 +389,23 @@ namespace LGLauncher
       if (LWorkDir == null) throw new Exception();
       if (TsShortName == null) throw new Exception();
 
-      //IsAll
-      if (IsAll)
-      {
-        PartNo = -1;
-        return;
-      }
+      PartNo = IsAll ? -1 : Detect_PartNo_fromFileName();
 
-      //IsPart
+      if (PartNo <= -2 || PartNo == 0)
+        throw new LGLException("Invalid PartNo.  PartNo = " + PartNo);
+    }
+    /// <summary>
+    /// PartNo検出  ファイル名から値を取得
+    /// </summary>
+    private static int Detect_PartNo_fromFileName()
+    {
       //  search *.p2.frame.cat.txt  ファイル名からPartNoを決定する
       var files = Directory.GetFiles(LWorkDir,
                                      TsShortName + ".p*.frame.cat.txt");
       if (files.Count() == 0)
       {
         // not found previous part file. set PartNo 1.
-        PartNo = 1;
+        return 1;
       }
       else
       {
@@ -428,11 +431,8 @@ namespace LGLauncher
 
         intNums.Sort();
         intNums.Reverse();
-        PartNo = intNums[0] + 1;
+        return intNums[0] + 1;
       }
-
-      if (PartNo <= -2 || PartNo == 0)
-        throw new LGLException("Invalid PartNo.  PartNo = " + PartNo);
     }
 
 
@@ -513,17 +513,17 @@ namespace LGLauncher
         }
         catch (IOException)
         {
-          //別プロセスとぶつかった
+          //多重起動で別プロセスとぶつかった
           System.Threading.Thread.Sleep(300);
           if (File.Exists(AVSPLG) == false)
-            throw new LGLException("USE_AVS creating error ");
+            throw new LGLException("USE_AVS creating error");
         }
       }
 
       //LogoSelector
       //  複数ある場合の優先順位は、
       //　    （高）  .exe .vbs .js  （低）
-      //   .vbs .jsは使用していないので削除してもいい
+      //  16/06/23    .vbs .jsは使用していないので削除してもいい
       var logoSelector_list = new string[] {
                                               SearchItem_OrEmpty(files, "LogoSelector.exe"),
                                               SearchItem_OrEmpty(files, "LogoSelector.vbs"),

@@ -17,7 +17,7 @@ namespace LGLauncher
     private static FileStream lock_lwi;
 
     /// <summary>
-    /// lwiをTsDirに移動
+    /// lwi  Workdir --> TsDir に移動
     /// </summary>
     public static void Set_ifLwi()
     {
@@ -48,7 +48,7 @@ namespace LGLauncher
     }
 
     /// <summary>
-    /// lwiをTsDirから戻す
+    /// lwi  TsDir --> Workdir に戻す
     /// </summary>
     public static void Back_ifLwi()
     {
