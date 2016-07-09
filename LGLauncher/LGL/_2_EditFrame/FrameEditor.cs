@@ -114,6 +114,8 @@ namespace LGLauncher.EditFrame
         editFrame = new List<int>(rawFrame);
         editFrame = EditFrame.FlatOut_CM__(editFrame, PathList.Regard_NsecCM_AsMain);
         editFrame = EditFrame.FlatOut_Main(editFrame, PathList.Regard_NsecMain_AsCM);
+        editFrame = EditFrame.FlatOut_CM__(editFrame, PathList.Regard_NsecCM_AsMain);
+        editFrame = EditFrame.FlatOut_Main(editFrame, PathList.Regard_NsecMain_AsCM);
       }
 
 
