@@ -21,22 +21,15 @@ namespace LGLauncher
     /// <summary>
     /// Format  d2v, lwi Index
     /// </summary>
-    public static void Format()
+    public static void Format(bool FormatD2v)
     {
-      if (HasFormatted == false)
-      {
-        HasFormatted = true;
+      if (HasFormatted) return;
+      HasFormatted = true;
 
-        if (PathList.InputPlugin == PluginType.D2v)
-        {
-          D2vFormatter.Format();
-        }
-        else if (PathList.InputPlugin == PluginType.Lwi)
-        {
-          LwiFormatter.Format();
-        }
-
-      }
+      if (FormatD2v)
+        D2vFormatter.Format();
+      else
+        LwiFormatter.Format();
     }
   }
 
@@ -92,19 +85,16 @@ namespace LGLauncher
       }
 
       //書
-      {
-        File.WriteAllLines(PathList.D2vPathInLWork, formatText, TextEnc.Shift_JIS);
+      File.WriteAllLines(PathList.D2vPathInLWork, formatText, TextEnc.Shift_JIS);
 
 #pragma warning disable 0162           //警告0162：到達できないコード
-        //デバッグ用のコピー  TsShortName.d2v  -->  TsShortName.p2.d2v
-        if (Debug.CopyInxex)
-        {
-          string outPath_part = PathList.WorkPath + ".d2v";
-          File.WriteAllLines(outPath_part, formatText, TextEnc.Shift_JIS);
-        }
-#pragma warning restore 0162
+      //デバッグ用のコピー  TsShortName.d2v  -->  TsShortName.p2.d2v
+      if (Debug.CopyIndex)
+      {
+        string outPath_part = PathList.WorkPath + ".d2v";
+        File.WriteAllLines(outPath_part, formatText, TextEnc.Shift_JIS);
       }
-
+#pragma warning restore 0162
     }
   }
 }

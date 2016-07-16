@@ -23,11 +23,11 @@ namespace LGLauncher
     {
       //総フレーム数取得用スクリプト　作成、実行
       {
-        string infoPath = module.CreateInfo_vpy();
+        string path = module.CreateInfo_vpy();
         try
         {
           LwiFile.Set_ifLwi();
-          module.RunInfo_vpy(infoPath);
+          module.RunInfo_vpy(path);
         }
         finally
         {
@@ -38,8 +38,8 @@ namespace LGLauncher
       //総フレーム数取得
       int totalframe;
       {
-        string infoText = Path.Combine(PathList.LWorkDir, PathList.WorkName + ".info.txt");
-        var info = AvsVpyCommon.GetInfo_fromText(infoText);
+        string path = Path.Combine(PathList.LWorkDir, PathList.WorkName + ".info.txt");
+        var info = AvsVpyCommon.GetInfo_fromText(path);
         totalframe = (int)info[0];
       }
 
@@ -94,13 +94,13 @@ namespace LGLauncher
         line = Regex.Replace(line, "#LWorkDir#", PathList.LWorkDir, RegexOptions.IgnoreCase);
 
         //Plugin
-        if (PathList.InputPlugin == PluginType.D2v)
+        if (PathList.InputPlugin == Plugin.D2v)
         {
           line = Regex.Replace(line, "#d2v#", "", RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#d2vsource#", PathList.d2vsource_dll, RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#D2vName#", PathList.D2vNameInLWork, RegexOptions.IgnoreCase);
         }
-        else if (PathList.InputPlugin == PluginType.Lwi)
+        else if (PathList.InputPlugin == Plugin.Lwi)
         {
           line = Regex.Replace(line, "#lwi#", "", RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#vslsmashsoruce#", PathList.vslsmashsource_dll, RegexOptions.IgnoreCase);
@@ -165,13 +165,13 @@ namespace LGLauncher
       {
         var line = text[i];
         //Plugin
-        if (PathList.InputPlugin == PluginType.D2v)
+        if (PathList.InputPlugin == Plugin.D2v)
         {
           line = Regex.Replace(line, "#d2v#", "", RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#d2vsource#", PathList.d2vsource_dll, RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#D2vName#", PathList.D2vNameInLWork, RegexOptions.IgnoreCase);
         }
-        else if (PathList.InputPlugin == PluginType.Lwi)
+        else if (PathList.InputPlugin == Plugin.Lwi)
         {
           line = Regex.Replace(line, "#lwi#", "", RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#vslsmashsoruce#", PathList.vslsmashsource_dll, RegexOptions.IgnoreCase);

@@ -21,7 +21,7 @@ namespace LGLauncher
     /// </summary>
     public static void Set_ifLwi()
     {
-      if (PathList.InputPlugin != PluginType.Lwi) return;
+      if (PathList.InputPlugin != Plugin.Lwi) return;
 
       string srcPath = PathList.LwiPathInLWork;
       string dstPath = PathList.TsPath + ".lwi";
@@ -52,7 +52,7 @@ namespace LGLauncher
     /// </summary>
     public static void Back_ifLwi()
     {
-      if (PathList.InputPlugin != PluginType.Lwi) return;
+      if (PathList.InputPlugin != Plugin.Lwi) return;
 
       string srcPath = PathList.TsPath + ".lwi";
       string dstPath = PathList.LwiPathInLWork;
@@ -165,7 +165,7 @@ namespace LGLauncher
 
           if (readBuff.Count() == 8 * 1000)
           {
-            writer.WriteText(writeBuff);           //write file
+            writer.WriteLine(writeBuff);           //write file
             writeBuff = readBuff;                  //copy reference
             readBuff = new List<string>();         //initialize buff reference
           }
@@ -202,8 +202,8 @@ namespace LGLauncher
         var footer_bin = ReadFile_footer();         //footerファイル読込み binary
         if (footer_bin != null)
         {
-          //残りを書込み
-          writer.WriteText(writeBuff);
+          //先に残りを書込み
+          writer.WriteLine(writeBuff);
           writer.Close();
 
           FileW.AppendBytes(PathList.LwiPathInLWork, footer_bin);
@@ -213,14 +213,14 @@ namespace LGLauncher
           //読込失敗、footer作成
           var footer_new = Create_footer(writeBuff);
 
-          writer.WriteText(writeBuff);
-          writer.WriteText(footer_new);
+          writer.WriteLine(writeBuff);
+          writer.WriteLine(footer_new);
           writer.Close();
         }
 
 #pragma warning disable 0162           //警告0162：到達できないコード
         //デバッグ用のコピー  TsShortName.lwi  -->  TsShortName.p2.lwi
-        if (Debug.CopyInxex)
+        if (Debug.CopyIndex)
         {
           string outPath_part = PathList.WorkPath + ".lwi";
           File.Copy(PathList.LwiPathInLWork, outPath_part, true);
@@ -283,10 +283,10 @@ namespace LGLauncher
     /// </summary>
     private static string Create_footer(List<string> lwiText)
     {
-      //
-      //lwiText line sample
-      //  Key=0,Pic=3,POC=0,Repeat=1,Field=1,Width=1440,Height=1080,Format=yuv420p,ColorSpace=1
-      //
+      /*
+        lwiText line sample
+          Key=0,Pic=3,POC=0,Repeat=1,Field=1,Width=1440,Height=1080,Format=yuv420p,ColorSpace=1
+      */
 
       //Width, Height, Format取得
       string Width = "", Height = "", Format = "";

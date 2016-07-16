@@ -14,7 +14,6 @@ namespace LGLauncher
   /// </summary>
   class Setting_CmdLine
   {
-    //public int No { get; private set; }
     public bool IsLast { get; private set; }
     public bool IsAll { get; private set; }
     public string SequenceName { get; private set; }  //作業フォルダ名後半のハッシュ用
@@ -50,7 +49,7 @@ namespace LGLauncher
       //オプションの最後に=をつける。 bool型ならつけない。
       var optionset = new OptionSet_icase();
       optionset
-        .Add("all", "Is etire part", (v) => this.IsAll = v != null)
+        .Add("all", "Is all", (v) => this.IsAll = v != null)
         .Add("last", "Is last part", (v) => this.IsLast = v != null)
 
         .Add("ts=", "ts file path", (v) => this.TsPath = v)

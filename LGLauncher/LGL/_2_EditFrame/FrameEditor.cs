@@ -37,7 +37,7 @@ namespace LGLauncher.EditFrame
       //JLSの出力をLogoGuilloと同じ形式にする。
       //  Join_Logo_Scp
       //     *.p1.jls.result.txt  -->  *.p1.frame.txt
-      if (PathList.Detector == DetectorType.Join_Logo_Scp)
+      if (PathList.Detector == Detector.Join_Logo_Scp)
       {
         JLS.JLS.Result_to_Frame(false);
 
@@ -108,6 +108,18 @@ namespace LGLauncher.EditFrame
       }
 
 
+      ////短いＭａｉｎ、ＣＭを潰す
+      //Log.WriteLine("Regard_NsecCM_AsMain = " + PathList.Regard_NsecCM_AsMain);
+      //Log.WriteLine("Regard_NsecMain_AsCM = " + PathList.Regard_NsecMain_AsCM);
+      //List<int> editFrame0 = null;
+      //{
+      //  editFrame0 = new List<int>(rawFrame);
+      //  editFrame0 = EditFrame.FlatOut_CM__(editFrame0, 29);
+      //  editFrame0 = EditFrame.FlatOut_Main(editFrame0, 14);
+      //}
+      //return;
+
+
       //短いＭａｉｎ、ＣＭを潰す
       List<int> editFrame = null;
       {
@@ -134,7 +146,7 @@ namespace LGLauncher.EditFrame
           path = Path.Combine(dir, name);
         }
 
-        ConvertToFile.To_FrameFile(path, rawFrame, endFrame);
+        ConvertToFile.To_FrameFile(path, editFrame, endFrame);
       }
 
       //TvtPlay

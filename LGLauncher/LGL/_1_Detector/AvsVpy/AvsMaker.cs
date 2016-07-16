@@ -21,11 +21,11 @@ namespace LGLauncher
     {
       //総フレーム数取得用スクリプト　作成、実行
       {
-        string infoPath = module.CreateInfo_avs();
+        string path = module.CreateInfo_avs();
         try
         {
           LwiFile.Set_ifLwi();
-          module.RunInfo_avs(infoPath);
+          module.RunInfo_avs(path);
         }
         finally
         {
@@ -36,8 +36,8 @@ namespace LGLauncher
       //総フレーム数取得
       int totalframe = 0;
       {
-        string infoText = Path.Combine(PathList.LWorkDir, PathList.WorkName + ".info.txt");
-        var info = AvsVpyCommon.GetInfo_fromText(infoText);
+        string path = Path.Combine(PathList.LWorkDir, PathList.WorkName + ".info.txt");
+        var info = AvsVpyCommon.GetInfo_fromText(path);
         totalframe = (int)info[0];
       }
 
@@ -92,13 +92,13 @@ namespace LGLauncher
         line = Regex.Replace(line, "#LWorkDir#", PathList.LWorkDir, RegexOptions.IgnoreCase);
 
         //Plugin
-        if (PathList.InputPlugin == PluginType.D2v)
+        if (PathList.InputPlugin == Plugin.D2v)
         {
           line = Regex.Replace(line, "#d2v#", "", RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#DGDecode#", PathList.DGDecode_dll, RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#D2vName#", PathList.D2vNameInLWork, RegexOptions.IgnoreCase);
         }
-        else if (PathList.InputPlugin == PluginType.Lwi)
+        else if (PathList.InputPlugin == Plugin.Lwi)
         {
           line = Regex.Replace(line, "#lwi#", "", RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#LSMASHSource#", PathList.LSMASHSource_dll, RegexOptions.IgnoreCase);
@@ -174,13 +174,13 @@ namespace LGLauncher
         line = Regex.Replace(line, "#LWorkDir#", PathList.LWorkDir, RegexOptions.IgnoreCase);
 
         //Plugin
-        if (PathList.InputPlugin == PluginType.D2v)
+        if (PathList.InputPlugin == Plugin.D2v)
         {
           line = Regex.Replace(line, "#d2v#", "", RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#DGDecode#", PathList.DGDecode_dll, RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#D2vName#", PathList.D2vNameInLWork, RegexOptions.IgnoreCase);
         }
-        else if (PathList.InputPlugin == PluginType.Lwi)
+        else if (PathList.InputPlugin == Plugin.Lwi)
         {
           line = Regex.Replace(line, "#lwi#", "", RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#LSMASHSource#", PathList.LSMASHSource_dll, RegexOptions.IgnoreCase);
@@ -188,9 +188,9 @@ namespace LGLauncher
         }
 
         //Detector
-        if (PathList.Detector == DetectorType.Join_Logo_Scp)
+        if (PathList.Detector == Detector.Join_Logo_Scp)
           line = Regex.Replace(line, "#Join_Logo_Scp#", "", RegexOptions.IgnoreCase);
-        else if (PathList.Detector == DetectorType.LogoGuillo)
+        else if (PathList.Detector == Detector.LogoGuillo)
           line = Regex.Replace(line, "#LogoGuillo#", "", RegexOptions.IgnoreCase);
 
         //Trim

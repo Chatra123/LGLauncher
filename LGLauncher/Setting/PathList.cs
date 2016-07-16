@@ -14,13 +14,13 @@ namespace LGLauncher
   static class Debug
   {
     // format d2v, lwiをデバッグ用に別名で保存するか？
-    public const bool CopyInxex = false;  // true  false
+    public const bool CopyIndex = false;  // true  false
   }
 
   /// <summary>
   /// 入力プラグイン
   /// </summary>
-  enum PluginType
+  enum Plugin
   {
     Unknown,
     D2v,
@@ -30,7 +30,7 @@ namespace LGLauncher
   /// <summary>
   /// FrameServer
   /// </summary>
-  enum AvsVpyType
+  enum AvsVpy
   {
     Unknown,
     Avs,
@@ -40,7 +40,7 @@ namespace LGLauncher
   /// <summary>
   /// ロゴ検出器
   /// </summary>
-  enum DetectorType
+  enum Detector
   {
     Unknown,
     Join_Logo_Scp,
@@ -158,10 +158,10 @@ namespace LGLauncher
     public static string avs2pipemod { get; private set; }
 
     //avs vpy
-    public static AvsVpyType AvsVpy { get; private set; }
+    public static AvsVpy AvsVpy { get; private set; }
     public static string AvsVpyExt { get { return "." + AvsVpy.ToString().ToLower(); } }
 
-    public static PluginType InputPlugin { get; private set; }
+    public static Plugin InputPlugin { get; private set; }
     public static string DGDecode_dll { get; private set; }
     public static string LSMASHSource_dll { get; private set; }
     public static string d2vsource_dll { get; private set; }
@@ -173,7 +173,7 @@ namespace LGLauncher
     public static string LogoSelector { get; private set; }
 
     //Detector
-    public static DetectorType Detector { get; private set; }
+    public static Detector Detector { get; private set; }
     public static int Detector_MultipleRun { get; private set; }
     public static readonly string[] DetectorName =
       new string[] { "chapter_exe", "logoframe", "logoGuillo" };
@@ -302,25 +302,27 @@ namespace LGLauncher
           || detector == "LogoGuillo".ToLower();
 
         bool isJLS = detector == "JLS".ToLower()
+          || detector == "JoinLogoScp".ToLower()
+          || detector == "JoinLogoScpos".ToLower()
           || detector == "Join_Logo_Scp".ToLower()
           || detector == "Join_Logo_Scpos".ToLower();
 
-        InputPlugin = isD2v ? PluginType.D2v
-          : isLwi ? PluginType.Lwi
-          : PluginType.Unknown;
+        InputPlugin = isD2v ? Plugin.D2v
+          : isLwi ? Plugin.Lwi
+          : Plugin.Unknown;
 
-        Detector = isJLS ? DetectorType.Join_Logo_Scp
-          : isLG ? DetectorType.LogoGuillo
-          : DetectorType.Unknown;
+        Detector = isJLS ? Detector.Join_Logo_Scp
+          : isLG ? Detector.LogoGuillo
+          : Detector.Unknown;
       }
 
       //AvsVpyType
       {
         //Avs固定 
-        const AvsVpyType frameServerType = AvsVpyType.Avs;
+        const AvsVpy frameServerType = AvsVpy.Avs;
         AvsVpy = frameServerType;
 
-        if (AvsVpy == AvsVpyType.Vpy)
+        if (AvsVpy == AvsVpy.Vpy)
           throw new NotImplementedException();
       }
     }
@@ -402,37 +404,33 @@ namespace LGLauncher
       //  search *.p2.frame.cat.txt  ファイル名からPartNoを決定する
       var files = Directory.GetFiles(LWorkDir,
                                      TsShortName + ".p*.frame.cat.txt");
+      // not found previous part file. set PartNo 1.
       if (files.Count() == 0)
-      {
-        // not found previous part file. set PartNo 1.
         return 1;
-      }
-      else
+
+      //ファイル名  -->  PartNo抽出
+      var strNums = files.Select(fullname =>
       {
-        //ファイル名  -->  PartNo抽出
-        var strNums = files.Select(fullname =>
-        {
-          //"movie.p1.frame.cat.txt"
-          string name = Path.GetFileName(fullname);
-          //  "movie.p"
-          int len_ts = (TsShortName + ".p").Length;
-          //     "1"  = "movie.p1.frame.cat.txt"  -  "movie.p"  -  ".frame.cat.txt"
-          int len_no = name.Length - len_ts - ".frame.cat.txt".Length;
-          string no = name.Substring(len_ts, len_no);
-          return no;
-        });
+        //"movie.p1.frame.cat.txt"
+        string name = Path.GetFileName(fullname);
+        //  "movie.p"
+        int len_ts = (TsShortName + ".p").Length;
+        //     "1"  = "movie.p1.frame.cat.txt"  -  "movie.p"  -  ".frame.cat.txt"
+        int len_no = name.Length - len_ts - ".frame.cat.txt".Length;
+        string no = name.Substring(len_ts, len_no);
+        return no;
+      });
 
-        // string  -->  int
-        var intNums = strNums.Select(strnum =>
-        {
-          try { return int.Parse(strnum); }
-          catch { throw new LGLException("PartNo parse error"); }
-        }).ToList();
+      // string  -->  int
+      var intNums = strNums.Select(strnum =>
+      {
+        try { return int.Parse(strnum); }
+        catch { throw new LGLException("PartNo parse error"); }
+      }).ToList();
 
-        intNums.Sort();
-        intNums.Reverse();
-        return intNums[0] + 1;
-      }
+      intNums.Sort();
+      intNums.Reverse();
+      return intNums[0] + 1;
     }
 
 
@@ -473,23 +471,23 @@ namespace LGLauncher
       avs2pipemod = SearchItem(files, "avs2pipemod.exe");
 
       //InputPlugin
-      if (PathList.AvsVpy == AvsVpyType.Avs)
+      if (PathList.AvsVpy == AvsVpy.Avs)
       {
-        if (InputPlugin == PluginType.D2v)
+        if (InputPlugin == Plugin.D2v)
           DGDecode_dll = SearchItem(files, "DGDecode.dll");
-        else if (InputPlugin == PluginType.Lwi)
+        else if (InputPlugin == Plugin.Lwi)
           LSMASHSource_dll = SearchItem(files, "LSMASHSource.dll");
       }
-      else if (PathList.AvsVpy == AvsVpyType.Vpy)
+      else if (PathList.AvsVpy == AvsVpy.Vpy)
       {
-        if (InputPlugin == PluginType.D2v)
+        if (InputPlugin == Plugin.D2v)
           d2vsource_dll = SearchItem(files, "d2vsource.dll");
-        else if (InputPlugin == PluginType.Lwi)
+        else if (InputPlugin == Plugin.Lwi)
           vslsmashsource_dll = SearchItem(files, "vslsmashsource.dll");
       }
 
       //Detector
-      if (Detector == DetectorType.Join_Logo_Scp)
+      if (Detector == Detector.Join_Logo_Scp)
       {
         //Join_Logo_Scp
         avsinp_aui = SearchItem(files, "avsinp.aui");
@@ -499,7 +497,7 @@ namespace LGLauncher
         JL_Cmd_OnRec = SearchItem(files, "JL_標準_Rec.txt");
         JL_Cmd_Standard = SearchItem(files, "JL_標準.txt");
       }
-      else if (Detector == DetectorType.LogoGuillo)
+      else if (Detector == Detector.LogoGuillo)
       {
         //LogoGuillo
         LogoGuillo = SearchItem(files, "LogoGuillo.exe");
@@ -581,26 +579,26 @@ namespace LGLauncher
       }
 
       //check
-      if (InputPlugin == PluginType.D2v
+      if (InputPlugin == Plugin.D2v
         && File.Exists(D2vPath) == false)
         throw new LGLException("d2v dose not exist: " + D2vName);
 
-      if (InputPlugin == PluginType.Lwi
+      if (InputPlugin == Plugin.Lwi
         && File.Exists(LwiPath) == false)
         throw new LGLException("lwi dose not exist: " + LwiName);
 
-      if (InputPlugin == PluginType.Unknown)
+      if (InputPlugin == Plugin.Unknown)
         throw new LGLException("Unknown InputPlugin");
 
-      if (AvsVpy == AvsVpyType.Unknown)
+      if (AvsVpy == AvsVpy.Unknown)
         throw new LGLException("Unknown AvsVpyType");
 
-      if (Detector == DetectorType.Unknown)
+      if (Detector == Detector.Unknown)
         throw new LGLException("Unknown LogoDetector");
 
-      if (InputPlugin == PluginType.D2v
-        && Detector == DetectorType.Join_Logo_Scp)
-        throw new LGLException("Cannot select d2v with Join_Logo_Scp");
+      if (InputPlugin == Plugin.D2v
+        && Detector == Detector.Join_Logo_Scp)
+        throw new LGLException("Cannot select d2v with JLS");
 
     }
 

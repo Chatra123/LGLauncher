@@ -28,6 +28,7 @@ namespace LGLauncher
       //args = testArgs.ToArray();
 
 
+
       //例外を捕捉する
       AppDomain.CurrentDomain.UnhandledException += OctNov.Excp.ExceptionInfo.OnUnhandledException;
 
@@ -247,14 +248,14 @@ namespace LGLauncher
         //bat
         string batPath = "";
         {
-          if (PathList.Detector == DetectorType.Join_Logo_Scp)
+          if (PathList.Detector == Detector.Join_Logo_Scp)
           {
             var logo = LogoSelector.GetLogo();
             var jl_cmd = PathList.JL_Cmd_OnRec;
             batPath = Bat_Join_Logo_Scp.Make_OnRec(avsPath,
                                                    logo[0], jl_cmd);
           }
-          else if (PathList.Detector == DetectorType.LogoGuillo)
+          else if (PathList.Detector == Detector.LogoGuillo)
           {
             var logo_param = LogoSelector.GetLogo_and_Param();
             batPath = Bat_LogoGuillo.Make(avsPath, srtPath,
@@ -284,8 +285,10 @@ namespace LGLauncher
               if (isReady == false) return;
             }
 
+
             int timeout_ms;
             {
+              //logoframeが終了しないことがあったのでタイムアウトを設定
               //  ”avsの総時間”の３倍
               int len_frame = trimFrame[1] - trimFrame[0] + 1;
               double len_sec = 1.0 * len_frame / 29.970;

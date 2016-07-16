@@ -22,11 +22,12 @@ namespace LGLauncher
     /// </summary>
     public AvsVpyMaker()
     {
-      IndexFormatter.Format();
+      bool isD2v = PathList.InputPlugin == Plugin.D2v;
+      IndexFormatter.Format(isD2v);
 
       maker =
-        (PathList.AvsVpy == AvsVpyType.Avs) ? new AvsMaker() as AbstractAvsMaker :
-        (PathList.AvsVpy == AvsVpyType.Vpy) ? new VpyMaker() as AbstractAvsMaker :
+        (PathList.AvsVpy == AvsVpy.Avs) ? new AvsMaker() as AbstractAvsMaker :
+        (PathList.AvsVpy == AvsVpy.Vpy) ? new VpyMaker() as AbstractAvsMaker :
         null;
     }
 
@@ -98,7 +99,7 @@ namespace LGLauncher
       if (infoText == null || infoText.Count <= 1)
         throw new LGLException("info file is invalid");
 
-      //文字　→　数値
+      //文字　-->　数値
       try
       {
         double frame = double.Parse(infoText[0]);
@@ -199,8 +200,7 @@ namespace LGLauncher
       int endFrame = trimFrame[1];
       int len = endFrame - beginFrame + 1;
 
-      //150 frame 以上か？
-      if (30 * 5 <= len)
+      if (150 <= len)
       {
         //書
         string outPath = string.Format("{0}.{1}__{2}{3}",
@@ -248,7 +248,7 @@ namespace LGLauncher
         }
       }
 
-      string dummyFilePath = string.Format(
+      string path = string.Format(
         "{0}.{1}__{2}{3}",
         PathList.WorkPath,
         trimFrame_prv[1],
@@ -256,7 +256,7 @@ namespace LGLauncher
         PathList.AvsVpyExt
         );
 
-      File.Create(dummyFilePath).Close();
+      File.Create(path).Close();
 
     }
 
