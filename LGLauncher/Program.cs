@@ -127,8 +127,8 @@ namespace LGLauncher
       }
 
 
+      Log.Close();
       CleanWorkItem.Clean_Lastly();
-      Log.Close();                     //Logは残すのでClean_Lastly()の後
     }
 
 

@@ -47,7 +47,7 @@ namespace LGLauncher
         if (PathList.IsLastPart)
         {
           //LWorkDir
-          cleaner.Delete_File(0.0, PathList.LWorkDir, "_" + PathList.TsShortName + "*.sys.*", ".log");
+          cleaner.Delete_File(0.0, PathList.LWorkDir, "_" + PathList.TsShortName + "*.sys.*");
           cleaner.Delete_File(0.0, PathList.LWorkDir, PathList.TsShortName + "*");
         }
 
