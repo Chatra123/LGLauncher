@@ -8,16 +8,16 @@
 ------------------------------------------------------------------
 ### 使い方　　コマンドライン
 
-録画中のＴＳファイル
+録画中のファイル  
     LGLauncher.exe         -ts "C:\Video.ts"  -channel "abc"  
-  最後のみ  
+最後のみ  
     LGLauncher.exe  -last  -ts "C:\Video.ts"  -channel "abc"  
 
 
-録画終了後のＴＳファイル
+録画終了後のファイル  
     LGLauncher.exe  -all   -ts "C:\Video.ts"  -channel "abc"  
 
-  
+
 ------------------------------------------------------------------
 ### 必要なソフト
 
@@ -33,13 +33,13 @@
 ### 使用前の準備
 
 1. LSystemフォルダに  
-   logoGuillo.exe  
-   avs2pipemod.exe  
-   LSMASHSource.dll  
+    - logoGuillo.exe  
+    - avs2pipemod.exe  
+    - LSMASHSource.dll  
    を入れる。
 
-2. LSystemフォルダのLogoSelector.exe を実行し設定ファイルを生成。  
-   LogoSelector.txtの"[LogoDir]"に lgd, paramファイルのあるフォルダを指定する。
+2. LSystemフォルダの LogoSelector.exeを実行し設定ファイルを生成。  
+   LogoSelector.txtの [LogoDir]に lgd, paramファイルのあるフォルダを追加する。
 
 
 ------------------------------------------------------------------
@@ -65,7 +65,7 @@ tsと同じフォルダに d2v, lwi, srtをおいてください。
 -lastの指定は必要ありません。  
 
  
-    -ch "abc"
+    -ch      "abc"
     -channel "abc"
 LogoSelecterに渡すチャンネル名  
 
@@ -74,13 +74,12 @@ LogoSelecterに渡すチャンネル名
 ------------------------------------------------------------------
 #### 引数２
 
-    -program "defgh"
-LogoSelecterに渡すプログラム名  
-
-
     -SequenceName  20160701_2000
 作業フォルダ名の一部に使用  
 基本的に無くても処理できます。
+
+    -program "defgh"
+LogoSelecterに渡すプログラム名  
 
 
     -d2v "D:\rec\video.ts.d2v"
@@ -114,7 +113,7 @@ LG  :  LogoGuilloで処理
 
 
     Detector_MultipleRun  1  
-Winsows内での chapter_exe, LogoGuillo, logoframe同時実行数
+Windows内での chapter_exe, LogoGuillo, logoframe同時実行数
 
 
     Regard_NsecCM_AsMain  14.0  
@@ -157,12 +156,12 @@ Ogm形式のチャプターファイルを出力
 2 : 毎回出力する  
 
 
-    DirPath_Tvtp  "C:\Tvtp_Dir"  
+    DirPath_Tvtp  C:\Tvtp_Directory  
 Tvtplayチャプターの出力フォルダ
 フォルダが存在しない場合はＴＳと同じ場所に出力します。  
 
 
-    DirPath_Misc  "C:\Ogm_and_Frame_Dir"  
+    DirPath_Misc  C:\Ogm_and_Frame_Direrctory  
 Ogm chapter、フレームファイルの出力フォルダ
 フォルダが存在しない場合はＴＳと同じ場所に出力します。  
 
@@ -208,20 +207,12 @@ Ogm chapter、フレームファイルの出力フォルダ
 
 ------------------------------------------------------------------
 ### メモ
-
-* LSystemフォルダにSystemIdleMonitor.exeがあれば、ＣＰＵ使用率が６０％以下になるまで待機
-してからLogoGuilloを実行します。
-
-
-* 文字コード
- * Tvtp chapter                 : UTF-8 bom
- * Ogm chapter, Frame text      : Shift-JIS
-
  
 * 作業ファイルのパスが２５０文字を超えると正常に動きません。深いフォルダにおかないでください。
 
 
-* LogoGuillo, avs2pipemod側でエラーが発生しても再実行するので、多少のエラーなら無視できます。
+* LSystemフォルダにSystemIdleMonitor.exeがあれば、ＣＰＵ使用率が６０％以下になるまで待機
+してからLogoGuilloを実行します。
 
 
 * LogoGuillo実行間隔による差
