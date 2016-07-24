@@ -64,7 +64,8 @@ namespace LGLauncher
 
       //確実に書き込まれている行数までを取り出す。
       int idx_lastValidLine = idx_LastTimeline - 2;
-      if (idx_lastValidLine < 0) throw new LGLException("srt format error");   //srt形式でない or テキストが４行以下
+      if (idx_lastValidLine < 0) 
+        throw new LGLException("srt format error");   //srt形式でない or テキストが４行以下
       var formatText = (PathList.IsLastPart)
                             ? srtText : srtText.GetRange(0, idx_lastValidLine + 1);
 
