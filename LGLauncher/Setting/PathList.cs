@@ -38,7 +38,7 @@ namespace LGLauncher
   }
 
   /// <summary>
-  /// ロゴ検出器
+  /// 検出器
   /// </summary>
   enum Detector
   {
@@ -149,11 +149,11 @@ namespace LGLauncher
     public static void IncrementPartNo()
     {
       PartNo++;
-      if (IsAll) throw new Exception("cannot increment PartNo at 'IsAll' session");
+      if (IsAll) throw new Exception(" cannot increment PartNo at 'IsAll' ");
     }
 
 
-    //  [  LSystem  ]  binary path
+    //  [  LSystem binary path ]  
     public static string SystemIdleMonitor { get; private set; }
     public static string avs2pipemod { get; private set; }
 
@@ -167,7 +167,7 @@ namespace LGLauncher
     public static string d2vsource_dll { get; private set; }
     public static string vslsmashsource_dll { get; private set; }
 
-    //logo select
+    //select logo
     public static string Channel { get; private set; }
     public static string Program { get; private set; }
     public static string LogoSelector { get; private set; }
@@ -197,10 +197,10 @@ namespace LGLauncher
     public static double Regard_NsecMain_AsCM { get; private set; }
 
     //chapter output mode
+    public static int Output_RawFrame { get; private set; }
+    public static int Output_Frame { get; private set; }
     public static int Output_Tvtp { get; private set; }
     public static int Output_Ogm { get; private set; }
-    public static int Output_Frame { get; private set; }
-    public static int Output_RawFrame { get; private set; }
 
     //chapter directory
     public static string DirPath_Tvtp { get; private set; }
@@ -348,7 +348,7 @@ namespace LGLauncher
 
       //
       //WorkDir
-      //    衝突は考えない、重複チェックはしてない。
+      //  衝突は考えない、重複チェックはしてない。
       string workDirName;
       {
         var tsinfo = new FileInfo(TsPath);
@@ -401,10 +401,10 @@ namespace LGLauncher
     /// </summary>
     private static int Detect_PartNo_fromFileName()
     {
-      //  search *.p2.frame.cat.txt  ファイル名からPartNoを決定する
+      //  search *.p2.frame.cat.txt
       var files = Directory.GetFiles(LWorkDir,
                                      TsShortName + ".p*.frame.cat.txt");
-      // not found previous part file. set PartNo 1.
+      // not found file
       if (files.Count() == 0)
         return 1;
 
@@ -414,17 +414,17 @@ namespace LGLauncher
         //"movie.p1.frame.cat.txt"
         string name = Path.GetFileName(fullname);
         //  "movie.p"
-        int len_ts = (TsShortName + ".p").Length;
-        //     "1"  = "movie.p1.frame.cat.txt"  -  "movie.p"  -  ".frame.cat.txt"
-        int len_no = name.Length - len_ts - ".frame.cat.txt".Length;
-        string no = name.Substring(len_ts, len_no);
+        int len_title = (TsShortName + ".p").Length;
+        //    "1"  =  "movie.p1.frame.cat.txt"  -  "movie.p"  -  ".frame.cat.txt"
+        int len_no = name.Length - len_title - ".frame.cat.txt".Length;
+        string no = name.Substring(len_title, len_no);
         return no;
       });
 
       // string  -->  int
-      var intNums = strNums.Select(strnum =>
+      var intNums = strNums.Select(num =>
       {
-        try { return int.Parse(strnum); }
+        try { return int.Parse(num); }
         catch { throw new LGLException("PartNo parse error"); }
       }).ToList();
 
@@ -440,7 +440,7 @@ namespace LGLauncher
     /// </summary>
     private static void Get_BinaryFile(Setting_File setting)
     {
-      //ファイルリストから対象のフルパス取得
+      //ファイル一覧から対象のフルパス取得
       var SearchItem_OrEmpty = new Func<FileInfo[], string, string>(
         (filelist, target) =>
         {

@@ -66,6 +66,7 @@ namespace LGLauncher
       {
         WriteLine("  exit");
         writer.Close();
+        writer = null;
       }
     }
 
