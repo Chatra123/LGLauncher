@@ -38,8 +38,7 @@
     - LSMASHSource.dll  
    を入れる。
 
-2. LSystemフォルダの LogoSelector.exeを実行し設定ファイルを生成。  
-   LogoSelector.txtの [LogoDir]に lgd, paramファイルのあるフォルダを追加する。
+2. LSystemフォルダの LogoSelector.exeを実行しiniファイルを作成し、[LogoDir]の設定をする。  
 
 
 ------------------------------------------------------------------
@@ -51,7 +50,7 @@ tsファイルのパスを元に各ファイルパスを作成します。
 "C:\video.ts.pp.d2v"  
 "C:\video.ts.pp.lwi"  
 "C:\video.ts.pp.lwifooter"  
-"C:\video.ts.srt"  
+"C:\video.srt"  
 tsと同じフォルダに d2v, lwi, srtをおいてください。  
 
 
@@ -90,7 +89,7 @@ d2vパスの個別指定
 lwiパスの個別指定
 
 
-    -srt "D:\rec\video.ts.srt"
+    -srt "D:\rec\video.srt"
 srtパスの個別指定
     
     
@@ -107,7 +106,7 @@ d2v :  d2vで処理
 lwi :  lwiで処理  
 
 
-    LogoDetector  LG  
+    Detector  LG  
 JLS :  Join_Logo_Scpで処理  
 LG  :  LogoGuilloで処理  
 
@@ -120,8 +119,8 @@ Windows内での chapter_exe, LogoGuillo, logoframe同時実行数
 １４．０秒以下のＣＭ部を除去  
 
 
-    Regard_NsecMain_AsCM  29.0  
-２９．０秒以下の本編部を除去  
+    Regard_NsecMain_AsCM  14.0  
+１４．０秒以下の本編部を除去  
     
 
     Output_Tvtp  2  
@@ -132,7 +131,7 @@ Tvtplay用チャプターファイルを出力
 2 : 毎回出力する  
 
 
-    Output_Ogm  1  
+    Output_Ogm  0  
 Ogm形式のチャプターファイルを出力  
 短い本編、ＣＭは除去されています。  
 0 : 出力しない  
@@ -157,12 +156,12 @@ Ogm形式のチャプターファイルを出力
 
 
     DirPath_Tvtp  C:\Tvtp_Directory  
-Tvtplayチャプターの出力フォルダ
+Tvtplayチャプターの出力フォルダ  
 フォルダが存在しない場合はＴＳと同じ場所に出力します。  
 
 
-    DirPath_Misc  C:\Ogm_and_Frame_Direrctory  
-Ogm chapter、フレームファイルの出力フォルダ
+    DirPath_Misc  C:\Ogm_and_Frame_Directory  
+Ogm chapter、フレームファイルの出力フォルダ  
 フォルダが存在しない場合はＴＳと同じ場所に出力します。  
 
 
@@ -204,34 +203,7 @@ Ogm chapter、フレームファイルの出力フォルダ
     JL_標準_Rec.txt  
 
 
-
-------------------------------------------------------------------
-### メモ
- 
-* 作業ファイルのパスが２５０文字を超えると正常に動きません。深いフォルダにおかないでください。
-
-
-* LSystemフォルダにSystemIdleMonitor.exeがあれば、ＣＰＵ使用率が６０％以下になるまで待機
-してからLogoGuilloを実行します。
-
-
-* LogoGuillo実行間隔による差
-    * フレーム認識  
-        - １分～５分はＣＭが本編として組み込まれる量が多い。１０分ならほぼ差が出ない。
-        
-    * 処理時間の増加率  
-
-|  実行間隔  |  処理時間  |
-|:----------:|:----------:|
-|    60 min  |    1.0 倍  |
-|    20      |    1.1     |
-|    10      |    1.1     |
-|     5      |    1.4     |
-|     3      |    1.4     |
-|     1      |    2.0     |
-
-
-
+	
 ------------------------------------------------------------------
 ### lwi
 
@@ -260,10 +232,37 @@ AviSynthのファイル読込時にシステム側で使用します。
    を入れる。   
  
 - chpater_exe.exeは同梱のものでなくてもかまいません。安定して動くものを使用してください。  
-  テスト環境では終了時にエラーが発生したので、同梱のchpater_exeは終了処理を変更しただけです。  
+  テスト環境で終了時にエラーが発生したので、同梱のchpater_exeは終了処理を変更しただけです。  
 
 - JL_標準_Rec.txtは JL_標準.txtから必要なさそうな項目をコメントアウトしただけで、  
   それ以外は同じです。
+ 
+
+ 
+------------------------------------------------------------------
+### メモ
+ 
+* 作業ファイルのパスが２５０文字を超えると正常に動きません。深いフォルダにおかないでください。
+
+
+* LSystemフォルダにSystemIdleMonitor.exeがあれば、ＣＰＵ使用率が６０％以下になるまで待機
+してからLogoGuilloを実行します。
+
+
+* LogoGuillo実行間隔による差
+    * フレーム認識  
+        - １分～５分はＣＭが本編として組み込まれる量が多い。１０分ならほぼ差が出ない。
+        
+    * 処理時間の増加率  
+
+|  実行間隔  |  処理時間  |
+|:----------:|:----------:|
+|    60 min  |    1.0 倍  |
+|    20      |    1.1     |
+|    10      |    1.1     |
+|     5      |    1.4     |
+|     3      |    1.4     |
+|     1      |    2.0     |
 
 
   
@@ -296,15 +295,10 @@ AviSynthのファイル読込時にシステム側で使用します。
     Copyright (C) 2012 Xamarin Inc (http://www.xamarin.com)  
   
 
-
 ------------------------------------------------------------------
 ### ライセンス
-    GPL v3
+
+    MIT Licence
     Copyright (C) 2014  CHATRA
-    http://www.gnu.org/licenses/
-    
-    
-  
 
 
- 
