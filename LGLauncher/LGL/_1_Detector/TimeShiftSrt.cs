@@ -48,6 +48,7 @@ namespace LGLauncher
       if (srtText == null) throw new LGLException("srt read file error");
       else if (srtText.Count <= 3) return "";                                  //まだテキストが書き込まれていない
 
+
       //フォーマット
       //最後の時間行から下を切り捨てる
       int idx_LastTimeline = 0;
@@ -86,6 +87,7 @@ namespace LGLauncher
 
     #region Shift_SrtText
 
+    //srt sample
     //
     //76                                         Srt_Index
     //00:10:04,630 --> 00:10:07,500              line_1stTimecode
@@ -116,7 +118,6 @@ namespace LGLauncher
       //１つ目のタイムコードを探す
       for (int i = 1; i < srtText.Count; i++)
       {
-        //タイムコード？
         if (Regex.IsMatch(srtText[i], @"\d\d:\d\d:\d\d,\d\d\d\s*-->\s*\d\d:\d\d:\d\d,\d\d\d"))
         {
           int line_1stTimecode = i;
@@ -125,7 +126,6 @@ namespace LGLauncher
           string shift_timecode;
           bool canShift = Shift_Timecode(srtText[line_1stTimecode], shift_sec, out shift_timecode);
           if (canShift == false) continue;                  //０秒以下  or  変換失敗　でスキップ
-
 
           //２つ目のタイムコードを探す
           int line_2ndTimecode = -1;
@@ -139,8 +139,8 @@ namespace LGLauncher
           }
 
           int line_blockend = (line_2ndTimecode != -1)
-            ? line_2ndTimecode - 2        // 2ndTimecodeがある  →　2ndタイムコードの2つ前
-            : srtText.Count - 1;          //              ない  →　テキストの最後
+            ? line_2ndTimecode - 2        // 2ndTimecodeがある  →　2ndタイムコードの2つ前まで
+            : srtText.Count - 1;          //              ない  →　テキストの最後まで
           int blocksize = line_blockend - (line_1stTimecode + 1) + 1;
 
           //shiftText作成

@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 
 
-namespace LGLauncher.EditFrame
+namespace LGLauncher.Frame
 {
   using OctNov.IO;
 
@@ -28,16 +28,16 @@ namespace LGLauncher.EditFrame
       //　add_FrameListが見つからなくても処理は継続する。
       List<int> add_FrameList = null, old_CatList = null;
       {
-        add_FrameList = EditFrame.FrameFile_to_List(add_FramePath);    // from  *.p3.frame.txt
+        add_FrameList = ConvertFrame.Read_FrameFile(add_FramePath);    // from  *.p3.frame.txt
 
         //前回までの結合フレームを取得
         if (2 <= PathList.PartNo)
         {
-          old_CatList = EditFrame.FrameFile_to_List(catPath);          // from  *.frame.cat.txt
+          old_CatList = ConvertFrame.Read_FrameFile(catPath);          // from  *.frame.cat.txt
           if (old_CatList == null && add_FrameList == null)
             throw new LGLException("not detect frame file  or  is invalid file");
         }
-        //ファイルがなければnullが返されているのでnew()。
+        //ファイルが見つからないと new()
         old_CatList = old_CatList ?? new List<int>();
         add_FrameList = add_FrameList ?? new List<int>();
       }
@@ -56,7 +56,7 @@ namespace LGLauncher.EditFrame
 
         new_CatList.AddRange(add_FrameList);
         //連結部の繋ぎ目をけす。
-        new_CatList = EditFrame.FlatOut_CM__(new_CatList, 0.5);
+        new_CatList = ConvertFrame.FlatOut_CM__(new_CatList, 0.5);
       }
 
 
@@ -68,7 +68,7 @@ namespace LGLauncher.EditFrame
         //次回の参照用                            *.frame.cat.txt
         File.WriteAllLines(catPath, new_CatText, TextEnc.Shift_JIS);
 
-        //catPath_partはAutoDetectPartNoで使用されるので必ず作成すること。
+        //catPath_partはDetect_PartNoで使用されるので必ず作成すること。
         //                                        *.p3.frame.cat.txt
         string catPath_part = PathList.WorkPath + ".frame.cat.txt";
         File.WriteAllLines(catPath_part, new_CatText, TextEnc.Shift_JIS);

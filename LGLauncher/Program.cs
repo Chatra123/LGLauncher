@@ -8,6 +8,7 @@ using System.IO;
 #endregion
 
 
+
 namespace LGLauncher
 {
   internal class Program
@@ -28,7 +29,6 @@ namespace LGLauncher
       //args = testArgs.ToArray();
 
 
-
       //例外を捕捉する
       AppDomain.CurrentDomain.UnhandledException += OctNov.Excp.ExceptionInfo.OnUnhandledException;
 
@@ -41,7 +41,7 @@ namespace LGLauncher
         bool initialized = module.Initialize(args, out cmdline_ToString);
         if (initialized == false) return;
 
-        //トリムフレーム取得
+        //有効フレーム範囲取得
         var maker = new AvsVpyMaker();
         trimFrame = maker.GetTrimFrame();
       }
@@ -79,7 +79,7 @@ namespace LGLauncher
         bool HasError = false;
         try
         {
-          string batpath = module.MakeDetecotrBat(splitTrim);
+          string batpath = module.MakeDetectorBat(splitTrim);
           module.RunDetectorBat(splitTrim, batpath);
         }
         catch (LGLException e)
@@ -108,8 +108,8 @@ namespace LGLauncher
         //チャプター出力
         try
         {
-          var concat = EditFrame.FrameEditor.ConcatFrame(splitTrim);
-          EditFrame.FrameEditor.OutputChapter(concat, splitTrim);
+          var concat = Frame.EditFrame.Concat(splitTrim);
+          Frame.EditFrame.OutputChapter(concat, splitTrim);
         }
         catch (LGLException e)
         {
@@ -217,7 +217,7 @@ namespace LGLauncher
           text.AppendLine("             [1]  =  " + splitTrim[1]);
           text.AppendLine("    length        =  " + string.Format("{0:f1}  min", len_min));
           text.AppendLine("    EndFrame_Max  =  " + endFrame_Max);
-          text.AppendLine("    isLastSplit   =  " + isLastSplit);
+          text.AppendLine("    IsLastSplit   =  " + isLastSplit);
           Log.WriteLine(text.ToString());
         }
 
@@ -228,7 +228,7 @@ namespace LGLauncher
       /// <summary>
       /// フレーム検出　bat作成
       /// </summary>
-      public string MakeDetecotrBat(int[] trimFrame)
+      public string MakeDetectorBat(int[] trimFrame)
       {
         //avs
         string avsPath;

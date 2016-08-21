@@ -19,10 +19,10 @@ set begin=%hour%	%min_%	%sec_%	%msec%0
 (                 
   "#chapter_exe#"                            ^
                    -v  "#AvsPath#"           ^
-	               -o  "#SCPosPath#"         ^
-		           -m  100  -s 15
+                   -o  "#SCPosPath#"         ^
+                   -m  100  -s 15
 )
-if not %ERRORLEVEL%  == 0 (
+if not %ERRORLEVEL% == 0 (
     exit %ERRORLEVEL%
 )
 echo ERRORLEVEL = %ERRORLEVEL%
@@ -36,10 +36,10 @@ echo .
 (
   "#logoframeExe#"                           ^
                           "#AvsPath#"        ^
-				   -logo  "#LogoPath#"       ^
-				   -oa    "#LogoFrameText#"
+                   -logo  "#LogoPath#"       ^
+                   -oa    "#LogoFrameText#"
 )
-if not %ERRORLEVEL%  == 0 (
+if not %ERRORLEVEL% == 0 (
     exit %ERRORLEVEL%
 )
 echo ERRORLEVEL = %ERRORLEVEL%
@@ -55,7 +55,7 @@ echo .
                      -inlogo  "#LogoFrameText#"   ^
                      -inscp   "#SCPosPath#"       ^
                      -incmd   "#JL_CmdPath#"      ^
-				     -o       "#JLS_ResultPath#"
+                     -o       "#JLS_ResultPath#"
 )
 echo ERRORLEVEL = %ERRORLEVEL%
 echo ----------------------------------------------------------------------
@@ -71,14 +71,13 @@ set min_=%TIME:~3,2%
 set sec_=%TIME:~6,2%
 set msec=%TIME:~9,2%
 set end=%hour%	%min_%	%sec_%	%msec%0
-echo #PartNo#	%begin%		%end%>>"_#TsShortName#_ˆ—ŠÔ.sys.txt"
+echo #PartNo#		%begin%		%end%>>"_#TsShortName#_ˆ—ŠÔ.sys.txt"
 
 
 endlocal
 ::  TIMEOUT /T 5 /NOBREAK
 ::  pause
 ::  exit /b
-
 
 
 

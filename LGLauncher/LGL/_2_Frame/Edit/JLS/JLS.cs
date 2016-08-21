@@ -8,7 +8,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 
 
-namespace LGLauncher.EditFrame.JLS
+namespace LGLauncher.Frame.JLS
 {
   using OctNov.IO;
 
@@ -50,7 +50,7 @@ namespace LGLauncher.EditFrame.JLS
         string liner = "";
         readfile.ForEach((line) => { liner += line; });
 
-        framelist = EditFrame.AvsTrim_to_FrameList(liner);
+        framelist = ConvertFrame.AvsTrim_to_FrameList(liner);
       }
 
       //書

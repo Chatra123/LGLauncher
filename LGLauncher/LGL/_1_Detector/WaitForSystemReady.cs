@@ -97,7 +97,7 @@ namespace LGLauncher
 
       //Mutex取得        LGL
       //  LGLauncher同士での衝突回避
-      //  Mutexが取得できないときは待機時間の追加
+      //  Mutexが取得できないときは待機時間を追加
       //bool addtionalWait;
       //{
       //  const string MutexName = "LGL-41CDEAC6-6717";      //LGL
@@ -107,14 +107,14 @@ namespace LGLauncher
       //  addtionalWait = mutexControl.HasControl == false;
       //}
       //Semaphore取得    LGL V2P
-      bool addtionalWait;
+      bool additionalWait;
       {
         const string MutexName = "LGL-41CDEAC6-6717";  //LGL
         //const string MutexName = "V2P-33A2FE1F-0891";    //V2P
         mutexControl = new SemaphoreControl();
         mutexControl.Initilize(MutexName, multiRun);
         mutexControl.Get();
-        addtionalWait = mutexControl.HasControl == false;
+        additionalWait = mutexControl.HasControl == false;
       }
 
       //
@@ -128,18 +128,18 @@ namespace LGLauncher
         //プロセス数
         while (TargetHasExited() == false)
         {
-          Thread.Sleep(2 * 60 * 1000);                               // 2 min
+          Thread.Sleep(1 * 60 * 1000);                               // 1 min
         }
 
         //ＣＰＵ使用率
         if (check_SysIdle && SystemIsIdle() == false)
         {
-          Thread.Sleep(rand.Next(5 * 60 * 1000, 7 * 60 * 1000));     // 5  to  7 min
+          Thread.Sleep(rand.Next(3 * 60 * 1000, 5 * 60 * 1000));     // 3  to  5 min
           continue;
         }
 
-        //Mutexが取得できないときは追加待機
-        if (addtionalWait)
+        //Mutexが取得できないときは待機時間を追加
+        if (additionalWait)
         {
           Thread.Sleep(rand.Next(0 * 1000, 3 * 60 * 1000));          // 0  to  3 min
         }

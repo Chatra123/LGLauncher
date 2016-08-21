@@ -17,7 +17,7 @@ namespace LGLauncher
 
     /// <summary>
     /// LWorkDir内のファイル削除
-    ///   以前の処理のファイルが残っていたら削除。
+    ///   以前の処理でファイルが残っていたら削除
     /// </summary>
     public static void Clean_Beforehand()
     {
@@ -30,7 +30,7 @@ namespace LGLauncher
         cleaner.Delete_File(0.0, PathList.LWorkDir, "*.lwi");
 
         if (PathList.Is1stPart)
-          cleaner.Delete_File(0.0, PathList.LWorkDir, "*.p?*.*");                              //ワイルドカード指定可
+          cleaner.Delete_File(0.0, PathList.LWorkDir, "*.p?*.*");        //ワイルドカード指定可
         else if (PathList.IsAll)
           cleaner.Delete_File(0.0, PathList.LWorkDir, "*.all.*");
       }
@@ -57,7 +57,7 @@ namespace LGLauncher
         {
           const double nDaysBefore = 2.0;
           //LTopWorkDir                    サブフォルダ内も対象
-          cleaner.Delete_File(nDaysBefore, PathList.LTopWorkDir, "*.frame.cat.txt*");
+          cleaner.Delete_File(nDaysBefore, PathList.LTopWorkDir, "*.frame.cat.txt");
           cleaner.Delete_File(nDaysBefore, PathList.LTopWorkDir, "*.jls.*");
           cleaner.Delete_File(nDaysBefore, PathList.LTopWorkDir, "*.all.*");
           cleaner.Delete_File(nDaysBefore, PathList.LTopWorkDir, "*.p?*.*");

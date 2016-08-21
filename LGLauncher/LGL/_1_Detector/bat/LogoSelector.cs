@@ -56,16 +56,15 @@ namespace LGLauncher
       if (File.Exists(PathList.LogoSelector) == false)
         throw new LGLException("LogoSelector does not exist");
 
-      string exepath, args;
+      string path, args;
       {
-        exepath = PathList.LogoSelector;
+        path = PathList.LogoSelector;
         args = string.Format("  \"{0}\"   \"{1}\"   \"{2}\"  ",
                               PathList.Channel, PathList.Program, PathList.TsPath);
-        SetVbsScript(ref exepath, ref args);
       }
 
       //実行
-      string result = Start_GetStdout(exepath, args);
+      string result = Start_GetStdout(path, args);
       var split = result.Split(new string[] { Environment.NewLine }, StringSplitOptions.None).ToList();
 
       //Log
@@ -74,7 +73,7 @@ namespace LGLauncher
         var log = new StringBuilder();
         log.AppendLine("  [ LogoSelector ]");
         log.AppendLine("    path   :");
-        log.AppendLine(exepath);
+        log.AppendLine(path);
         log.AppendLine("    args   :");
         log.AppendLine(args);
         log.AppendLine("    return :");
@@ -82,34 +81,6 @@ namespace LGLauncher
         Log.WriteLine(log.ToString());
       }
       return split;
-    }
-
-
-    /// <summary>
-    /// vbsがセットされていたらcscript.exeに変更。
-    /// batは変更しなくても処理できる。
-    /// </summary>
-    /// <returns>
-    ///       vbs &     exist  -->  true
-    ///           & not exist  -->  false
-    ///   not vbs              -->  false
-    /// </returns>
-    private static bool SetVbsScript(ref string exepath, ref string args)
-    {
-      var ext = System.IO.Path.GetExtension(exepath).ToLower();
-      var isVBS = (ext == ".vbs" || ext == ".js");
-
-      if (isVBS)
-      {
-        string vbsPath = exepath;
-        exepath = "cscript.exe";
-        args = string.Format(" \"{0}\"  {1} ", vbsPath, args);
-        return File.Exists(vbsPath);
-      }
-      else
-      {
-        return false;
-      }
     }
 
 

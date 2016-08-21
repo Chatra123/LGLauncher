@@ -10,7 +10,7 @@ pushd %0\..
                      -inlogo  "#LogoFrameText#"   ^
                      -inscp   "#SCPosPath#"       ^
                      -incmd   "#JL_CmdPath#"      ^
-				     -o       "#JLS_ResultPath#"
+                     -o       "#JLS_ResultPath#"
 )
 echo ERRORLEVEL = %ERRORLEVEL%
 
@@ -20,7 +20,6 @@ endlocal
 ::  TIMEOUT /T 5 /NOBREAK
 ::  pause
 ::  exit /b
-
 
 
 

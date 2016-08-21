@@ -288,7 +288,8 @@ namespace LGLauncher
       D2vPath = D2vPath ?? TsPath + ".pp.d2v";
       LwiPath = LwiPath ?? TsPath + ".pp.lwi";
       LwiFooterPath = LwiPath + "footer";
-      SrtPath = SrtPath ?? TsPath + ".srt";
+      SrtPath = SrtPath ?? Path.Combine(TsDir, TsNameWithoutExt + ".srt");
+
 
       //PluginType  DetectorType
       {
@@ -408,7 +409,7 @@ namespace LGLauncher
       if (files.Count() == 0)
         return 1;
 
-      //ファイル名  -->  PartNo抽出
+      //ファイルパス  -->  PartNo抽出
       var strNums = files.Select(fullname =>
       {
         //"movie.p1.frame.cat.txt"
@@ -467,6 +468,7 @@ namespace LGLauncher
       var dirInfo = new DirectoryInfo(LSystemDir);
       var files = dirInfo.GetFiles("*", SearchOption.AllDirectories);
 
+      LogoSelector = SearchItem(files, "LogoSelector.exe");
       SystemIdleMonitor = SearchItem_OrEmpty(files, "SystemIdleMonitor.exe");
       avs2pipemod = SearchItem(files, "avs2pipemod.exe");
 
@@ -518,17 +520,6 @@ namespace LGLauncher
         }
       }
 
-      //LogoSelector
-      //  複数ある場合の優先順位は、
-      //　    （高）  .exe .vbs .js  （低）
-      //  16/06/23    .vbs .jsは使用していないので削除してもいい
-      var logoSelector_list = new string[] {
-                                              SearchItem_OrEmpty(files, "LogoSelector.exe"),
-                                              SearchItem_OrEmpty(files, "LogoSelector.vbs"),
-                                              SearchItem_OrEmpty(files, "LogoSelector.js") 
-                                           };
-      LogoSelector = logoSelector_list.Where((LSpath) => File.Exists(LSpath)).FirstOrDefault();
-      LogoSelector = LogoSelector ?? "";
     }
 
 

@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 
 
-namespace LGLauncher.EditFrame
+namespace LGLauncher.Frame
 {
   using OctNov.IO;
   /*
@@ -27,31 +27,29 @@ namespace LGLauncher.EditFrame
    *   }
    *   
    */
-  static class FrameEditor
+  static class EditFrame
   {
     /// <summary>
     /// 結合フレームリストを作成
     /// </summary>
-    public static List<int> ConcatFrame(int[] trimFrame)
+    public static List<int> Concat(int[] trimFrame)
     {
-      //JLSの出力をLogoGuilloと同じ形式にする。
-      //  Join_Logo_Scp
-      //     *.p1.jls.result.txt  -->  *.p1.frame.txt
+      //Join_Logo_Scp
+      //  JLSの出力をLogoGuilloと同じ形式にする。
       if (PathList.Detector == Detector.Join_Logo_Scp)
       {
+        //     *.p1.jls.result.txt  -->  *.p1.frame.txt
         JLS.JLS.Result_to_Frame(false);
 
-        //Concat
-        //  Chapter_exe, LogoFrame
-        //    scpos.cat, logoframe.catはIsLastで使用する。
+        //Chapter_exe, LogoFrame
+        //  scpos.cat, logoframe.catはIsLastで使用する。
         if (PathList.IsPart)
         {
           JLS.Chapter_exe.Concat(trimFrame);
           JLS.LogoFrame.Concat(trimFrame);
         }
 
-        //Re-execute JLS with *.cat and JL_Cmd_Standard
-        //  Join_Logo_Scp
+        //Re-execute JLS with *.cat
         if (PathList.IsPart && PathList.IsLastPart)
         {
           var jl_cmd = PathList.JL_Cmd_Standard;
@@ -63,7 +61,7 @@ namespace LGLauncher.EditFrame
       }
 
       //フレームテキスト合成
-      //  Join_Logo_Scp  &  LogoGuillo
+      //Join_Logo_Scp  &  LogoGuillo
       //    *.p1.frame.txt  -->  List<int> frame  -->  List<int> concat
       List<int> concat = LogoGuillo.Concat(trimFrame);
       return concat;
@@ -104,30 +102,25 @@ namespace LGLauncher.EditFrame
           path = Path.Combine(dir, name);
         }
 
-        ConvertToFile.To_FrameFile(path, rawFrame, endFrame);
+        var text = MakeChapText.Make_Frame(rawFrame, endFrame);
+
+        try
+        {
+          if (text != null)
+            File.WriteAllText(path, text, TextEnc.Shift_JIS);
+        }
+        catch { }
       }
-
-
-      ////短いＭａｉｎ、ＣＭを潰す
-      //Log.WriteLine("Regard_NsecCM_AsMain = " + PathList.Regard_NsecCM_AsMain);
-      //Log.WriteLine("Regard_NsecMain_AsCM = " + PathList.Regard_NsecMain_AsCM);
-      //List<int> editFrame0 = null;
-      //{
-      //  editFrame0 = new List<int>(rawFrame);
-      //  editFrame0 = EditFrame.FlatOut_CM__(editFrame0, 29);
-      //  editFrame0 = EditFrame.FlatOut_Main(editFrame0, 14);
-      //}
-      //return;
 
 
       //短いＭａｉｎ、ＣＭを潰す
       List<int> editFrame = null;
       {
-        editFrame = new List<int>(rawFrame);
-        editFrame = EditFrame.FlatOut_CM__(editFrame, PathList.Regard_NsecCM_AsMain);
-        editFrame = EditFrame.FlatOut_Main(editFrame, PathList.Regard_NsecMain_AsCM);
-        editFrame = EditFrame.FlatOut_CM__(editFrame, PathList.Regard_NsecCM_AsMain);
-        editFrame = EditFrame.FlatOut_Main(editFrame, PathList.Regard_NsecMain_AsCM);
+        editFrame = new List<int>(rawFrame);  //コピー
+        editFrame = ConvertFrame.FlatOut_CM__(editFrame, PathList.Regard_NsecCM_AsMain);
+        editFrame = ConvertFrame.FlatOut_Main(editFrame, PathList.Regard_NsecMain_AsCM);
+        editFrame = ConvertFrame.FlatOut_CM__(editFrame, PathList.Regard_NsecCM_AsMain);
+        editFrame = ConvertFrame.FlatOut_Main(editFrame, PathList.Regard_NsecMain_AsCM);
       }
 
 
@@ -146,10 +139,18 @@ namespace LGLauncher.EditFrame
           path = Path.Combine(dir, name);
         }
 
-        ConvertToFile.To_FrameFile(path, editFrame, endFrame);
+        var text = MakeChapText.Make_Frame(editFrame, endFrame);
+
+        try
+        {
+          if (text != null)
+            File.WriteAllText(path, text, TextEnc.Shift_JIS);
+        }
+        catch { }
       }
 
-      //TvtPlay
+
+      //Tvtp
       if ((PathList.IsPart && 2 <= PathList.Output_Tvtp)
         || (PathList.IsLastPart && 1 <= PathList.Output_Tvtp))
       {
@@ -158,26 +159,57 @@ namespace LGLauncher.EditFrame
           string dir = (Directory.Exists(PathList.DirPath_Tvtp))
                             ? PathList.DirPath_Tvtp
                             : PathList.TsDir;
-          path = Path.Combine(dir, PathList.TsNameWithoutExt + ".chapter");
+          string name = PathList.TsNameWithoutExt + ".chapter";
+          path = Path.Combine(dir, name);
         }
 
-        ConvertToFile.To_TvtpChap(path, editFrame, endFrame);
+        var text = MakeChapText.Make_Tvtp(editFrame, endFrame);
+
+        try
+        {
+          if (text != null)
+            File.WriteAllText(path, text, TextEnc.UTF8_bom);
+        }
+        catch { }
       }
 
+
       //Ogm
-      if (PathList.IsLastPart && 1 <= PathList.Output_Tvtp)
+      if (PathList.IsLastPart && 1 <= PathList.Output_Ogm)
       {
         string path;
         {
           string dir = (Directory.Exists(PathList.DirPath_Misc))
                             ? PathList.DirPath_Misc
                             : PathList.TsDir;
-          path = Path.Combine(dir, PathList.TsNameWithoutExt + ".ogm.chapter");
+          string name = PathList.TsNameWithoutExt + ".ogm.chapter";
+          path = Path.Combine(dir, name);
         }
 
-        ConvertToFile.To_OgmChap(path, editFrame, endFrame);
+        var text = MakeChapText.Make_Ogm(editFrame, endFrame);
+
+        try
+        {
+          if (text != null)
+            File.WriteAllText(path, text, TextEnc.Shift_JIS);
+        }
+        catch { }
       }
     }
 
   }//class
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

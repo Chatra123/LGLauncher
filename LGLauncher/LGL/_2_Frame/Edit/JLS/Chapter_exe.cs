@@ -8,7 +8,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 
 
-namespace LGLauncher.EditFrame.JLS
+namespace LGLauncher.Frame.JLS
 {
   using OctNov.IO;
 
@@ -67,7 +67,7 @@ namespace LGLauncher.EditFrame.JLS
         {
           //CHAPTER03  の 03 部分のオフセット数
           int chapcnt_offset = old_CatText.Count / 2;
-          add_ScposText = ApeendOffset_Scpos(add_ScposText, chapcnt_offset, beginFrame);
+          add_ScposText = AppendOffset_Scpos(add_ScposText, chapcnt_offset, beginFrame);
         }
 
         new_CatText.AddRange(add_ScposText);
@@ -85,11 +85,11 @@ namespace LGLauncher.EditFrame.JLS
       }
     }
 
-
+    
     /// <summary>
     /// Scposテキストをオフセット分ずらす
     /// </summary>
-    static List<string> ApeendOffset_Scpos(List<string> scposText, int chapcnt_offset, int frame_offset)
+    static List<string> AppendOffset_Scpos(List<string> scposText, int chapcnt_offset, int frame_offset)
     {
       var new_scposText = new List<string>();
 

@@ -16,33 +16,33 @@ namespace LGLauncher
   [Serializable]
   public class Setting_File
   {
-    const double CurrentRev = 12.0;
-
+    const double CurrentRev = 13.2;
+    
     public double Rev = 0.0;
     public string memo31 = "  Set InputPlugin     d2v  or  lwi  ";
     public string memo32 = "  Set Detector        JLS  or  LG   ";
     public string memo33 = "      cannot set d2v with JLS       ";
     public int Enable = 1;
     public string InputPlugin = "  lwi  ";
-    public string Detector = "  LogoGuillo  ";
+    public string Detector = "  LG  ";
     public int Detector_MultipleRun = 1;
     public string space_1 = "";
 
     //edit chapter
     public double Regard_NsecCM_AsMain = 14.0;
-    public double Regard_NsecMain_AsCM = 29.0;
+    public double Regard_NsecMain_AsCM = 14.0;
     public string space_2 = "";
 
     //output chapter
     public int Output_Tvtp = 2;
-    public int Output_Ogm = 1;
+    public int Output_Ogm = 0;
     public int Output_Frame = 1;
     public int Output_RawFrame = 0;
     public string space_3 = "";
 
     //chapter directory
     public string DirPath_Tvtp = @"  C:\Tvtp_Directory            ";
-    public string DirPath_Misc = @"  C:\Ogm_and_Frame_Direrctory  ";
+    public string DirPath_Misc = @"  C:\Ogm_and_Frame_Directory   ";
     public string space_4 = "";
 
     public int CleanWorkItem = 2;

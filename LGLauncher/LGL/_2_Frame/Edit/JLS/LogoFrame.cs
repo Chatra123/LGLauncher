@@ -8,7 +8,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 
 
-namespace LGLauncher.EditFrame.JLS
+namespace LGLauncher.Frame.JLS
 {
   using OctNov.IO;
 
@@ -58,7 +58,7 @@ namespace LGLauncher.EditFrame.JLS
         if (PathList.IsPart && trimFrame != null)
         {
           int beginFrame = trimFrame[0];
-          add_LogoframeText = ApeendOffset_logoframe(add_LogoframeText, beginFrame);
+          add_LogoframeText = AppendOffset_logoframe(add_LogoframeText, beginFrame);
         }
 
         new_CatText.AddRange(add_LogoframeText);
@@ -79,7 +79,7 @@ namespace LGLauncher.EditFrame.JLS
     /// <summary>
     /// logoframeテキストをオフセット分ずらす
     /// </summary>
-    static List<string> ApeendOffset_logoframe(List<string> logoframeText, int frame_offset)
+    static List<string> AppendOffset_logoframe(List<string> logoframeText, int frame_offset)
     {
       var new_logoframeText = new List<string>();
 

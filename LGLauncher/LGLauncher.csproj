@@ -52,15 +52,15 @@
     <Compile Include="LGL\_1_Detector\WaitForSystemReady.cs" />
     <Compile Include="LGL\_1_Detector\bat\Bat_Join_Logo_Scp.cs" />
     <Compile Include="LGL\_1_Detector\bat\LogoSelector.cs" />
-    <Compile Include="LGL\_1_Detector\bat\BatLuncher.cs" />
+    <Compile Include="LGL\_1_Detector\bat\BatLauncher.cs" />
     <Compile Include="LGL\Misc\CleanWorkItem.cs" />
     <Compile Include="LGL\_1_Detector\AvsVpy\AvsVpyCommon.cs" />
-    <Compile Include="LGL\_2_EditFrame\EditFrame\LogoGuillo.cs" />
-    <Compile Include="LGL\_2_EditFrame\EditFrame\JLS\LogoFrame.cs" />
-    <Compile Include="LGL\_2_EditFrame\EditFrame\JLS\Chapter_exe.cs" />
-    <Compile Include="LGL\_2_EditFrame\EditFrame\JLS\JLS.cs" />
-    <Compile Include="LGL\_2_EditFrame\EditFrame\EditFrame.cs" />
-    <Compile Include="LGL\_2_EditFrame\EditFrame\ConvertToFile.cs" />
+    <Compile Include="LGL\_2_Frame\Edit\LogoGuillo.cs" />
+    <Compile Include="LGL\_2_Frame\Edit\JLS\LogoFrame.cs" />
+    <Compile Include="LGL\_2_Frame\Edit\JLS\Chapter_exe.cs" />
+    <Compile Include="LGL\_2_Frame\Edit\JLS\JLS.cs" />
+    <Compile Include="LGL\_2_Frame\Edit\ConvertFrame.cs" />
+    <Compile Include="LGL\_2_Frame\Edit\MakeChapText.cs" />
     <Compile Include="Setting\Mono.Options\Options.cs" />
     <Compile Include="Setting\Mono.Options\Options_icase.cs" />
     <Compile Include="Setting\Setting_CmdLine.cs" />
@@ -72,7 +72,7 @@
     <Compile Include="Setting\PathList.cs" />
     <Compile Include="LGL\_1_Detector\TimeShiftSrt.cs" />
     <Compile Include="LGL\_1_Detector\bat\Bat_LogoGuillo.cs" />
-    <Compile Include="LGL\_2_EditFrame\FrameEditor.cs" />
+    <Compile Include="LGL\_2_Frame\EditFrame.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

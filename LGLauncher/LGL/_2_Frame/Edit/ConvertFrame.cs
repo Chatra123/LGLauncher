@@ -8,46 +8,44 @@ using System.IO;
 using System.Text.RegularExpressions;
 
 
-namespace LGLauncher.EditFrame
+namespace LGLauncher.Frame
 {
   using OctNov.IO;
 
   /// <summary>
-  /// フレームリストの編集　＆　各形式への変換
+  /// フレームリストから各形式への変換
   /// </summary>
-  static class EditFrame
+  static class ConvertFrame
   {
     /// <summary>
-    /// read Frame File  →  List<int>
+    /// read Frame File  -->  List<int>
     /// </summary>
     /// <returns>
-    /// 取得成功　→　List<int>
-    /// 　　失敗　→　null
+    /// 取得成功  -->  List<int>
+    /// 　　失敗  -->  null
     /// </returns>
-    public static List<int> FrameFile_to_List(string framePath)
+    public static List<int> Read_FrameFile(string framePath)
     {
       //List<string>  -->  List<int>
       var ConvertToIntList = new Func<List<string>, List<int>>(
-        (stringList) =>
+        (strList) =>
         {
-          stringList = stringList.Select(
-                                  (line) =>
-                                  {
-                                    //コメント削除、トリム
-                                    int found = line.IndexOf("//");
-                                    line = (0 <= found) ? line.Substring(0, found) : line;
-                                    line = line.Trim();
-                                    return line;
-                                  })
-                                  .Where((line) => string.IsNullOrWhiteSpace(line) == false)    //空白行削除
-                                  .Distinct()                                                   //重複削除
-                                  .ToList();
+          //コメント削除、トリム
+          strList = strList.Select(
+            (line) =>
+            {
+              int found = line.IndexOf("//");
+              line = (0 <= found) ? line.Substring(0, found) : line;
+              return line.Trim();
+            })
+            .Where((line) => string.IsNullOrWhiteSpace(line) == false)    //空白行削除
+            .Distinct()                                                   //重複削除
+            .ToList();
 
-          var intList = new List<int>();
+          List<int> intList;
           try
           {
-            foreach (var line in stringList)
-              intList.Add(int.Parse(line));
+            intList = strList.Select(line => int.Parse(line)).ToList();
           }
           catch
           {
@@ -61,15 +59,15 @@ namespace LGLauncher.EditFrame
       if (File.Exists(framePath) == false) return null;
 
       //読
-      var frameText = FileR.ReadAllLines(framePath);       //List<string>でファイル取得
+      var frameText = FileR.ReadAllLines(framePath);
       if (frameText == null) return null;
 
       //List<string>  -->  List<int>
       var frameList = ConvertToIntList(frameText);
 
-      //エラーチェック
+      //check
       if (frameList == null) return null;
-      if (frameList.Count % 2 == 1) return null;           //奇数ならエラー
+      if (frameList.Count % 2 == 1) return null;
       return frameList;
     }
 
@@ -82,8 +80,8 @@ namespace LGLauncher.EditFrame
     /// <param name="frameList">元になるフレームリスト</param>
     /// <param name="ths_Mainsec">指定秒数以下のＭａｉｎをつぶす</param>
     /// <returns>
-    ///   成功　→　List<int>
-    ///   失敗　→　null
+    ///   成功  -->  List<int>
+    ///   失敗  -->  null
     /// </returns>
     public static List<int> FlatOut_Main(List<int> frameList, double ths_Mainsec)
     {
@@ -114,8 +112,8 @@ namespace LGLauncher.EditFrame
     /// <param name="frameList">元になるフレームリスト</param>
     /// <param name="ths_CMsec">指定秒数以下のＣＭをつぶす</param>
     /// <returns>
-    ///   成功　→　List<int>
-    ///   失敗　→　null
+    ///   成功  -->  List<int>
+    ///   失敗  -->  null
     /// </returns>
     /// <remarks>開始直後のＣＭはつぶさない。</remarks>
     public static List<int> FlatOut_CM__(List<int> frameList, double ths_CMsec)
@@ -127,11 +125,11 @@ namespace LGLauncher.EditFrame
       //
       //”frameList[i]のフレーム数”と”newListの末尾のフレーム数”の差がcmLength
       //
-      //cmLengthが短ければ newList[last]を次の本編終端のframeList[i+1]にする。
+      //cmLengthが短ければ newList[last]を次の本編終端 frameList[i+1]に置き換える。
       //　　　　　長ければ newListに本編 frameList[i], frameList[i+1]を加える。
       //
       //ただし、開始直後のＣＭは無視する。
-      //開始直後に短いＣＭがあっても本編にはいれない。
+      //開始直後に短いＣＭがあっても本編には加えない。
       //
       var newList = new List<int>();
 
@@ -145,13 +143,13 @@ namespace LGLauncher.EditFrame
         if (cmLength < ths_CMsec)
         {
           //短
-          //ＣＭを無視し本編内とする。次の本編終端をいれる
+          //ＣＭを無視し本編内とする。次の本編終端に置き換える
           newList[newList.Count - 1] = frameList[i + 1];
         }
         else
         {
           //長
-          //ＣＭを採用し通常の　本編始端＆終端　をいれる
+          //ＣＭを採用し通常の　本編始端＆終端　を加える
           newList.Add(frameList[i]);
           newList.Add(frameList[i + 1]);
         }
@@ -163,11 +161,11 @@ namespace LGLauncher.EditFrame
 
 
     /// <summary>
-    ///  avs Trim(1000,2000)　→　List<int>
+    ///  avs Trim(1000,2000)  -->  List<int>
     /// </summary>
     /// <returns>
-    ///   成功　→　List<int>
-    ///   失敗　→　null
+    ///   成功  -->  List<int>
+    ///   失敗  -->  null
     /// </returns>
     public static List<int> AvsTrim_to_FrameList(string avsTrim)
     {
@@ -195,12 +193,12 @@ namespace LGLauncher.EditFrame
 
 
     /// <summary>
-    /// List<int>　→　TvtPlayチャプター
+    /// List<int>  -->  Tvtpチャプター
     /// </summary>
-    public static string To_TvtPlayChap(List<int> frameList)
+    public static string To_TvtpChap(List<int> frameList)
     {
       //フレーム数を100msec単位の時間に変換
-      //    300[frame]  -->  300 / 29.97 * 10  -->  100[100msec]
+      //    300[frame]  -->  300 / 29.970 * 10  -->  100[100msec]
       var timeList = frameList.Select((frame) => { return (int)((1.0 * frame / 29.970) * 10.0); }).ToList();
 
       //intへの変換で丸められている。同じ値が続いたら＋１
@@ -214,7 +212,7 @@ namespace LGLauncher.EditFrame
       var chapText = new List<string>() { "c-" };
       for (int i = 0; i < timeList.Count; i++)
       {
-        int time = timeList[i];        //100msec単位
+        int time = timeList[i];
 
         if (i == 0 && time != 0)
           chapText.Add("0dix-" + time + "dox-");            //開始直後のＣＭスキップ用
@@ -223,15 +221,16 @@ namespace LGLauncher.EditFrame
         else
           chapText.Add("" + time + "dix-");                 //odd     cm in
       }
-      chapText.Add("0eox-c");                               //close
+      chapText.Add("0eox-c");
 
-      //１行にする    List<string>  →  string
+
+      //１行にする    List<string>  -->  string
       string oneliner = "";
       chapText.ForEach((line) => { oneliner += line; });
 
       return oneliner;
     }
-    /*TvtPlay  ChapterMap.cpp*/
+    /* TvtPlay  ChapterMap.cpp */
     // [チャプターコマンド仕様]
     // ・ファイルの文字コードはBOM付きUTF-8であること
     // ・Caseはできるだけ保存するが区別しない
@@ -247,7 +246,7 @@ namespace LGLauncher.EditFrame
     // ・例2: "c-1234cName1-3456c-2345c2ndName-0e-c"
     //
     //
-    /*TvtPlay  Readme.txt*/
+    /* TvtPlay  Readme.txt */
     //TsSkipXChapter【ver.1.4～】
     //チャプタースキップする[=1]かどうか
     // スキップチャプター(名前が"ix"または"ox"で始まるもの)の間をスキップします。
@@ -256,18 +255,18 @@ namespace LGLauncher.EditFrame
 
 
     /// <summary>
-    /// List<int>　→　Ogmチャプター type1
+    /// List<int>  -->  Ogmチャプター type1
     /// </summary>
-    public static string To_OgmChap_type1(List<int> chaplist)
+    public static string To_OgmChap_type1(List<int> frameList)
     {
-      var timecodelist = Frame_to_TimeCode(chaplist);
+      var timecodelist = Frame_to_TimeCode(frameList);
       var chapText = new StringBuilder();
 
       //convert
-      for (int i = 0; i < chaplist.Count; i++)
+      for (int i = 0; i < frameList.Count; i++)
       {
-        string cnt = (i + 1).ToString("00");
         string timecode = timecodelist[i];
+        string cnt = (i + 1).ToString("00");
         chapText.AppendLine(timecode + " " + "chapter " + cnt);
       }
 
@@ -283,18 +282,18 @@ namespace LGLauncher.EditFrame
 
 
     /// <summary>
-    /// List<int>　→　Ogmチャプター type2
+    /// List<int> --> Ogmチャプター type2
     /// </summary>
-    public static string To_OgmChap_type2(List<int> chaplist)
+    public static string To_OgmChap_type2(List<int> frameList)
     {
-      var timecodelist = Frame_to_TimeCode(chaplist);
+      var timecodelist = Frame_to_TimeCode(frameList);
       var chapText = new StringBuilder();
 
       //convert
-      for (int i = 0; i < chaplist.Count; i++)
+      for (int i = 0; i < frameList.Count; i++)
       {
-        string cnt = (i + 1).ToString("00");
         string timecode = timecodelist[i];
+        string cnt = (i + 1).ToString("00");
         chapText.AppendLine("Chapter" + cnt + "=" + timecode);
         chapText.AppendLine("Chapter" + cnt + "Name=" + "chapter " + cnt);
       }
@@ -312,13 +311,14 @@ namespace LGLauncher.EditFrame
      */
 
 
+
     /// <summary>
-    /// フレーム　→　タイムコード文字列  00:10:20.345         for OgmChap
+    /// フレーム  -->  タイムコード文字列  00:10:20.345         for Ogmチャプター
     /// </summary>
-    private static List<string> Frame_to_TimeCode(List<int> framelist)
+    private static List<string> Frame_to_TimeCode(List<int> frameList)
     {
-      //  msec         <--  frame
-      var msec = framelist.Select(frame => 1.0 * frame / 29.970 * 1000).ToList();
+      // msec          <--  frame
+      var msec = frameList.Select(frame => 1.0 * frame / 29.970 * 1000).ToList();
       // timespan      <--  msec
       var timespan = msec.Select(ms => new TimeSpan(0, 0, 0, 0, (int)ms)).ToList();
       // 00:10:20.345  <--  timespan
