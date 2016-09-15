@@ -102,7 +102,7 @@ namespace LGLauncher
                             string searchKey, string ignoreKey = null)
     {
       if (Directory.Exists(directory) == false) return;
-      Thread.Sleep(500);
+      Thread.Sleep(200);
 
       //ファイル取得
       var files = new FileInfo[] { };
