@@ -62,19 +62,17 @@ namespace LGLauncher
     /// <param name="xmlpath">ファイル名を指定</param>
     public static Setting_File LoadFile(string xmlpath = null)
     {
-      //デフォルト名を使用
+      //デフォルト名を使用、新規作成
       if (string.IsNullOrEmpty(xmlpath))
       {
         xmlpath = Default_XmlPath;
 
         if (File.Exists(xmlpath) == false)
-        {
-          var def_Setting = new Setting_File();
-          XmlRW.Save(xmlpath, def_Setting);
-        }
+          XmlRW.Save(xmlpath, new Setting_File());
       }
 
       var file = XmlRW.Load<Setting_File>(xmlpath);
+      file = file ?? new Setting_File();
 
       //追加された項目、削除された項目を書き換え。
       //ユーザーが消したタグなども復元される。
