@@ -346,8 +346,6 @@ namespace LGLauncher
       if (Directory.Exists(LSystemDir) == false)
         Directory.CreateDirectory(LSystemDir);
 
-
-      //
       //WorkDir
       //  衝突は考えない、重複チェックはしてない。
       string workDirName;

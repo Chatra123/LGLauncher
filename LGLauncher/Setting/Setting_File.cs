@@ -29,7 +29,7 @@ namespace LGLauncher
     public string space_1 = "";
 
     //edit chapter
-    public double Regard_NsecCM_AsMain = 14.0;
+    public double Regard_NsecCM_AsMain = 29.0;
     public double Regard_NsecMain_AsCM = 14.0;
     public string space_2 = "";
 
