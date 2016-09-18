@@ -68,7 +68,7 @@ namespace LGLauncher
           //Windows Temp
           cleaner.Delete_File(nDaysBefore, Path.GetTempPath(), "logoGuillo_*.avs");
           cleaner.Delete_File(nDaysBefore, Path.GetTempPath(), "logoGuillo_*.txt");
-          cleaner.Delete_File(nDaysBefore, Path.GetTempPath(), "DGI_pf_tmp_*_*");
+          cleaner.Delete_File(nDaysBefore, Path.GetTempPath(), "DGI_temp_*_*");
         }
     }
 
