@@ -199,7 +199,7 @@ namespace LGLauncher.Frame
     {
       //フレーム数を100msec単位の時間に変換
       //    300[frame]  -->  300 / 29.970 * 10  -->  100[100msec]
-      var timeList = frameList.Select((frame) => { return (int)((1.0 * frame / 29.970) * 10.0); }).ToList();
+      var timeList = frameList.Select((frame) => { return (int)((1.0 * frame / 29.970) * 10); }).ToList();
 
       //intへの変換で丸められている。同じ値が続いたら＋１
       for (int i = 1; i < timeList.Count; i++)
@@ -209,26 +209,21 @@ namespace LGLauncher.Frame
       }
 
       //convert
-      var chapText = new List<string>() { "c-" };
+      string chapText = "c-";
       for (int i = 0; i < timeList.Count; i++)
       {
         int time = timeList[i];
 
         if (i == 0 && time != 0)
-          chapText.Add("0dix-" + time + "dox-");            //開始直後のＣＭスキップ用
+          chapText += "0dix-" + time + "dox-";            //開始直後のＣＭスキップ用
         else if (i % 2 == 0)
-          chapText.Add("" + time + "dox-");                 //even    cm out
+          chapText += "" + time + "dox-";                 //even    cm out
         else
-          chapText.Add("" + time + "dix-");                 //odd     cm in
+          chapText += "" + time + "dix-";                 //odd     cm in
       }
-      chapText.Add("0eox-c");
+      chapText += "0eox-c";
 
-
-      //１行にする    List<string>  -->  string
-      string oneliner = "";
-      chapText.ForEach((line) => { oneliner += line; });
-
-      return oneliner;
+      return chapText;
     }
     /* TvtPlay  ChapterMap.cpp */
     // [チャプターコマンド仕様]
