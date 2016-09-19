@@ -22,7 +22,7 @@ namespace LGLauncher
   /// </summary>
   enum Plugin
   {
-    Unknown,
+    None,
     D2v,
     Lwi,
   }
@@ -32,7 +32,7 @@ namespace LGLauncher
   /// </summary>
   enum AvsVpy
   {
-    Unknown,
+    None,
     Avs,
     Vpy,
   }
@@ -42,7 +42,7 @@ namespace LGLauncher
   /// </summary>
   enum Detector
   {
-    Unknown,
+    None,
     Join_Logo_Scp,
     LogoGuillo,
   }
@@ -310,11 +310,11 @@ namespace LGLauncher
 
         InputPlugin = isD2v ? Plugin.D2v
           : isLwi ? Plugin.Lwi
-          : Plugin.Unknown;
+          : Plugin.None;
 
         Detector = isJLS ? Detector.Join_Logo_Scp
           : isLG ? Detector.LogoGuillo
-          : Detector.Unknown;
+          : Detector.None;
       }
 
       //AvsVpyType
@@ -576,14 +576,14 @@ namespace LGLauncher
         && File.Exists(LwiPath) == false)
         throw new LGLException("lwi dose not exist: " + LwiName);
 
-      if (InputPlugin == Plugin.Unknown)
-        throw new LGLException("Unknown InputPlugin");
+      if (InputPlugin == Plugin.None)
+        throw new LGLException("None InputPlugin");
 
-      if (AvsVpy == AvsVpy.Unknown)
-        throw new LGLException("Unknown AvsVpyType");
+      if (AvsVpy == AvsVpy.None)
+        throw new LGLException("None AvsVpyType");
 
-      if (Detector == Detector.Unknown)
-        throw new LGLException("Unknown LogoDetector");
+      if (Detector == Detector.None)
+        throw new LGLException("None Detector");
 
       if (InputPlugin == Plugin.D2v
         && Detector == Detector.Join_Logo_Scp)
