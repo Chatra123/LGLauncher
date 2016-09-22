@@ -18,7 +18,7 @@ namespace LGLauncher.Frame
   static class ConvertFrame
   {
     /// <summary>
-    /// read Frame File  -->  List<int>
+    /// read *.frame.txt  -->  List<int>
     /// </summary>
     /// <returns>
     /// 取得成功  -->  List<int>
@@ -26,44 +26,35 @@ namespace LGLauncher.Frame
     /// </returns>
     public static List<int> Read_FrameFile(string framePath)
     {
-      //List<string>  -->  List<int>
-      var ConvertToIntList = new Func<List<string>, List<int>>(
-        (strList) =>
-        {
-          //コメント削除、トリム
-          strList = strList.Select(
-            (line) =>
-            {
-              int found = line.IndexOf("//");
-              line = (0 <= found) ? line.Substring(0, found) : line;
-              return line.Trim();
-            })
-            .Where((line) => string.IsNullOrWhiteSpace(line) == false)    //空白行削除
-            .Distinct()                                                   //重複削除
-            .ToList();
-
-          List<int> intList;
-          try
-          {
-            intList = strList.Select(line => int.Parse(line)).ToList();
-          }
-          catch
-          {
-            return null;  //変換失敗
-          }
-
-          return intList;
-        });
-
       //check
       if (File.Exists(framePath) == false) return null;
 
       //読
-      var frameText = FileR.ReadAllLines(framePath);
-      if (frameText == null) return null;
+      var text = FileR.ReadAllLines(framePath);
+      if (text == null) return null;
+
+      //コメント削除、トリム
+      text = text.Select(
+        (line) =>
+        {
+          int found = line.IndexOf("//");
+          line = (0 <= found) ? line.Substring(0, found) : line;
+          return line.Trim();
+        })
+        .Where((line) => string.IsNullOrWhiteSpace(line) == false)    //空白行削除
+        .ToList();
+
 
       //List<string>  -->  List<int>
-      var frameList = ConvertToIntList(frameText);
+      List<int> frameList;
+      try
+      {
+        frameList = text.Select(line => int.Parse(line)).ToList();
+      }
+      catch
+      {
+        frameList = null;  //変換失敗
+      }
 
       //check
       if (frameList == null) return null;
@@ -123,10 +114,10 @@ namespace LGLauncher.Frame
       if (frameList.Count <= 2) return frameList;
 
       //
-      //”frameList[i]のフレーム数”と”newListの末尾のフレーム数”の差がcmLength
+      //「frameList[i]のフレーム数」と「newListの末尾のフレーム数」の差がcmLength
       //
       //cmLengthが短ければ newList[last]を次の本編終端 frameList[i+1]に置き換える。
-      //　　　　　長ければ newListに本編 frameList[i], frameList[i+1]を加える。
+      //　　　　　長ければ newListに本編 frameList[i] to frameList[i+1]を加える。
       //
       //ただし、開始直後のＣＭは無視する。
       //開始直後に短いＣＭがあっても本編には加えない。
@@ -139,7 +130,7 @@ namespace LGLauncher.Frame
 
       for (int i = 2; i < frameList.Count; i += 2)
       {
-        double cmLength = 1.0 * (frameList[i] - newList[newList.Count - 1]) / 29.970;
+        double cmLength = 1.0 * (frameList[i] - newList.Last()) / 29.970;
         if (cmLength < ths_CMsec)
         {
           //短

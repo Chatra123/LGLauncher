@@ -25,15 +25,6 @@ namespace LGLFrameChecker
         //フレームチェック成功、ファイル書込み
         File.WriteAllText("__FrameCheckResult.sys.txt", result);
       }
-      else
-      {
-        //on error
-        //１０秒後に自動終了
-        Console.WriteLine();
-        Console.WriteLine();
-        Console.WriteLine("auto exit after 10 sec");
-        Task.Factory.StartNew(() => { Thread.Sleep(10 * 1000); Environment.Exit(0); });
-      }
 
       Console.Read();
     }
@@ -58,7 +49,7 @@ namespace LGLFrameChecker
       {
         string[] avsfiles = Directory.GetFiles(LWorkDir, "*.*__*.avs");
         if (avsfiles.Count() == 0)
-          return "  Error:  not found  VideoName.p1.*__*.avs";
+          return "  Error:  not found name.p1.0__1000.avs";
       }
 
 
@@ -74,7 +65,7 @@ namespace LGLFrameChecker
       //
       for (int partNo = 1; partNo <= 200; partNo++)
       {
-        //fset_part取得
+        //FrameSet_part取得
         var fs_part = FrameSet.Create(LWorkDir, partNo);
         if (fs_part.HasValidData == false) { FrameSetList.Add(null); continue; }
 
@@ -124,7 +115,7 @@ namespace LGLFrameChecker
           double MatchR_Main = 1.0 * Match_Main / Match__Sum * 100;
           double MatchR___Cm = 1.0 * Match___CM / Match__Sum * 100;
           double MatchR__Not = 1.0 * Match__Not / Match__Sum * 100;
-          //total line
+
           string line = string.Format("{0,3:N0}  {1}      {2,3:N0}  {3,3:N0}  {4,3:N0} ,      {5,7:N0}  {6,7:N0}  {7,7:N0}",
                                       "total", "      ",
                                       MatchR_Main, MatchR___Cm, MatchR__Not,
@@ -258,7 +249,7 @@ namespace LGLFrameChecker
       }
 
       //FrameList取得
-      frameset.List = FrameFile_to_List(files[0]);
+      frameset.List = Read_FrameFile(files[0]);
       if (frameset.List == null)
       {
         frameset.ErrMessage = "  Error:  frameList file  " + files[0];
@@ -344,54 +335,50 @@ namespace LGLFrameChecker
 
 
     /// <summary>
-    /// *.frame.txtを取得
+    /// read *.frame.txt  -->  List<int>
     /// </summary>
-    private static List<int> FrameFile_to_List(string framePath)
+    /// <returns>
+    /// 取得成功  -->  List<int>
+    /// 　　失敗  -->  null
+    /// </returns>
+    public static List<int> Read_FrameFile(string framePath)
+     
     {
-      //List<string>  -->  List<int>
-      var ConvertToIntList = new Func<List<string>, List<int>>(
-        (stringList) =>
-        {
-          stringList = stringList.Select(
-                                  (line) =>
-                                  {
-                                    //コメント削除、トリム
-                                    int found = line.IndexOf("//");
-                                    line = (0 <= found) ? line.Substring(0, found) : line;
-                                    line = line.Trim();
-                                    return line;
-                                  })
-                                  .Where((line) => string.IsNullOrWhiteSpace(line) == false)    //空白行削除
-                                  .Distinct()                                                   //重複削除
-                                  .ToList();
-
-          var intList = new List<int>();
-          try
-          {
-            foreach (var line in stringList)
-              intList.Add(int.Parse(line));
-          }
-          catch
-          {
-            return null;  //変換失敗
-          }
-
-          return intList;
-        });
-
       //check
       if (File.Exists(framePath) == false) return null;
 
       //読
-      var frameText = File.ReadAllLines(framePath, Encoding.GetEncoding("Shift_JIS")).ToList();
-      if (frameText == null) return null;
+      //var text = FileR.ReadAllLines(framePath);
+      var text = File.ReadAllLines(framePath, Encoding.GetEncoding("Shift_JIS")).ToList();
+
+      if (text == null) return null;
+
+      //コメント削除、トリム
+      text = text.Select(
+        (line) =>
+        {
+          int found = line.IndexOf("//");
+          line = (0 <= found) ? line.Substring(0, found) : line;
+          return line.Trim();
+        })
+        .Where((line) => string.IsNullOrWhiteSpace(line) == false)    //空白行削除
+        .ToList();
+
 
       //List<string>  -->  List<int>
-      var frameList = ConvertToIntList(frameText);
+      List<int> frameList;
+      try
+      {
+        frameList = text.Select(line => int.Parse(line)).ToList();
+      }
+      catch
+      {
+        frameList = null;  //変換失敗
+      }
 
-      //エラーチェック
+      //check
       if (frameList == null) return null;
-      if (frameList.Count % 2 == 1) return null;           //奇数ならエラー
+      if (frameList.Count % 2 == 1) return null;
       return frameList;
     }
 
