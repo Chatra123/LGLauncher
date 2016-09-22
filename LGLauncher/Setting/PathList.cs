@@ -291,37 +291,26 @@ namespace LGLauncher
       SrtPath = SrtPath ?? Path.Combine(TsDir, TsNameWithoutExt + ".srt");
 
 
-      //PluginType  DetectorType
+      //Plugin  Detector  AvsVpy
       {
         string plugin = setting.InputPlugin.Trim().ToLower();
         string detector = setting.Detector.Trim().ToLower();
-
         bool isD2v = plugin == "d2v".ToLower();
         bool isLwi = plugin == "lwi".ToLower();
-
-        bool isLG = detector == "LG".ToLower()
-          || detector == "LogoGuillo".ToLower();
-
-        bool isJLS = detector == "JLS".ToLower()
-          || detector == "JoinLogoScp".ToLower()
-          || detector == "JoinLogoScpos".ToLower()
-          || detector == "Join_Logo_Scp".ToLower()
-          || detector == "Join_Logo_Scpos".ToLower();
+        bool isLG = detector == "LG".ToLower();
+        bool isJLS = detector == "JLS".ToLower();
 
         InputPlugin = isD2v ? Plugin.D2v
           : isLwi ? Plugin.Lwi
           : Plugin.None;
-
         Detector = isJLS ? Detector.Join_Logo_Scp
           : isLG ? Detector.LogoGuillo
           : Detector.None;
-      }
 
-      //AvsVpyType
-      {
+
         //Avs固定 
-        const AvsVpy frameServerType = AvsVpy.Avs;
-        AvsVpy = frameServerType;
+        const AvsVpy frameServer = AvsVpy.Avs;
+        AvsVpy = frameServer;
 
         if (AvsVpy == AvsVpy.Vpy)
           throw new NotImplementedException();
