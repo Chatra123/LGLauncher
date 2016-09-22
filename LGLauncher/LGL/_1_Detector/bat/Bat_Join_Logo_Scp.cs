@@ -17,7 +17,7 @@ namespace LGLauncher
     public static string Make_OnRec(string avsPath, string logoPath, string jl_CmdPath)
     {
       if (File.Exists(avsPath) == false)
-        throw new LGLException("format avs does not exist");
+        throw new LGLException("avs does not exist");
       if (File.Exists(logoPath) == false)
         throw new LGLException("logoPath does not exist");
       if (File.Exists(jl_CmdPath) == false)

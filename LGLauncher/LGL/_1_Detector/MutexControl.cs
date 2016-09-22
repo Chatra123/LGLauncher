@@ -31,9 +31,9 @@ namespace LGLauncher
     /// <summary>
     /// 初期化
     /// </summary>
-    public void Initilize(string mutexName, int maxCount = 1)
+    public void Initilize(string name, int count = 1)
     {
-      MutexName = mutexName;
+      MutexName = name;
       //ミューテックスのmaxCountは常に１
     }
 
@@ -57,7 +57,7 @@ namespace LGLauncher
       }
       catch (AbandonedMutexException)
       {
-        //別のスレッドが解放せずに放棄した Mutex オブジェクトを取得した
+        //別のスレッドが解放せずに放棄した Mutexを取得した
         HasControl = false;
       }
 
@@ -104,10 +104,10 @@ namespace LGLauncher
     /// <summary>
     /// 初期化
     /// </summary>
-    public void Initilize(string semaphoreName, int maxCount = 1)
+    public void Initilize(string name, int count = 1)
     {
-      SemaphoreName = semaphoreName;
-      MaxCount = maxCount;
+      SemaphoreName = name;
+      MaxCount = count;
     }
 
     /// <summary>

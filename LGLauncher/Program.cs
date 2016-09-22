@@ -88,11 +88,11 @@ namespace LGLauncher
           * エラー発生時の動作について
           * 　・作成済みのavs  *.p3.2000__3000.avs  を削除
           * 　・ダミーavs      *.p3.2000__2000.avs  を作成
-          * 　　次回のLGLauncherでダミーavsのトリムレンジを読み込んでもらう。
+          * 　　次回のLGLauncherでダミーavsの 2000, 2000を読み込んでもらう。
           * 
           * チャプター出力について
           * 　　エラーが発生してもチャプター出力は行う。
-          * 　　Detect PartNo があるので *.p3.frame.cat.txtを作成しなくてはいけない。
+          * 　　Detect PartNo があるので *.p3.frame.cat.txtを作成しなくてはならない。
           * 　　値は前回のチャプターと同じ値にする。
           * 　　IsLastPartならば join_logo_scpのlast_batch、chapter出力を実行する必要がある。
           */

@@ -17,7 +17,7 @@ namespace LGLauncher
     public static string Make(string avsPath, string srtPath, string logoPath, string paramPath)
     {
       if (File.Exists(avsPath) == false)
-        throw new LGLException("format avs does not exist"); 
+        throw new LGLException("avs does not exist"); 
       if (File.Exists(logoPath) == false)
         throw new LGLException("logoPath does not exist");
       if (File.Exists(paramPath) == false)
@@ -44,17 +44,11 @@ namespace LGLauncher
 
       //#LOGOG_PATH#
       string LOGOG_PATH = PathList.LogoGuillo;
-      //#AVS2X_PATH#
       string AVS2X_PATH = PathList.avs2pipemod;
-      //#AVSPLG_PATH#
       string AVSPLG_PATH = @"..\..\LWork\USE_AVS";
-      //#VIDEO_PATH#
       string VIDEO_PATH = avsPath;     //相対パスだとLogoGuilloの作業フォルダから検索される。フルパスで指定
-      //#LOGO_PATH#
       string LOGO_PATH = logoPath;
-      //#PRM_PATH#
       string PRM_PATH = paramPath;
-      //#OUTPUT_PATH#
       string OUTPUT_PATH = PathList.WorkName + ".frame.txt";
 
       //bat

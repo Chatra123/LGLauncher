@@ -35,7 +35,7 @@ namespace LGLauncher.Frame
         {
           old_CatList = ConvertFrame.Read_FrameFile(catPath);          // from  *.frame.cat.txt
           if (old_CatList == null && add_FrameList == null)
-            throw new LGLException("not detect frame file  or  is invalid file");
+            throw new LGLException("not found frame file  or  is invalid");
         }
         //ファイルが見つからないと new()
         old_CatList = old_CatList ?? new List<int>();
@@ -69,7 +69,7 @@ namespace LGLauncher.Frame
         File.WriteAllLines(catPath, new_CatText, TextEnc.Shift_JIS);
 
         //catPath_partはDetect_PartNoで使用されるので必ず作成すること。
-        //                                        *.p3.frame.cat.txt
+        //                                     *.p3.frame.cat.txt
         string catPath_part = PathList.WorkPath + ".frame.cat.txt";
         File.WriteAllLines(catPath_part, new_CatText, TextEnc.Shift_JIS);
       }
