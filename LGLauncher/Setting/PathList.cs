@@ -223,7 +223,7 @@ namespace LGLauncher
 
       Detect_PartNo();
 
-      Get_BinaryFile(setting);
+      Get_BinaryPath(setting);
 
       Set_Chap_and_Misc(setting);
 
@@ -435,72 +435,87 @@ namespace LGLauncher
 
 
     /// <summary>
+    /// フォルダ内から目的のファイルを取得
+    /// </summary>
+    class FileSercher
+    {
+      FileInfo[] files;
+
+      public FileSercher(string dirpath)
+      {
+        var dirInfo = new DirectoryInfo(LSystemDir);
+        files = dirInfo.GetFiles("*", SearchOption.AllDirectories);
+      }
+
+      /// <summary>
+      /// フルパス  or  string.Empty
+      /// </summary>
+      public string Get_orEmpty(string filename)
+      {
+        var fileInfo = files.Where(fi => fi.Name.ToLower() == filename.ToLower())
+          .FirstOrDefault();
+        return fileInfo != null ? fileInfo.FullName : "";
+      }
+
+      /// <summary>
+      /// フルパス  or  LGLException
+      /// </summary>
+      public string Get(string filename)
+      {
+        string fullpath = Get_orEmpty(filename);
+
+        if (fullpath != "")
+          return fullpath;
+        else
+          throw new LGLException("not found: " + filename);
+      }
+    }
+
+
+
+    /// <summary>
     /// LSystemフォルダ内の各バイナリを取得
     /// </summary>
-    private static void Get_BinaryFile(Setting_File setting)
+    private static void Get_BinaryPath(Setting_File setting)
     {
-      //ファイル一覧から対象のフルパス取得
-      var SearchItem_OrEmpty = new Func<FileInfo[], string, string>(
-        (filelist, target) =>
-        {
-          var finfo = filelist.Where(fi => fi.Name.ToLower() == target.ToLower())
-                              .FirstOrDefault();
-          if (finfo != null)
-            return finfo.FullName;
-          else
-            return "";
-        });
-
-      var SearchItem = new Func<FileInfo[], string, string>(
-        (filelist, target) =>
-        {
-          string path = SearchItem_OrEmpty(filelist, target);
-          if (path != "")
-            return path;
-          else
-            throw new LGLException("not found: " + target);
-        });
-
-
       //ファイル一覧を取得
-      var dirInfo = new DirectoryInfo(LSystemDir);
-      var files = dirInfo.GetFiles("*", SearchOption.AllDirectories);
+      FileSercher sercher = new FileSercher(LSystemDir);
 
-      LogoSelector = SearchItem(files, "LogoSelector.exe");
-      SystemIdleMonitor = SearchItem_OrEmpty(files, "SystemIdleMonitor.exe");
-      avs2pipemod = SearchItem(files, "avs2pipemod.exe");
+      LogoSelector = sercher.Get("LogoSelector.exe");
+      SystemIdleMonitor = sercher.Get_orEmpty("SystemIdleMonitor.exe");
+      avs2pipemod = sercher.Get("avs2pipemod.exe");
 
       //InputPlugin
       if (PathList.AvsVpy == AvsVpy.Avs)
       {
         if (InputPlugin == Plugin.D2v)
-          DGDecode_dll = SearchItem(files, "DGDecode.dll");
+          DGDecode_dll = sercher.Get("DGDecode.dll");
         else if (InputPlugin == Plugin.Lwi)
-          LSMASHSource_dll = SearchItem(files, "LSMASHSource.dll");
+          LSMASHSource_dll = sercher.Get("LSMASHSource.dll");
       }
       else if (PathList.AvsVpy == AvsVpy.Vpy)
       {
         if (InputPlugin == Plugin.D2v)
-          d2vsource_dll = SearchItem(files, "d2vsource.dll");
+          d2vsource_dll = sercher.Get("d2vsource.dll");
         else if (InputPlugin == Plugin.Lwi)
-          vslsmashsource_dll = SearchItem(files, "vslsmashsource.dll");
+          vslsmashsource_dll = sercher.Get("vslsmashsource.dll");
       }
 
       //Detector
       if (Detector == Detector.Join_Logo_Scp)
       {
         //Join_Logo_Scp
-        avsinp_aui = SearchItem(files, "avsinp.aui");
-        Chapter_exe = SearchItem(files, "Chapter_exe.exe");
-        LogoFrame = SearchItem(files, "LogoFrame.exe");
-        Join_Logo_Scp = SearchItem(files, "Join_Logo_Scp.exe");
-        JL_Cmd_OnRec = SearchItem(files, "JL_標準_Rec.txt");
-        JL_Cmd_Standard = SearchItem(files, "JL_標準.txt");
+        avsinp_aui = sercher.Get("avsinp.aui");
+        Chapter_exe = sercher.Get("Chapter_exe.exe");
+        LogoFrame = sercher.Get("LogoFrame.exe");
+        Join_Logo_Scp = sercher.Get("Join_Logo_Scp.exe");
+        JL_Cmd_OnRec = sercher.Get("JL_標準_Rec.txt");
+        JL_Cmd_Standard = sercher.Get("JL_標準.txt");
       }
       else if (Detector == Detector.LogoGuillo)
       {
         //LogoGuillo
-        LogoGuillo = SearchItem(files, "LogoGuillo.exe");
+        LogoGuillo = sercher.Get("LogoGuillo.exe");
 
         //USE_AVS    LTopWorkDir内に作成
         var AVSPLG = Path.Combine(LTopWorkDir, "USE_AVS");
