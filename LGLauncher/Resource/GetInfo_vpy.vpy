@@ -23,7 +23,6 @@ os.chdir(script_dir)
 #lwi#  clip = core.lsmas.LWLibavSource(tspath)
 
 
-
 ## get info
 num_frames = clip.num_frames
 num_frames = str(num_frames) + "\n"

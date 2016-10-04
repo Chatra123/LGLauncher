@@ -83,11 +83,11 @@ namespace LGLauncher
       }
 
       //異常終了
-      if (PathList.Detector == Detector.Join_Logo_Scp)
+      if (PathList.IsJLS)
       {
         throw new LGLException("★ ExitCode = " + exitCode + "");
       }
-      else if (PathList.Detector == Detector.LogoGuillo)
+      else if (PathList.IsLG)
       {
         if (exitCode == -9)
         {

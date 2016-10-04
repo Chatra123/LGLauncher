@@ -67,8 +67,8 @@ namespace LGLauncher
       int idx_lastValidLine = idx_LastTimeline - 2;
       if (idx_lastValidLine < 0) 
         throw new LGLException("srt format error");   //srt形式でない or テキストが４行以下
-      var formatText = (PathList.IsLastPart)
-                            ? srtText : srtText.GetRange(0, idx_lastValidLine + 1);
+      var formatText = PathList.IsLastProcess
+        ? srtText : srtText.GetRange(0, idx_lastValidLine + 1);
 
       //タイムコードの開始を０秒からにする
       var shiftText = formatText;

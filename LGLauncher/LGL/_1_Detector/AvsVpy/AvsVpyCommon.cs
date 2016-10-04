@@ -22,12 +22,12 @@ namespace LGLauncher
     /// </summary>
     public AvsVpyMaker()
     {
-      bool isD2v = PathList.InputPlugin == Plugin.D2v;
-      IndexFormatter.Format(isD2v);
+
+      IndexFormatter.Format(PathList.IsD2v);
 
       maker =
-        (PathList.AvsVpy == AvsVpy.Avs) ? new AvsMaker() as AbstractAvsMaker :
-        (PathList.AvsVpy == AvsVpy.Vpy) ? new VpyMaker() as AbstractAvsMaker :
+        (PathList.IsAvs) ? new AvsMaker() as AbstractAvsMaker :
+        (PathList.IsVpy) ? new VpyMaker() as AbstractAvsMaker :
         null;
     }
 

@@ -9,27 +9,25 @@ namespace LGLauncher
   /*
    * ◇例外について
    *   想定できるエラーはLGLExceptionを発生させてtry{}catch{}で捕まえる。
-   *   録画中にダイアログを表示したくないので、Windowsのエラーダイアログは表示させない。
-   *
-   *
-   * LGLException以外の想定外の例外はOnUnhandledException()で処理する。
-   *    LGLException　　　　　　  通常のログに追記　　　エラーダイアログを表示しない
-   *    OnUnhandledException()    専用のerrlogを作成　　エラーダイアログを表示する
+   *   LGLException以外の想定外の例外はOnUnhandledException()で処理する。
+   *   
+   *    LGLException　　　　　　　通常のログに追記　　　エラーダイアログを表示しない
+   *    OnUnhandledException()　　専用のerrlogを作成　　エラーダイアログを表示する
    */
 
-  class LGLException : System.Exception
+  class LGLException : Exception
   {
     public LGLException() { }
     public LGLException(string message) : base(message) { }
-    public LGLException(string message, System.Exception inner) : base(message, inner) { }
+    public LGLException(string message, Exception inner) : base(message, inner) { }
 
     public override string ToString()
     {
       var text = new StringBuilder();
       text.AppendLine(base.ToString());
-      text.AppendLine("▽    Message    ▽");
+      text.AppendLine("＞  Exception Message  ＜");
       text.AppendLine(base.Message);
-      text.AppendLine("△    Message    △");
+      text.AppendLine("＞                     ＜");
       return text.ToString();
     }
 

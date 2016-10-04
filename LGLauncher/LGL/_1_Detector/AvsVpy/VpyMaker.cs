@@ -94,21 +94,21 @@ namespace LGLauncher
         line = Regex.Replace(line, "#LWorkDir#", PathList.LWorkDir, RegexOptions.IgnoreCase);
 
         //Plugin
-        if (PathList.InputPlugin == Plugin.D2v)
+        if (PathList.IsD2v)
         {
           line = Regex.Replace(line, "#d2v#", "", RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#d2vsource#", PathList.d2vsource_dll, RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#d2vsource#", PathList.d2vsource, RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#D2vName#", PathList.D2vNameInLWork, RegexOptions.IgnoreCase);
         }
-        else if (PathList.InputPlugin == Plugin.Lwi)
+        else if (PathList.IsLwi)
         {
           line = Regex.Replace(line, "#lwi#", "", RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#vslsmashsoruce#", PathList.vslsmashsource_dll, RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#vslsmashsoruce#", PathList.vslsmashsoruce, RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#TsPath#", PathList.TsPath, RegexOptions.IgnoreCase);
         }
 
         line = Regex.Replace(line, "#InfoName#", PathList.WorkName + ".info.txt", RegexOptions.IgnoreCase);
-        text[i] = line.Trim(); // pythonは unexpected indentになるので必ずTrim()
+        text[i] = line.Trim();  // pythonは unexpected indentになるので必ずTrim()
       }
 
       //書
@@ -136,18 +136,16 @@ namespace LGLauncher
       try
       {
         prc.Start();
-        prc.WaitForExit(60 * 1000);
+        prc.WaitForExit(20 * 1000);
         if (prc.HasExited && prc.ExitCode == 0)
           return;  //正常終了
       }
       catch
       {
-        throw new LGLException("python runtime error");
+        //not found python 
+        throw new LGLException("  RunInfo_vpy() runtime error");
       }
-
-      Log.WriteLine("RunInfo process error");
-      Log.WriteLine("  prc.ExitCode  =  " + prc.ExitCode);
-      Log.WriteLine("  prc.HasExited =  " + prc.HasExited);
+      new LGLException("  RunInfo_vpy() timeout");
     }
 
 
@@ -165,24 +163,24 @@ namespace LGLauncher
       {
         var line = text[i];
         //Plugin
-        if (PathList.InputPlugin == Plugin.D2v)
+        if (PathList.IsD2v)
         {
           line = Regex.Replace(line, "#d2v#", "", RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#d2vsource#", PathList.d2vsource_dll, RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#d2vsource#", PathList.d2vsource, RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#D2vName#", PathList.D2vNameInLWork, RegexOptions.IgnoreCase);
         }
-        else if (PathList.InputPlugin == Plugin.Lwi)
+        else if (PathList.IsLwi)
         {
           line = Regex.Replace(line, "#lwi#", "", RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#vslsmashsoruce#", PathList.vslsmashsource_dll, RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#vslsmashsoruce#", PathList.vslsmashsoruce, RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#TsPath#", PathList.TsPath, RegexOptions.IgnoreCase);
         }
 
         //Detector
-        //if (PathList.Detector == DetectorType.Join_Logo_Scp)
-        //  line = Regex.Replace(line, "#Join_Logo_Scp#", "", RegexOptions.IgnoreCase);
-        //else if (PathList.Detector == DetectorType.LogoGuillo)
-        //  line = Regex.Replace(line, "#LogoGuillo#", "", RegexOptions.IgnoreCase);
+        if (PathList.IsJLS)
+          line = Regex.Replace(line, "#JLS#", "", RegexOptions.IgnoreCase);
+        else if (PathList.IsLG)
+          line = Regex.Replace(line, "#LG#", "", RegexOptions.IgnoreCase);
 
         //Trim
         if (PathList.IsPart)
@@ -193,7 +191,7 @@ namespace LGLauncher
           line = Regex.Replace(line, "#BeginFrame#", "" + beginFrame, RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#EndFrame_plus1#", "" + (endFrame + 1), RegexOptions.IgnoreCase);
         }
-        text[i] = line.Trim(); // pythonは unexpected indentになるので必ずTrim()
+        text[i] = line.Trim();  // pythonは unexpected indentになるので必ずTrim()
       }
 
       return text;

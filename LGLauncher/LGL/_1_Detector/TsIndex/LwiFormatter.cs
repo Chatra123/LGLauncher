@@ -21,23 +21,22 @@ namespace LGLauncher
     /// </summary>
     public static void Set_ifLwi()
     {
-      if (PathList.InputPlugin != Plugin.Lwi) return;
+      if (PathList.IsLwi == false) return;
 
       string srcPath = PathList.LwiPathInLWork;
       string dstPath = PathList.TsPath + ".lwi";
-      bool hasSameRoot = Path.GetPathRoot(srcPath).ToLower()
+      bool isSameRoot = Path.GetPathRoot(srcPath).ToLower()
                            == Path.GetPathRoot(dstPath).ToLower();
       try
       {
-        //すでにファイルがあるなら削除
         if (File.Exists(dstPath)) File.Delete(dstPath);
-        Thread.Sleep(200);
+        Thread.Sleep(300);
 
-        if (hasSameRoot)
+        if (isSameRoot)
           File.Move(srcPath, dstPath);
         else
           File.Copy(srcPath, dstPath);
-        Thread.Sleep(200);
+        Thread.Sleep(300);
 
         lock_lwi = new FileStream(dstPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
       }
@@ -52,11 +51,11 @@ namespace LGLauncher
     /// </summary>
     public static void Back_ifLwi()
     {
-      if (PathList.InputPlugin != Plugin.Lwi) return;
+      if (PathList.IsLwi == false) return;
 
       string srcPath = PathList.TsPath + ".lwi";
       string dstPath = PathList.LwiPathInLWork;
-      bool hasSameRoot = Path.GetPathRoot(srcPath).ToLower()
+      bool isSameRoot = Path.GetPathRoot(srcPath).ToLower()
                            == Path.GetPathRoot(dstPath).ToLower();
       if (File.Exists(srcPath) == false) return;
 
@@ -68,15 +67,15 @@ namespace LGLauncher
           lock_lwi = null;
         }
 
-        if (hasSameRoot)
+        if (isSameRoot)
           File.Move(srcPath, dstPath);
         else
           File.Delete(srcPath);
-        Thread.Sleep(200);
+        Thread.Sleep(300);
       }
       catch
       {
-        throw new LGLException("lwi file is locked. fail to back.");
+        throw new LGLException("lwi file is locked. fail to move back.");
       }
     }
 
@@ -254,7 +253,7 @@ namespace LGLauncher
       const string Tag = "</LibavReaderIndexFile>\n";
       byte[] footer = null;
 
-      //footerは数秒間隔でファイル全体が更新されるので
+      //数秒間隔でfooterファイル全体が更新されるので、
       //</LibavReaderIndexFile>を確認するまで繰り返す。
       for (int i = 0; i < 3; i++)
       {

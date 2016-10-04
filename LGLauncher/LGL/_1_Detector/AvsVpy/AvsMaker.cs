@@ -92,16 +92,24 @@ namespace LGLauncher
         line = Regex.Replace(line, "#LWorkDir#", PathList.LWorkDir, RegexOptions.IgnoreCase);
 
         //Plugin
-        if (PathList.InputPlugin == Plugin.D2v)
+        if (PathList.IsD2v_DGDecode)
         {
           line = Regex.Replace(line, "#d2v#", "", RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#DGDecode#", PathList.DGDecode_dll, RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#DGD#", "", RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#DGDecode#", PathList.DGDecode, RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#D2vName#", PathList.D2vNameInLWork, RegexOptions.IgnoreCase);
         }
-        else if (PathList.InputPlugin == Plugin.Lwi)
+        else if (PathList.IsD2v_MPEG2DecPlus)
+        {
+          line = Regex.Replace(line, "#d2v#", "", RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#M2Dp#", "", RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#MPEG2DecPlus#", PathList.MPEG2DecPlus, RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#D2vName#", PathList.D2vNameInLWork, RegexOptions.IgnoreCase);
+        }
+        else if (PathList.IsLwi)
         {
           line = Regex.Replace(line, "#lwi#", "", RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#LSMASHSource#", PathList.LSMASHSource_dll, RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#LSMASHSource#", PathList.LSMASHSource, RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#TsPath#", PathList.TsPath, RegexOptions.IgnoreCase);
         }
 
@@ -126,37 +134,29 @@ namespace LGLauncher
     /// <summary>
     /// InfoSciprt実行  avs
     /// </summary>
-    /// 
     public void RunInfo_avs(string avsPath)
     {
-      for (int retry = 1; retry <= 2; retry++)
+      var prc = new Process();
       {
-        var prc = new Process();
-        {
-          prc.StartInfo.FileName = PathList.avs2pipemod;
-          prc.StartInfo.Arguments = " -info \"" + avsPath + "\"";
-          prc.StartInfo.CreateNoWindow = true;
-          prc.StartInfo.UseShellExecute = false;
-        }
+        prc.StartInfo.FileName = PathList.avs2pipemod;
+        prc.StartInfo.Arguments = " -info \"" + avsPath + "\"";
+        prc.StartInfo.CreateNoWindow = true;
+        prc.StartInfo.UseShellExecute = false;
+      }
 
+      try
+      {
         prc.Start();
-        prc.WaitForExit(60 * 1000);
-
+        prc.WaitForExit(20 * 1000);  //数秒かかるので短すぎるのはダメ
         if (prc.HasExited && prc.ExitCode == 0)
           return;  //正常終了
-
-        if (retry == 1)
-          Thread.Sleep(180 * 1000);
-        else if (retry == 2)
-        {
-          Log.WriteLine("RunInfo process error");
-          Log.WriteLine("  prc.HasExited =  " + prc.HasExited);
-          Log.WriteLine("  prc.ExitCode  =  " + prc.ExitCode);
-        }
-
       }
+      catch
+      {
+        throw new LGLException("  RunInfo_avs() runtime error");
+      }
+      new LGLException("  RunInfo_avs() timeout");
     }
-
 
 
     /// <summary>
@@ -174,24 +174,32 @@ namespace LGLauncher
         line = Regex.Replace(line, "#LWorkDir#", PathList.LWorkDir, RegexOptions.IgnoreCase);
 
         //Plugin
-        if (PathList.InputPlugin == Plugin.D2v)
+        if (PathList.IsD2v_DGDecode)
         {
           line = Regex.Replace(line, "#d2v#", "", RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#DGDecode#", PathList.DGDecode_dll, RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#DGD#", "", RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#DGDecode#", PathList.DGDecode, RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#D2vName#", PathList.D2vNameInLWork, RegexOptions.IgnoreCase);
         }
-        else if (PathList.InputPlugin == Plugin.Lwi)
+        else if (PathList.IsD2v_MPEG2DecPlus)
+        {
+          line = Regex.Replace(line, "#d2v#", "", RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#M2Dp#", "", RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#MPEG2DecPlus#", PathList.MPEG2DecPlus, RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#D2vName#", PathList.D2vNameInLWork, RegexOptions.IgnoreCase);
+        }
+        else if (PathList.IsLwi)
         {
           line = Regex.Replace(line, "#lwi#", "", RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#LSMASHSource#", PathList.LSMASHSource_dll, RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#LSMASHSource#", PathList.LSMASHSource, RegexOptions.IgnoreCase);
           line = Regex.Replace(line, "#TsPath#", PathList.TsPath, RegexOptions.IgnoreCase);
         }
 
         //Detector
-        if (PathList.Detector == Detector.Join_Logo_Scp)
-          line = Regex.Replace(line, "#Join_Logo_Scp#", "", RegexOptions.IgnoreCase);
-        else if (PathList.Detector == Detector.LogoGuillo)
-          line = Regex.Replace(line, "#LogoGuillo#", "", RegexOptions.IgnoreCase);
+        if (PathList.IsJLS)
+          line = Regex.Replace(line, "#JLS#", "", RegexOptions.IgnoreCase);
+        else if (PathList.IsLG)
+          line = Regex.Replace(line, "#LG#", "", RegexOptions.IgnoreCase);
 
         //Trim
         if (PathList.IsPart)

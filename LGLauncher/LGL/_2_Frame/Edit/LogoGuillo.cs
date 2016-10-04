@@ -68,7 +68,7 @@ namespace LGLauncher.Frame
         //次回の参照用                            *.frame.cat.txt
         File.WriteAllLines(catPath, new_CatText, TextEnc.Shift_JIS);
 
-        //catPath_partはDetect_PartNoで使用されるので必ず作成すること。
+        //catPath_partはDetect_PartNo()で使用されるので必ず作成すること。
         //                                     *.p3.frame.cat.txt
         string catPath_part = PathList.WorkPath + ".frame.cat.txt";
         File.WriteAllLines(catPath_part, new_CatText, TextEnc.Shift_JIS);

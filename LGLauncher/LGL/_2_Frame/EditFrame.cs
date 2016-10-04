@@ -36,7 +36,7 @@ namespace LGLauncher.Frame
     {
       //Join_Logo_Scp
       //  JLSの出力をLogoGuilloと同じ形式にする。
-      if (PathList.Detector == Detector.Join_Logo_Scp)
+      if (PathList.IsJLS)
       {
         //     *.p1.jls.result.txt  -->  *.p1.frame.txt
         JLS.JLS.Result_to_Frame(false);
@@ -93,8 +93,8 @@ namespace LGLauncher.Frame
       {
         string path;
         {
-          string dir = (Directory.Exists(PathList.DirPath_Misc))
-                            ? PathList.DirPath_Misc
+          string dir = (Directory.Exists(PathList.ChapDir_Misc))
+                            ? PathList.ChapDir_Misc
                             : PathList.TsDir;
           string name = (PathList.IsLastPart)
                              ? PathList.TsNameWithoutExt + ".rawframe.txt"
@@ -117,10 +117,10 @@ namespace LGLauncher.Frame
       List<int> editFrame = null;
       {
         editFrame = new List<int>(rawFrame);  //コピー
-        editFrame = ConvertFrame.FlatOut_CM__(editFrame, PathList.Regard_NsecCM_AsMain);
         editFrame = ConvertFrame.FlatOut_Main(editFrame, PathList.Regard_NsecMain_AsCM);
         editFrame = ConvertFrame.FlatOut_CM__(editFrame, PathList.Regard_NsecCM_AsMain);
         editFrame = ConvertFrame.FlatOut_Main(editFrame, PathList.Regard_NsecMain_AsCM);
+        editFrame = ConvertFrame.FlatOut_CM__(editFrame, PathList.Regard_NsecCM_AsMain);
       }
 
 
@@ -130,8 +130,8 @@ namespace LGLauncher.Frame
       {
         string path;
         {
-          string dir = (Directory.Exists(PathList.DirPath_Misc))
-                            ? PathList.DirPath_Misc
+          string dir = (Directory.Exists(PathList.ChapDir_Misc))
+                            ? PathList.ChapDir_Misc
                             : PathList.TsDir;
           string name = (PathList.IsLastPart)
                              ? PathList.TsNameWithoutExt + ".frame.txt"
@@ -156,8 +156,8 @@ namespace LGLauncher.Frame
       {
         string path;
         {
-          string dir = (Directory.Exists(PathList.DirPath_Tvtp))
-                            ? PathList.DirPath_Tvtp
+          string dir = (Directory.Exists(PathList.ChapDir_Tvtp))
+                            ? PathList.ChapDir_Tvtp
                             : PathList.TsDir;
           string name = PathList.TsNameWithoutExt + ".chapter";
           path = Path.Combine(dir, name);
@@ -179,8 +179,8 @@ namespace LGLauncher.Frame
       {
         string path;
         {
-          string dir = (Directory.Exists(PathList.DirPath_Misc))
-                            ? PathList.DirPath_Misc
+          string dir = (Directory.Exists(PathList.ChapDir_Misc))
+                            ? PathList.ChapDir_Misc
                             : PathList.TsDir;
           string name = PathList.TsNameWithoutExt + ".ogm.chapter";
           path = Path.Combine(dir, name);

@@ -15,7 +15,6 @@ namespace LGLauncher
   {
     static MainMethod_Module module = new MainMethod_Module();
 
-
     private static void Main(string[] args)
     {
       ///*テスト用引数*/
@@ -56,8 +55,6 @@ namespace LGLauncher
 
       while (true)
       {
-        Log.WriteLine();
-
         //分割トリム作成
         int[] splitTrim;
         if (PathList.IsPart)
@@ -66,12 +63,12 @@ namespace LGLauncher
           int EndFrame_Max = trimFrame[1];
           bool isLastSplit;
           splitTrim = module.MakeSplitTrim(EndFrame_Max, out isLastSplit);
-          PathList.Set_IsLastSplit(isLastSplit);
+          PathList.Update_IsLastSplit(isLastSplit);
         }
         else//IsAll
         {
           splitTrim = trimFrame;
-          PathList.Set_IsLastSplit(true);
+          PathList.Update_IsLastSplit(true);
         }
 
 
@@ -85,14 +82,14 @@ namespace LGLauncher
         catch (LGLException e)
         {
           /*
-          * エラー発生時の動作について
+          * ◇エラー発生時の動作について
           * 　・作成済みのavs  *.p3.2000__3000.avs  を削除
           * 　・ダミーavs      *.p3.2000__2000.avs  を作成
           * 　　次回のLGLauncherでダミーavsの 2000, 2000を読み込んでもらう。
           * 
-          * チャプター出力について
+          * ◇チャプター出力について
           * 　　エラーが発生してもチャプター出力は行う。
-          * 　　Detect PartNo があるので *.p3.frame.cat.txtを作成しなくてはならない。
+          * 　　Detect_PartNo()があるので *.p3.frame.cat.txtは作成しなくてはならない。
           * 　　値は前回のチャプターと同じ値にする。
           * 　　IsLastPartならば join_logo_scpのlast_batch、chapter出力を実行する必要がある。
           */
@@ -123,7 +120,7 @@ namespace LGLauncher
         if (PathList.IsLastSplit || PathList.IsAll || HasError)
           break;
         else
-          PathList.IncrementPartNo();  //PartNo++で continue
+          PathList.IncrementPartNo();  //PartNo++
       }
 
 
@@ -248,14 +245,14 @@ namespace LGLauncher
         //bat
         string batPath = "";
         {
-          if (PathList.Detector == Detector.Join_Logo_Scp)
+          if (PathList.IsJLS)
           {
             var logo = LogoSelector.GetLogo();
             var jl_cmd = PathList.JL_Cmd_OnRec;
             batPath = Bat_Join_Logo_Scp.Make_OnRec(avsPath,
                                                    logo[0], jl_cmd);
           }
-          else if (PathList.Detector == Detector.LogoGuillo)
+          else if (PathList.IsLG)
           {
             var logo_param = LogoSelector.GetLogo_and_Param();
             batPath = Bat_LogoGuillo.Make(avsPath, srtPath,

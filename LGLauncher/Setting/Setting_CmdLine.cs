@@ -86,17 +86,17 @@ namespace LGLauncher
     {
       var text = new StringBuilder();
       text.AppendLine("  [ App Command Line ]");
-      text.AppendLine("    All      = " + IsAll);
-      text.AppendLine("    Last     = " + IsLast);
-      text.AppendLine("    Sequence = " + SequenceName);
+      text.AppendLine("    All       =  " + IsAll);
+      text.AppendLine("    Last      =  " + IsLast);
+      text.AppendLine("    Sequence  =  " + SequenceName);
 
-      text.AppendLine("    TsPath   = " + TsPath);
-      text.AppendLine("    D2vPath  = " + D2vPath);
-      text.AppendLine("    LwiPath  = " + LwiPath);
-      text.AppendLine("    SrtPath  = " + SrtPath);
+      text.AppendLine("    TsPath    =  " + TsPath);
+      text.AppendLine("    D2vPath   =  " + D2vPath);
+      text.AppendLine("    LwiPath   =  " + LwiPath);
+      text.AppendLine("    SrtPath   =  " + SrtPath);
 
-      text.AppendLine("    Channel  = " + Channel);
-      text.AppendLine("    Program  = " + Program);      
+      text.AppendLine("    Channel   =  " + Channel);
+      text.AppendLine("    Program   =  " + Program);
       return text.ToString();
     }
 

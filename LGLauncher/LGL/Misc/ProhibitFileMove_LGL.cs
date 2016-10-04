@@ -31,7 +31,7 @@ namespace LGLauncher
       catch { throw new LGLException("cant lock ts file"); }
 
       //d2v
-      if (PathList.InputPlugin == Plugin.D2v)
+      if (PathList.IsD2v)
         try
         {
           var d2v = new FileStream(PathList.D2vPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
@@ -40,7 +40,7 @@ namespace LGLauncher
         catch { throw new LGLException("cant lock d2v file"); }
 
       //lwi
-      if (PathList.InputPlugin == Plugin.Lwi)
+      if (PathList.IsLwi)
         try
         {
           var lwi = new FileStream(PathList.LwiPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);

@@ -17,41 +17,38 @@ namespace LGLauncher
     /// </summary>
     public static List<string> GetLogo_and_Param()
     {
-      var getdata = RunLogoSelector();
+      var result = Run();
+      if (result == null)
+        throw new LGLException("LogoSelector return value is null");
+      if (result.Count < 2)
+        throw new LGLException("LogoSelector return value is -lt 2 lines");
 
-      if (getdata == null)
-        throw new LGLException("LogoSelector return data is null");
-      if (getdata.Count < 2)
-        throw new LGLException("LogoSelector return data is -lt 2 lines");
-
-      string logoPath = getdata[0];
-      string paramPath = getdata[1];
+      string logoPath = result[0];
+      string paramPath = result[1];
       return new List<string> { logoPath, paramPath };
     }
 
 
     /// <summary>
-    /// Join_logo_Scp用    Logo取得
+    /// Join_logo_Scp用  Logo取得
     /// </summary>
     public static List<string> GetLogo()
     {
-      var getdata = RunLogoSelector();
+      var result = Run();
+      if (result == null)
+        throw new LGLException("LogoSelector return value is null");
+      if (result.Count < 1)
+        throw new LGLException("LogoSelector return value is -lt 1 line");
 
-      if (getdata == null)
-        throw new LGLException("LogoSelector return data is null");
-      if (getdata.Count < 1)
-        throw new LGLException("LogoSelector return data is -lt 1 lines");
-
-      string logoPath = getdata[0];
+      string logoPath = result[0];
       return new List<string> { logoPath };
-
     }
 
 
     /// <summary>
     /// LogoSelector実行
     /// </summary>
-    private static List<string> RunLogoSelector()
+    private static List<string> Run()
     {
       if (File.Exists(PathList.LogoSelector) == false)
         throw new LGLException("LogoSelector does not exist");
@@ -72,16 +69,16 @@ namespace LGLauncher
       {
         var log = new StringBuilder();
         log.AppendLine("  [ LogoSelector ]");
-        log.AppendLine("    path   :");
-        log.AppendLine(path);
-        log.AppendLine("    args   :");
-        log.AppendLine(args);
-        log.AppendLine("    return :");
-        log.AppendLine(result);
+        log.AppendLine("    path   :  " + path);
+        log.AppendLine("    args   :  " + args);
+        log.AppendLine("    return :" );
+        log.Append(result);
         Log.WriteLine(log.ToString());
       }
       return split;
     }
+
+
 
 
     /// <summary>
@@ -109,9 +106,9 @@ namespace LGLauncher
         prc.Close();
         return result;
       }
-      catch (Exception exc)
+      catch (Exception e)
       {
-        Log.WriteLine(exc.ToString());
+        Log.WriteLine(e.ToString());
         throw new LGLException("LogoSelector has error");
       }
     }
