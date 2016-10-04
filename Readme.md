@@ -46,7 +46,7 @@
 
     -ts "C:\video.ts"
 tsファイルのフルパス  
-tsファイルのパスを元に各ファイルパスを作成します。  
+tsのパスを元に各ファイルパスを作成します。  
 "C:\video.ts.pp.d2v"  
 "C:\video.ts.pp.lwi"  
 "C:\video.ts.pp.lwifooter"  
@@ -115,7 +115,7 @@ LG  :  LogoGuilloで処理
 Windows内での chapter_exe, LogoGuillo, logoframe同時実行数
 
 
-    Regard_NsecCM_AsMain  14.0  
+    Regard_NsecCM_AsMain  25.0  
 １４．０秒以下のＣＭ部を除去  
 
 
@@ -155,12 +155,12 @@ Ogm形式のチャプターファイルを出力
 2 : 毎回出力する  
 
 
-    DirPath_Tvtp  C:\Tvtp_Directory  
+    ChapDir_Tvtp  C:\Tvtp_Directory  
 Tvtplayチャプターの出力フォルダ  
 フォルダが存在しない場合はＴＳと同じ場所に出力します。  
 
 
-    DirPath_Misc  C:\Ogm_and_Frame_Directory  
+    ChapDir_Misc  C:\Ogm_and_Frame_Directory  
 Ogm chapter、フレームファイルの出力フォルダ  
 フォルダが存在しない場合はＴＳと同じ場所に出力します。  
 
@@ -174,46 +174,31 @@ Ogm chapter、フレームファイルの出力フォルダ
 
 ------------------------------------------------------------------
 ### LSystemフォルダ
-　フォルダ以下に各バイナリファイルを置いてください。  
-　サブフォルダ内も自動で検索します。
+　フォルダ以下に必要なバイナリファイルを置いてください。  
+　サブフォルダ内も検索します。
 
-
-##### 必要  
-    DGDecode.dll  
-    LSMASHSource.dll  
-
+##### 必要 
     avs2pipemod.exe  
     LogoSelector.exe  
-
+	
+##### avisynth
+    DGDecode.dll  
+	MPEG2DecPlus.dll  
+    LSMASHSource.dll  
 
 ##### ファイルがあれば使用
     SystemIdleMonitor.exe  
 
-
-##### LogoGuilloを使用する場合  
+##### LogoGuillo
     logoGuillo.exe  
 
-
-##### join_logo_scpを使用する場合  
+##### join_logo_scp
     avsinp.aui  
     chapter_exe.exe  
     logoframe.exe  
     join_logo_scp.exe  
     JL__標準.txt  
     JL_標準_Rec.txt  
-
-
-	
-------------------------------------------------------------------
-### lwi
-
-- d2vよりも２倍程速く処理できます。
-
-- フッターファイルがあれば使用します。
-
-- tsとlwiが同じフォルダにある場合はlwiのファイル名をTsName.ts.lwiにしないでください。
-AviSynthのファイル読込時にシステム側で使用します。
-
         
     
 ------------------------------------------------------------------
@@ -249,22 +234,6 @@ AviSynthのファイル読込時にシステム側で使用します。
 してからLogoGuilloを実行します。
 
 
-* LogoGuillo実行間隔による差
-    * フレーム認識  
-        - １分～５分はＣＭが本編として組み込まれる量が多い。１０分ならほぼ差が出ない。
-        
-    * 処理時間の増加率  
-
-|  実行間隔  |  処理時間  |
-|:----------:|:----------:|
-|    60 min  |    1.0 倍  |
-|    20      |    1.1     |
-|    10      |    1.1     |
-|     5      |    1.4     |
-|     3      |    1.4     |
-|     1      |    2.0     |
-
-
   
 ------------------------------------------------------------------
 ### 謝辞
@@ -277,6 +246,7 @@ AviSynthのファイル読込時にシステム側で使用します。
 * join_logo_scp
 * LogoGuillo
 * L-SMASH Works
+* MPEG2DecPlus
 
 が必要です。各作者にお礼申し上げます。
 
