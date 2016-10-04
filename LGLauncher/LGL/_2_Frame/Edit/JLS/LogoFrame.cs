@@ -23,7 +23,7 @@ namespace LGLauncher.Frame.JLS
       //logoframeによって作成されるファイル                *.p3.jls.logoframe.txt
       string add_ScposPath = PathList.WorkPath + ".jls.logoframe.txt";
 
-      //結合SCPos                                          *.jls.logoframe.cat.txt
+      //結合logoframe                                      *.jls.logoframe.cat.txt
       string catPath = Path.Combine(PathList.LWorkDir,
                                     PathList.TsShortName + ".jls.logoframe.cat.txt");
 

@@ -566,6 +566,8 @@ namespace LGLauncher
       //chapter directory
       ChapDir_Tvtp = setting.ChapDir_Tvtp;
       ChapDir_Misc = setting.ChapDir_Misc;
+      ChapDir_Tvtp = Directory.Exists(ChapDir_Tvtp) ? ChapDir_Tvtp : TsDir;
+      ChapDir_Misc = Directory.Exists(ChapDir_Misc) ? ChapDir_Misc : TsDir;
 
       //misc
       Detector_MultipleRun = setting.Detector_MultipleRun;

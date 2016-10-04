@@ -88,18 +88,15 @@ namespace LGLauncher.Frame
       int endFrame = trimFrame[1];
 
       //raw frame
-      if ((PathList.IsPart && 2 <= PathList.Output_RawFrame)
-        || (PathList.IsLastPart && 1 <= PathList.Output_RawFrame))
+      if (PathList.IsPart && 2 <= PathList.Output_RawFrame
+        || PathList.IsLastPart && 1 <= PathList.Output_RawFrame)
       {
         string path;
         {
-          string dir = (Directory.Exists(PathList.ChapDir_Misc))
-                            ? PathList.ChapDir_Misc
-                            : PathList.TsDir;
-          string name = (PathList.IsLastPart)
+          string name = PathList.IsLastPart
                              ? PathList.TsNameWithoutExt + ".rawframe.txt"
                              : PathList.TsNameWithoutExt + ".part.rawframe.txt";
-          path = Path.Combine(dir, name);
+          path = Path.Combine(PathList.ChapDir_Misc, name);
         }
 
         var text = MakeChapText.Make_Frame(rawFrame, endFrame);
@@ -125,18 +122,15 @@ namespace LGLauncher.Frame
 
 
       //frame
-      if ((PathList.IsPart && 2 <= PathList.Output_Frame)
-        || (PathList.IsLastPart && 1 <= PathList.Output_Frame))
+      if (PathList.IsPart && 2 <= PathList.Output_Frame
+        || PathList.IsLastPart && 1 <= PathList.Output_Frame)
       {
         string path;
         {
-          string dir = (Directory.Exists(PathList.ChapDir_Misc))
-                            ? PathList.ChapDir_Misc
-                            : PathList.TsDir;
-          string name = (PathList.IsLastPart)
+          string name = PathList.IsLastPart
                              ? PathList.TsNameWithoutExt + ".frame.txt"
                              : PathList.TsNameWithoutExt + ".part.frame.txt";
-          path = Path.Combine(dir, name);
+          path = Path.Combine(PathList.ChapDir_Misc, name);
         }
 
         var text = MakeChapText.Make_Frame(editFrame, endFrame);
@@ -151,16 +145,13 @@ namespace LGLauncher.Frame
 
 
       //Tvtp
-      if ((PathList.IsPart && 2 <= PathList.Output_Tvtp)
-        || (PathList.IsLastPart && 1 <= PathList.Output_Tvtp))
+      if (PathList.IsPart && 2 <= PathList.Output_Tvtp
+        || PathList.IsLastPart && 1 <= PathList.Output_Tvtp)
       {
         string path;
         {
-          string dir = (Directory.Exists(PathList.ChapDir_Tvtp))
-                            ? PathList.ChapDir_Tvtp
-                            : PathList.TsDir;
           string name = PathList.TsNameWithoutExt + ".chapter";
-          path = Path.Combine(dir, name);
+          path = Path.Combine(PathList.ChapDir_Tvtp, name);
         }
 
         var text = MakeChapText.Make_Tvtp(editFrame, endFrame);
@@ -179,11 +170,8 @@ namespace LGLauncher.Frame
       {
         string path;
         {
-          string dir = (Directory.Exists(PathList.ChapDir_Misc))
-                            ? PathList.ChapDir_Misc
-                            : PathList.TsDir;
           string name = PathList.TsNameWithoutExt + ".ogm.chapter";
-          path = Path.Combine(dir, name);
+          path = Path.Combine(PathList.ChapDir_Misc, name);
         }
 
         var text = MakeChapText.Make_Ogm(editFrame, endFrame);
@@ -195,7 +183,7 @@ namespace LGLauncher.Frame
         }
         catch { }
       }
-    }
+
 
   }//class
 }
