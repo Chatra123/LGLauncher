@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using System.IO;
+using clean = LGLauncher.FileCleaner;
+
+
 
 namespace LGLauncher
 {
@@ -13,8 +16,6 @@ namespace LGLauncher
   /// </summary>
   static class CleanWorkItem
   {
-    static FileCleaner cleaner = new FileCleaner();
-
     /// <summary>
     /// LWorkDir内のファイル削除
     ///   以前の処理でファイルが残っていたら削除
@@ -24,15 +25,15 @@ namespace LGLauncher
       //LWorkDir
       if (PathList.Is1stPart || PathList.IsAll)
       {
-        cleaner.OldFile(0.0, PathList.LWorkDir, "*.frame.cat.txt");  //前回までの合成フレーム
-        cleaner.OldFile(0.0, PathList.LWorkDir, "*.jls.*");
-        cleaner.OldFile(0.0, PathList.LWorkDir, "*.d2v");
-        cleaner.OldFile(0.0, PathList.LWorkDir, "*.lwi");
+        clean.OldFile(0.0, PathList.LWorkDir, "*.frame.cat.txt");  //前回までの合成フレーム
+        clean.OldFile(0.0, PathList.LWorkDir, "*.jls.*");
+        clean.OldFile(0.0, PathList.LWorkDir, "*.d2v");
+        clean.OldFile(0.0, PathList.LWorkDir, "*.lwi");
 
         if (PathList.Is1stPart)
-          cleaner.OldFile(0.0, PathList.LWorkDir, "*.p?*.*");        //ワイルドカード指定可
+          clean.OldFile(0.0, PathList.LWorkDir, "*.p?*.*");        //ワイルドカード指定可
         else if (PathList.IsAll)
-          cleaner.OldFile(0.0, PathList.LWorkDir, "*.all.*");
+          clean.OldFile(0.0, PathList.LWorkDir, "*.all.*");
       }
     }
 
@@ -47,8 +48,8 @@ namespace LGLauncher
         if (PathList.IsLastPart)
         {
           //LWorkDir
-          cleaner.OldFile(0.0, PathList.LWorkDir, "_" + PathList.TsShortName + "*.sys.*");
-          cleaner.OldFile(0.0, PathList.LWorkDir, PathList.TsShortName + "*");
+          //cleaner.OldFile(0.0, PathList.LWorkDir, "_" + PathList.TsShortName + "*.sys.*");
+          clean.OldFile(0.0, PathList.LWorkDir, "*" + PathList.TsShortName + "*");
         }
 
       // Mode = 1    古いファイル削除
@@ -57,18 +58,16 @@ namespace LGLauncher
         {
           const double nDaysBefore = 2.0;
           //LTopWorkDir                    サブフォルダ内も対象
-          cleaner.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.frame.cat.txt");
-          cleaner.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.jls.*");
-          cleaner.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.all.*");
-          cleaner.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.p?*.*");
-          cleaner.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.sys.*");
-          cleaner.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.d2v");
-          cleaner.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.lwi");
-          cleaner.EmptyDir(PathList.LTopWorkDir);
+          clean.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.frame.cat.txt");
+          clean.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.jls.*");
+          clean.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.all.*");
+          clean.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.p?*.*");
+          clean.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.sys.*");
+          clean.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.d2v");
+          clean.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.lwi");
+          clean.EmptyDir(PathList.LTopWorkDir);
           //Windows Temp
-          cleaner.OldFile(nDaysBefore, Path.GetTempPath(), "logoGuillo_*.avs");
-          cleaner.OldFile(nDaysBefore, Path.GetTempPath(), "logoGuillo_*.txt");
-          cleaner.OldFile(nDaysBefore, Path.GetTempPath(), "DGI_temp_*_*");
+          clean.OldFile(nDaysBefore, Path.GetTempPath(), "DGI_temp_*_*");
         }
     }
 
@@ -79,8 +78,8 @@ namespace LGLauncher
     public static void Clean_OnError()
     {
       // *.p3.2000__3000.avs 削除
-      cleaner.OldFile(0.0, PathList.LWorkDir, PathList.WorkName + ".*__*.avs");
-      cleaner.OldFile(0.0, PathList.LWorkDir, PathList.WorkName + ".*__*.vpy");
+      clean.OldFile(0.0, PathList.LWorkDir, PathList.WorkName + ".*__*.avs");
+      clean.OldFile(0.0, PathList.LWorkDir, PathList.WorkName + ".*__*.vpy");
     }
   }
 
@@ -89,7 +88,7 @@ namespace LGLauncher
   /// <summary>
   /// 削除処理　古いファイル、空フォルダを削除
   /// </summary>
-  class FileCleaner
+  static class FileCleaner
   {
     /// <summary>
     /// 古いファイル削除
@@ -98,11 +97,10 @@ namespace LGLauncher
     /// <param name="directory">ファイルを探すフォルダ。　子フォルダ内も対象</param>
     /// <param name="searchKey">ファイル名に含まれる文字。ワイルドカード可 * </param>
     /// <param name="ignoreKey">除外するファイルに含まれる文字。ワイルドカード不可 × </param>
-    public void OldFile(double nDaysBefore, string directory,
+    public static void OldFile(double nDaysBefore, string directory,
                         string searchKey, string ignoreKey = null)
     {
       if (Directory.Exists(directory) == false) return;
-      Thread.Sleep(200);
 
       //ファイル取得
       var files = new FileInfo[] { };
@@ -144,7 +142,7 @@ namespace LGLauncher
     /// 空フォルダ削除
     /// </summary>
     /// <param name="parent_dir">親フォルダを指定。空の子フォルダが削除対象、親フォルダ自身は削除されない。</param>
-    public void EmptyDir(string parent_dir)
+    public static void EmptyDir(string parent_dir)
     {
       if (Directory.Exists(parent_dir) == false) return;
 
