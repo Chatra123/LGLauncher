@@ -185,6 +185,22 @@ namespace LGLauncher.Frame
       }
 
 
+
+      //SCPos & logoframe
+      if (PathList.IsJLS)
+        if (PathList.IsLastPart && 2 <= PathList.Output_Frame)
+        {
+          string src = Path.Combine(PathList.LWorkDir, PathList.TsShortName);
+          string dst = Path.Combine(PathList.ChapDir_Misc, PathList.TsNameWithoutExt);
+          try
+          {
+            File.Copy(src + ".jls.scpos.cat.txt", dst + ".scpos.txt");
+            File.Copy(src + ".jls.logoframe.cat.txt", dst + ".logoframe.txt");
+          }
+          catch { }
+        }
+
+    }
   }//class
 }
 
