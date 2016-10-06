@@ -155,12 +155,19 @@ Ogm形式のチャプターファイルを出力
 2 : 毎回出力する  
 
 
-    ChapDir_Tvtp  C:\Tvtp_Directory  
+    Output_scp  0  
+Chapter_exe、LogoFrameの出力ファイル
+0 : 出力しない  
+1 : -lastのみ出力する  
+2 : N/A
+
+
+    ChapDir_Tvtp  C:\Tvtp_Directory\  
 Tvtplayチャプターの出力フォルダ  
 フォルダが存在しない場合はＴＳと同じ場所に出力します。  
 
 
-    ChapDir_Misc  C:\Ogm_and_Frame_Directory  
+    ChapDir_Misc  C:\Ogm_and_Frame_Directory\  
 Ogm chapter、フレームファイルの出力フォルダ  
 フォルダが存在しない場合はＴＳと同じ場所に出力します。  
 
