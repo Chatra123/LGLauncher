@@ -29,8 +29,8 @@ namespace LGLauncher
     public string space_1 = "";
 
     //edit chapter
-    public double Regard_NsecCM_AsMain = 14.0;
     public double Regard_NsecMain_AsCM = 20.0;
+    public double Regard_NsecCM_AsMain = 14.0;
     public string space_2 = "";
 
     //output chapter
@@ -42,8 +42,8 @@ namespace LGLauncher
     public string space_3 = "";
 
     //chapter directory
-    public string ChapDir_Tvtp = @"  C:\Tvtp_Directory            ";
-    public string ChapDir_Misc = @"  C:\Ogm_and_Frame_Directory   ";
+    public string ChapDir_Tvtp = @"  C:\Tvtp_Directory\           ";
+    public string ChapDir_Misc = @"  C:\Ogm_and_Frame_Directory\  ";
     public string space_4 = "";
 
     public int CleanWorkItem = 2;

@@ -25,15 +25,15 @@ namespace LGLauncher
       //LWorkDir
       if (PathList.Is1stPart || PathList.IsAll)
       {
-        clean.OldFile(0.0, PathList.LWorkDir, "*.frame.cat.txt");  //前回までの合成フレーム
+        if (PathList.Is1stPart)
+          clean.OldFile(0.0, PathList.LWorkDir, "*.p?*.*");
+        else if (PathList.IsAll)
+          clean.OldFile(0.0, PathList.LWorkDir, "*.all.*");
+
+        clean.OldFile(0.0, PathList.LWorkDir, "*.frame.cat.txt");
         clean.OldFile(0.0, PathList.LWorkDir, "*.jls.*");
         clean.OldFile(0.0, PathList.LWorkDir, "*.d2v");
         clean.OldFile(0.0, PathList.LWorkDir, "*.lwi");
-
-        if (PathList.Is1stPart)
-          clean.OldFile(0.0, PathList.LWorkDir, "*.p?*.*");        //ワイルドカード指定可
-        else if (PathList.IsAll)
-          clean.OldFile(0.0, PathList.LWorkDir, "*.all.*");
       }
     }
 
@@ -48,7 +48,6 @@ namespace LGLauncher
         if (PathList.IsLastPart)
         {
           //LWorkDir
-          //cleaner.OldFile(0.0, PathList.LWorkDir, "_" + PathList.TsShortName + "*.sys.*");
           clean.OldFile(0.0, PathList.LWorkDir, "*" + PathList.TsShortName + "*");
         }
 
@@ -58,10 +57,10 @@ namespace LGLauncher
         {
           const double nDaysBefore = 2.0;
           //LTopWorkDir                    サブフォルダ内も対象
+          clean.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.p?*.*");
+          clean.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.all.*");
           clean.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.frame.cat.txt");
           clean.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.jls.*");
-          clean.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.all.*");
-          clean.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.p?*.*");
           clean.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.sys.*");
           clean.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.d2v");
           clean.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.lwi");
@@ -95,10 +94,10 @@ namespace LGLauncher
     /// </summary>
     /// <param name="nDaysBefore">Ｎ日前のファイルを削除対象にする。</param>
     /// <param name="directory">ファイルを探すフォルダ。　子フォルダ内も対象</param>
-    /// <param name="searchKey">ファイル名に含まれる文字。ワイルドカード可 * </param>
-    /// <param name="ignoreKey">除外するファイルに含まれる文字。ワイルドカード不可 × </param>
+    /// <param name="pattern">ファイル名に含まれる文字。ワイルドカード可 * </param>
+    /// <param name="ignore">除外するファイルに含まれる文字。ワイルドカード不可 × </param>
     public static void OldFile(double nDaysBefore, string directory,
-                        string searchKey, string ignoreKey = null)
+                        string pattern, string ignore = null)
     {
       if (Directory.Exists(directory) == false) return;
 
@@ -107,7 +106,7 @@ namespace LGLauncher
       try
       {
         var dirInfo = new DirectoryInfo(directory);
-        files = dirInfo.GetFiles(searchKey, SearchOption.AllDirectories);
+        files = dirInfo.GetFiles(pattern, SearchOption.AllDirectories);//ignore case
       }
       catch (System.UnauthorizedAccessException)
       {
@@ -124,7 +123,7 @@ namespace LGLauncher
       foreach (var finfo in files)
       {
         if (finfo.Exists == false) continue;
-        if (ignoreKey != null && 0 <= finfo.Name.IndexOf(ignoreKey)) continue;
+        if (ignore != null && 0 <= finfo.Name.IndexOf(ignore)) continue;
 
         //古いファイル？
         bool over_creation = nDaysBefore < (DateTime.Now - finfo.CreationTime).TotalDays;
