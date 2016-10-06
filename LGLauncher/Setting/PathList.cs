@@ -218,6 +218,7 @@ namespace LGLauncher
     public static int Output_Frame { get; private set; }
     public static int Output_Tvtp { get; private set; }
     public static int Output_Ogm { get; private set; }
+    public static int Output_Scp { get; private set; }
 
     //chapter directory
     public static string ChapDir_Tvtp { get; private set; }
@@ -562,6 +563,7 @@ namespace LGLauncher
       Output_Ogm = setting.Output_Ogm;
       Output_Frame = setting.Output_Frame;
       Output_RawFrame = setting.Output_RawFrame;
+      Output_Scp = setting.Output_Scp;
 
       //chapter directory
       ChapDir_Tvtp = setting.ChapDir_Tvtp;

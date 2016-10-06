@@ -29,8 +29,8 @@ namespace LGLauncher
     public string space_1 = "";
 
     //edit chapter
-    public double Regard_NsecCM_AsMain = 20.0;
-    public double Regard_NsecMain_AsCM = 14.0;
+    public double Regard_NsecCM_AsMain = 14.0;
+    public double Regard_NsecMain_AsCM = 20.0;
     public string space_2 = "";
 
     //output chapter
@@ -38,6 +38,7 @@ namespace LGLauncher
     public int Output_Ogm = 0;
     public int Output_Frame = 1;
     public int Output_RawFrame = 0;
+    public int Output_Scp = 0;
     public string space_3 = "";
 
     //chapter directory

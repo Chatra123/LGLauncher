@@ -188,7 +188,7 @@ namespace LGLauncher.Frame
 
       //SCPos & logoframe
       if (PathList.IsJLS)
-        if (PathList.IsLastPart && 2 <= PathList.Output_Frame)
+        if (PathList.IsLastPart && 1 <= PathList.Output_Scp)
         {
           string src = Path.Combine(PathList.LWorkDir, PathList.TsShortName);
           string dst = Path.Combine(PathList.ChapDir_Misc, PathList.TsNameWithoutExt);
