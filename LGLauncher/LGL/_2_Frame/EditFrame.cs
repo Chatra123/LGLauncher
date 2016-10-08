@@ -98,7 +98,6 @@ namespace LGLauncher.Frame
                              : PathList.TsNameWithoutExt + ".part.rawframe.txt";
           path = Path.Combine(PathList.ChapDir_Misc, name);
         }
-
         var text = MakeChapText.Make_Frame(rawFrame, endFrame);
 
         try
@@ -132,7 +131,6 @@ namespace LGLauncher.Frame
                              : PathList.TsNameWithoutExt + ".part.frame.txt";
           path = Path.Combine(PathList.ChapDir_Misc, name);
         }
-
         var text = MakeChapText.Make_Frame(editFrame, endFrame);
 
         try
@@ -153,7 +151,6 @@ namespace LGLauncher.Frame
           string name = PathList.TsNameWithoutExt + ".chapter";
           path = Path.Combine(PathList.ChapDir_Tvtp, name);
         }
-
         var text = MakeChapText.Make_Tvtp(editFrame, endFrame);
 
         try
@@ -173,7 +170,6 @@ namespace LGLauncher.Frame
           string name = PathList.TsNameWithoutExt + ".ogm.chapter";
           path = Path.Combine(PathList.ChapDir_Misc, name);
         }
-
         var text = MakeChapText.Make_Ogm(editFrame, endFrame);
 
         try
@@ -183,7 +179,6 @@ namespace LGLauncher.Frame
         }
         catch { }
       }
-
 
 
       //SCPos & logoframe
@@ -199,6 +194,7 @@ namespace LGLauncher.Frame
           }
           catch { }
         }
+
 
     }
   }//class
