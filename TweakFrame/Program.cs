@@ -12,6 +12,8 @@ namespace TweakFrame
   {
     static void Main(string[] args)
     {
+      AppDomain.CurrentDomain.UnhandledException += OctNov.Excp.ExceptionInfo.OnUnhandledException;
+
       //args = new string[] { @"sample.frame.txt" };
       Tweak_Main(args);
       //Test_Main(args);
@@ -60,8 +62,9 @@ namespace TweakFrame
       //変化があった？
       int Len_file = SideTool.GetTotalMainLen(frame);
       int Len_tweak = SideTool.GetTotalMainLen(tweak);
-      int diff = Math.Abs(Len_file - Len_tweak);
-      bool isDiff = 3.0 * 29.970 < diff;    // Nsec以上の変化がある
+      double diff_sec = 1.0 * Math.Abs(Len_file - Len_tweak) / 29.970;    // Nsec以上の変化がある
+      int diff_cnt = Math.Abs(frame.Count() - tweak.Count()) / 2;
+      bool isDiff = 0 < diff_sec && 2 <= diff_cnt;
       if (isDiff)
       {
         string dir = Path.GetDirectoryName(path);
