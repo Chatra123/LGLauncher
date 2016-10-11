@@ -39,6 +39,7 @@ set end=%hour%	%min_%	%sec_%	%msec%0
 echo #PartNo#		%begin%		%end%>>"_#TsShortName#_ˆ—ŠÔ.sys.txt"
 
 
+popd
 endlocal
 ::  TIMEOUT /T 5 /NOBREAK
 ::  pause

@@ -15,7 +15,7 @@ pushd %0\..
 echo ERRORLEVEL = %ERRORLEVEL%
 
 
-
+popd
 endlocal
 ::  TIMEOUT /T 5 /NOBREAK
 ::  pause
