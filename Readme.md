@@ -9,13 +9,13 @@
 ### 使い方　　コマンドライン
 
 録画中のファイル  
-    LGLauncher.exe         -ts "C:\Video.ts"  -channel "abc"  
+    LGLauncher.exe         -ts "C:\Video.ts"  -ch "abc"  
 最後のみ  
-    LGLauncher.exe  -last  -ts "C:\Video.ts"  -channel "abc"  
+    LGLauncher.exe  -last  -ts "C:\Video.ts"  -ch "abc"  
 
 
 録画終了後のファイル  
-    LGLauncher.exe  -all   -ts "C:\Video.ts"  -channel "abc"  
+    LGLauncher.exe  -all   -ts "C:\Video.ts"  -ch "abc"  
 
 
 ------------------------------------------------------------------
@@ -38,7 +38,7 @@
     - LSMASHSource.dll  
    を入れる。
 
-2. LSystemフォルダの LogoSelector.exeを実行しiniファイルを作成し、[LogoDir]の設定をする。  
+2. LSystemフォルダの LogoSelector.exeを実行してiniを作成し、[LogoDir]を設定する。  
 
 
 ------------------------------------------------------------------
@@ -115,13 +115,13 @@ LG  :  LogoGuilloで処理
 Windows内での chapter_exe, LogoGuillo, logoframe同時実行数
 
 
-    Regard_NsecCM_AsMain  25.0  
+    Regard_NsecMain_AsCM  20.0  
+２０．０秒以下の本編部を除去  
+
+
+    Regard_NsecCM_AsMain  14.0  
 １４．０秒以下のＣＭ部を除去  
 
-
-    Regard_NsecMain_AsCM  14.0  
-１４．０秒以下の本編部を除去  
-    
 
     Output_Tvtp  2  
 Tvtplay用チャプターファイルを出力  
@@ -155,8 +155,8 @@ Ogm形式のチャプターファイルを出力
 2 : 毎回出力する  
 
 
-    Output_scp  0  
-Chapter_exe、LogoFrameの出力ファイル
+    Output_Scp  0  
+Chapter_exe、LogoFrameの結果を出力
 0 : 出力しない  
 1 : -lastのみ出力する  
 2 : N/A
