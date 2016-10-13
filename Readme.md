@@ -167,7 +167,7 @@ Tvtplayチャプターの出力フォルダ
 フォルダが存在しない場合はＴＳと同じ場所に出力します。  
 
 
-    ChapDir_Misc  C:\Ogm_and_Frame_Directory\  
+    ChapDir_Misc  C:\Frame_and_misc_Directory\  
 Ogm chapter、フレームファイルの出力フォルダ  
 フォルダが存在しない場合はＴＳと同じ場所に出力します。  
 

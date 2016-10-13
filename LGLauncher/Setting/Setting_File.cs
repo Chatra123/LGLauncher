@@ -16,7 +16,7 @@ namespace LGLauncher
   [Serializable]
   public class Setting_File
   {
-    const double CurrentRev = 14.2;
+    const double CurrentRev = 14.3;
     
     public double Rev = 0.0;
     public string memo31 = "  Set InputPlugin     d2v  or  lwi  ";
@@ -43,7 +43,7 @@ namespace LGLauncher
 
     //chapter directory
     public string ChapDir_Tvtp = @"  C:\Tvtp_Directory\           ";
-    public string ChapDir_Misc = @"  C:\Ogm_and_Frame_Directory\  ";
+    public string ChapDir_Misc = @"  C:\Frame_and_misc_Directory\  ";
     public string space_4 = "";
 
     public int CleanWorkItem = 2;
