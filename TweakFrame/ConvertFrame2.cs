@@ -8,7 +8,7 @@ using System.IO;
 
 namespace TweakFrame
 {
-  static class Tweaker
+  static class ConvertFrame2
   {
 
     /// <summary>

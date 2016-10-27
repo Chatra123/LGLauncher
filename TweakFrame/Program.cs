@@ -37,57 +37,49 @@ namespace TweakFrame
 
       //tweak
       const double Regard_MainAsCm__Side = 20.0;
-      const double Regard_CmAsMain__Side = 14.0;
       const double Regard_MainAsCm__Center = 60.0;
-      const double Regard_CmAsMain__Center = 40.0;
+      const double Regard_CmAsMain__Side = 14.0;
+      const double Regard_CmAsMain__Center = 28.0;
 
       double total = frame.Last() + 29.970 * 60;//推定
-      double first_10min = 30 * 60 * 10, Last_10min = total - 30 * 60 * 10;//in frames
+      double First_5m = 30 * 60 * 5, Last_5m = total - 30 * 60 * 5;
+
+
+      //double First_10m = 30 * 60 * 10, Last_10m = total - 30 * 60 * 10;
+      double First_Nm = First_5m;
+      double Last_Nm = Last_5m;
+
 
       var tweak = frame.ToList();//copy
       for (int i = 0; i < 2; i++)
       {
-        tweak = Tweaker.FlatOut_CM__(tweak, Regard_CmAsMain__Side, 0, first_10min);
-        tweak = Tweaker.FlatOut_CM__(tweak, Regard_CmAsMain__Center, first_10min, Last_10min);
-        tweak = Tweaker.FlatOut_CM__(tweak, Regard_CmAsMain__Side, Last_10min, total);
+        tweak = ConvertFrame2.FlatOut_CM__(tweak, Regard_CmAsMain__Side, 0, First_Nm);
+        tweak = ConvertFrame2.FlatOut_CM__(tweak, Regard_CmAsMain__Center, First_Nm, Last_Nm);
+        tweak = ConvertFrame2.FlatOut_CM__(tweak, Regard_CmAsMain__Side, Last_Nm, total);
 
-        tweak = Tweaker.FlatOut_Main(tweak, Regard_MainAsCm__Side, 0, first_10min);
-        tweak = Tweaker.FlatOut_Main(tweak, Regard_MainAsCm__Center, first_10min, Last_10min);
-        tweak = Tweaker.FlatOut_Main(tweak, Regard_MainAsCm__Side, Last_10min, total);
+        tweak = ConvertFrame2.FlatOut_Main(tweak, Regard_MainAsCm__Side, 0, First_Nm);
+        tweak = ConvertFrame2.FlatOut_Main(tweak, Regard_MainAsCm__Center, First_Nm, Last_Nm);
+        tweak = ConvertFrame2.FlatOut_Main(tweak, Regard_MainAsCm__Side, Last_Nm, total);
       }
       SideTool.ShowFrame(frame, "file");
       SideTool.ShowFrame(tweak, "tweak");
 
 
       //変化があった？
-      int Len_file = SideTool.GetTotalMainLen(frame);
-      int Len_tweak = SideTool.GetTotalMainLen(tweak);
-      double diff_sec = 1.0 * Math.Abs(Len_file - Len_tweak) / 29.970;    // Nsec以上の変化がある
-      int diff_cnt = Math.Abs(frame.Count() - tweak.Count()) / 2;
-      bool isDiff = 0 < diff_sec && 2 <= diff_cnt;
-      if (isDiff)
+      bool diff = 4 <= Math.Abs(frame.Count() - tweak.Count());
+      if (diff)
       {
+        //save tvtp chapter
         string dir = Path.GetDirectoryName(path);
-        string name = Path.GetFileName(path);                                  //sample.frame.txt
-        string basename = name.Substring(0, name.Length - ".frame.txt".Length);//sample
-        //frame
-        {
-          string[] org_frameText = frame.Select(f => f.ToString()).ToArray();
-          string[] twk_frameText = tweak.Select(f => f.ToString()).ToArray();
-          string org_path = Path.Combine(dir, "Origin_" + basename + ".frame.txt");
-          string twk_path = Path.Combine(dir, "Tweak__" + basename + ".frame.txt");
-          File.WriteAllLines(org_path, org_frameText);
-          File.WriteAllLines(twk_path, twk_frameText);
-        }
-        //tvtp
-        {
-          string org_tvtpText = ConvertFrame.To_TvtpChap(frame);
-          string twk_tvtpText = ConvertFrame.To_TvtpChap(tweak);
-          string org_path = Path.Combine(dir, "Origin_" + basename + ".chapter");
-          string twk_path = Path.Combine(dir, "Tweak__" + basename + ".chapter");
-          File.WriteAllText(org_path, org_tvtpText);
-          File.WriteAllText(twk_path, twk_tvtpText);
-        }
+        string name = Path.GetFileName(path);
+        string basename = name.Substring(0, name.Length - ".frame.txt".Length);
+
+        string org_tvtpText = ConvertFrame.To_TvtpChap(frame);
+        string twk_tvtpText = ConvertFrame.To_TvtpChap(tweak);
+        string org_path = Path.Combine(dir, "Original " + basename + ".chapter");
+        string twk_path = Path.Combine(dir, "Edit     " + basename + ".chapter");
+        File.WriteAllText(org_path, org_tvtpText);
+        File.WriteAllText(twk_path, twk_tvtpText);
       }
     }
 
@@ -108,13 +100,13 @@ namespace TweakFrame
 
       //var mn_1 = ConvertFrame.FlatOut_Main(frame, 120.0 / 30);
       //SideTool.ShowFrame(mn_1, "FlatOut_Main1");
-      //var mn_2 = Tweaker.FlatOut_Main(frame, 120.0 / 30, 0.85, 1.0);
+      //var mn_2 = ConvertFrame2.FlatOut_Main(frame, 120.0 / 30, 0.85, 1.0);
       //SideTool.ShowFrame(mn_2, "FlatOut_Main2");
 
 
       var cm_1 = ConvertFrame.FlatOut_CM__(frame, 200.0 / 30);
       SideTool.ShowFrame(cm_1, "FlatOut_CM__1");
-      var cm_2 = Tweaker.FlatOut_CM__(frame, 200.0 / 30, 0.5, 0.95);
+      var cm_2 = ConvertFrame2.FlatOut_CM__(frame, 200.0 / 30, 0.5, 0.95);
       SideTool.ShowFrame(cm_2, "FlatOut_CM__2");
     }
 
