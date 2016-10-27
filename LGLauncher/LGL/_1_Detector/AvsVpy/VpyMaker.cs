@@ -126,12 +126,10 @@ namespace LGLauncher
     public void RunInfo_vpy(string vpyPath)
     {
       var prc = new Process();
-      {
-        prc.StartInfo.FileName = "python";
-        prc.StartInfo.Arguments = " \"" + vpyPath + "\"";
-        prc.StartInfo.CreateNoWindow = true;
-        prc.StartInfo.UseShellExecute = false;
-      }
+      prc.StartInfo.FileName = "python";
+      prc.StartInfo.Arguments = " \"" + vpyPath + "\"";
+      prc.StartInfo.CreateNoWindow = true;
+      prc.StartInfo.UseShellExecute = false;
 
       try
       {

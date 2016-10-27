@@ -77,6 +77,12 @@ namespace LGLauncher
   /// </summary>
   class AvsMakerModule
   {
+    /*
+     * note
+     *  - avs内のWriteFileStart()のファイルパスが長いと*.info.txtのファイル名が途中で切れる。
+     *  - ファイルパスの長さが255byteあたりでファイル名が切れる。
+     */
+
     /// <summary>
     /// 総フレーム数取得用のAvs作成
     /// </summary>
@@ -123,11 +129,6 @@ namespace LGLauncher
 
       return infoPath;
     }
-    /*
-     * note
-     *  - avs内のWriteFileStart()のファイル名が長いと*.info.txtのファイル名が途中で切れる。
-     *  - ファイルパスの長さが255byteあたりでファイル名が切れる
-     */
 
 
 
@@ -137,12 +138,10 @@ namespace LGLauncher
     public void RunInfo_avs(string avsPath)
     {
       var prc = new Process();
-      {
-        prc.StartInfo.FileName = PathList.avs2pipemod;
-        prc.StartInfo.Arguments = " -info \"" + avsPath + "\"";
-        prc.StartInfo.CreateNoWindow = true;
-        prc.StartInfo.UseShellExecute = false;
-      }
+      prc.StartInfo.FileName = PathList.avs2pipemod;
+      prc.StartInfo.Arguments = " -info \"" + avsPath + "\"";
+      prc.StartInfo.CreateNoWindow = true;
+      prc.StartInfo.UseShellExecute = false;
 
       try
       {
