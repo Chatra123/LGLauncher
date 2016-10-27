@@ -19,7 +19,7 @@ namespace LGLauncher
     {
       ///*テスト用引数*/
       //var testArgs = new List<string>() { 
-      //                                    "-last", 
+      //                                    "-part", 
       //                                    "-ts",
       //                                    @".\cap8s.ts",
       //                                    "-ch", "A", 
@@ -33,11 +33,10 @@ namespace LGLauncher
 
 
       //初期設定
-      string cmdline_ToString = "";  //ログ用のコマンドライン情報
       int[] trimFrame = null;        //avsの有効フレーム範囲
       try
       {
-        bool initialized = module.Initialize(args, out cmdline_ToString);
+        bool initialized = module.Initialize(args);
         if (initialized == false) return;
 
         //有効フレーム範囲取得
@@ -48,7 +47,6 @@ namespace LGLauncher
       {
         Log.WriteLine();
         Log.WriteLine(e.ToString());
-        Log.WriteLine(cmdline_ToString);
         return;
       }
 
@@ -90,13 +88,12 @@ namespace LGLauncher
           * ◇チャプター出力について
           * 　　エラーが発生してもチャプター出力は行う。
           * 　　Detect_PartNo()があるので *.p3.frame.cat.txtは作成しなくてはならない。
-          * 　　値は前回のチャプターと同じ値にする。
+          * 　　値は前回のチャプターと同じ値。
           * 　　IsLastPartならば join_logo_scpのlast_batch、chapter出力を実行する必要がある。
           */
           HasError = true;
           Log.WriteLine();
           Log.WriteLine(e.ToString());
-          Log.WriteLine(cmdline_ToString);
           CleanWorkItem.Clean_OnError();
           AvsVpyCommon.CreateDummy_OnError();
         }
@@ -113,7 +110,6 @@ namespace LGLauncher
           HasError = true;
           Log.WriteLine();
           Log.WriteLine(e.ToString());
-          Log.WriteLine(cmdline_ToString);
         }
 
 
@@ -136,24 +132,20 @@ namespace LGLauncher
       /// <summary>
       /// Initialize
       /// </summary>
-      public bool Initialize(string[] args, out string cmdline_ToString)
+      public bool Initialize(string[] args)
       {
         var cmdline = new Setting_CmdLine(args);
-        cmdline_ToString = cmdline.ToString();
-
         var setting = Setting_File.LoadFile();
         if (setting.Enable <= 0) return false;
         if (args.Count() == 0) return false;               //”引数０”なら設定ファイル作成後に終了
 
         //パス作成
         PathList.Initialize(cmdline, setting);
-
         ProhibitFileMove_LGL.Lock();
         CleanWorkItem.Clean_Beforehand();
 
         if (PathList.Is1stPart || PathList.IsAll)
-          Log.WriteLine(cmdline_ToString);
-
+          Log.WriteLine(cmdline.ToString());
         return true;
       }
 
@@ -172,7 +164,6 @@ namespace LGLauncher
          *  length = 45min なら、 30m, 15m       に分割
          *  length = 95min なら、 30m, 30m, 35m  に分割
          */
-
         //開始フレーム　　（　直前の終了フレーム　＋　１　）
         int beginFrame;
         {
@@ -190,7 +181,6 @@ namespace LGLauncher
         {
           const int len_30min = (int)(30.0 * 60.0 * 29.970);
           const int len_40min = (int)(40.0 * 60.0 * 29.970);
-
           int len = endFrame_Max - beginFrame + 1;
           if (len_40min < len)
           {
@@ -281,8 +271,7 @@ namespace LGLauncher
               bool isReady = waitForReady.GetReady(PathList.DetectorName, PathList.Detector_MultipleRun);
               if (isReady == false) return;
             }
-
-
+            
             int timeout_ms;
             {
               //logoframeが終了しないことがあったのでタイムアウトを設定
@@ -294,8 +283,8 @@ namespace LGLauncher
             }
 
             //Bat実行
-            bool need_retry;
             LwiFile.Set_ifLwi();
+            bool need_retry;
             BatLauncher.Launch(batPath, out need_retry, timeout_ms);
             if (need_retry)
               continue;
@@ -305,7 +294,6 @@ namespace LGLauncher
           finally
           {
             LwiFile.Back_ifLwi();
-
             //Semaphore解放
             if (waitForReady != null)
               waitForReady.Release();

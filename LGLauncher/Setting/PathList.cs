@@ -109,7 +109,7 @@ namespace LGLauncher
     //    previous work path      C:\EDCB\Write\Write_PF\LGLauncher\LWork\010101_ショップジ_0a1b308c1\ショップジ.p2
     //                  name      ショップジ.p2
     public static string WorkPath { get { return Path.Combine(LWorkDir, WorkName); } }
-    public static string WorkName { get { return (IsAll) ? TsShortName + ".all" : TsShortName + ".p" + PartNo; } }
+    public static string WorkName { get { return IsAll ? TsShortName + ".all" : TsShortName + ".p" + PartNo; } }
     public static string WorkPath_prv { get { return Path.Combine(LWorkDir, WorkName_prv); } }
     public static string WorkName_prv { get { return TsShortName + ".p" + (PartNo - 1); } }
     private static string SequenceName;    //作業フォルダ名のMD5に使用
@@ -119,15 +119,15 @@ namespace LGLauncher
     //   1 <= No  IsPart
     //  No  =  0  uninitialized value and detect No 
     //  No  = -1  IsAll
-    //  -2 <= No  throw Exception
     public static int PartNo { get; private set; }
     public static bool Is1stPart { get { return PartNo == 1; } }
-    public static bool IsPart { get { return 1 <= PartNo; } }
-    public static bool IsAll { get; private set; }
+    public static bool IsPart { get; private set; }
+    public static bool IsAll { get { return IsPart == false; } }
 
     //コマンドラインに -IsLast があるか？
-    //   -IsLastが指定されていれば録画終了済み
-    public static bool IsLastProcess { get; private set; }
+    private static bool IsLast_cmdline;
+    //最後のLGLauncherプロセスか？
+    public static bool IsLastProcess { get { return IsAll || IsLast_cmdline; } }
 
     //最後の SplitTrimか？
     //  SplitTrim : avsから有効フレームを取得した後に、さらに分割したTrim()
@@ -140,7 +140,6 @@ namespace LGLauncher
     }
 
     //最後の PartNoか？
-    //　複数回実行されるLGLauncherでの一番最後のPartNo
     public static bool IsLastPart
     {
       get
@@ -181,8 +180,7 @@ namespace LGLauncher
     public static string d2vsource { get; private set; }
     public static string vslsmashsoruce { get; private set; }
 
-
-    //Select logo file
+    //Select logo
     public static string Channel { get; private set; }
     public static string Program { get; private set; }
     public static string LogoSelector { get; private set; }
@@ -194,16 +192,13 @@ namespace LGLauncher
     public static int Detector_MultipleRun { get; private set; }
     public static readonly string[] DetectorName =
       new string[] { "chapter_exe", "logoframe", "logoGuillo" };
-
     //LogoGuillo
     public static string LogoGuillo { get; private set; }
-
     //Join_Logo_Scp
     public static string avsinp_aui { get; private set; }
     public static string Chapter_exe { get; private set; }
     public static string LogoFrame { get; private set; }
     public static string Join_Logo_Scp { get; private set; }
-
     //  JL command
     public static string JL_Cmd_OnRec { get; private set; }
     public static string JL_Cmd_Standard { get; private set; }
@@ -212,14 +207,12 @@ namespace LGLauncher
     //edit chapter
     public static double Regard_NsecCM_AsMain { get; private set; }
     public static double Regard_NsecMain_AsCM { get; private set; }
-
     //chapter output mode
     public static int Output_RawFrame { get; private set; }
     public static int Output_Frame { get; private set; }
     public static int Output_Tvtp { get; private set; }
     public static int Output_Ogm { get; private set; }
     public static int Output_Scp { get; private set; }
-
     //chapter directory
     public static string ChapDir_Tvtp { get; private set; }
     public static string ChapDir_Misc { get; private set; }
@@ -241,7 +234,7 @@ namespace LGLauncher
 
       Detect_PartNo();
 
-      Get_BinaryPath(setting);
+      Get_BinaryPath();
 
       Set_Chap_and_Misc(setting);
 
@@ -255,8 +248,8 @@ namespace LGLauncher
     private static void Copy_fromCommandLine(Setting_CmdLine cmdline)
     {
       //copy
-      IsAll = cmdline.IsAll;
-      IsLastProcess = cmdline.IsLast || cmdline.IsAll;
+      IsPart = cmdline.IsPart || cmdline.IsLast;
+      IsLast_cmdline = cmdline.IsLast;
       SequenceName = cmdline.SequenceName ?? "";
 
       TsPath = cmdline.TsPath;
@@ -267,7 +260,6 @@ namespace LGLauncher
       Channel = cmdline.Channel ?? "";
       Program = cmdline.Program ?? "";
 
-      //チェック
       //Ts
       if (File.Exists(TsPath) == false)
         throw new LGLException("ts does not exist");
@@ -282,13 +274,10 @@ namespace LGLauncher
       //Extension
       if (TsPath != null && Path.GetExtension(TsPath).ToLower() != ".ts")
         throw new LGLException("TsPath has invalid extension");
-
       if (D2vPath != null && Path.GetExtension(D2vPath).ToLower() != ".d2v")
         throw new LGLException("D2vPath has invalid extension");
-
       if (LwiPath != null && Path.GetExtension(LwiPath).ToLower() != ".lwi")
         throw new LGLException("LwiPath has invalid extension");
-
       if (SrtPath != null && Path.GetExtension(SrtPath).ToLower() != ".srt")
         throw new LGLException("SrtPath has invalid extension");
     }
@@ -308,6 +297,14 @@ namespace LGLauncher
       LwiFooterPath = LwiPath + "footer";
       SrtPath = SrtPath ?? Path.Combine(TsDir, TsNameWithoutExt + ".srt");
 
+      if (IsAll)
+      {
+        if (File.Exists(D2vPath) == false && File.Exists(TsPath + ".d2v"))
+          D2vPath = TsPath + ".d2v";
+        if (File.Exists(LwiPath) == false && File.Exists(TsPath + ".lwi"))
+          LwiPath = TsPath + ".lwi";
+      }
+
       //Plugin  Detector  AvsVpy
       {
         string plugin = setting.InputPlugin.Trim().ToLower();
@@ -325,9 +322,8 @@ namespace LGLauncher
           : Detector.None;
 
         //Avs固定 
-        const AvsVpy frameServer = AvsVpy.Avs;
-        AvsVpy = frameServer;
-
+        const AvsVpy avs = AvsVpy.Avs;
+        AvsVpy = avs;
         if (AvsVpy == AvsVpy.Vpy)
           throw new NotImplementedException();
       }
@@ -353,15 +349,15 @@ namespace LGLauncher
 
       //WorkDir
       //  衝突は考えない、重複チェックはしてない。
-      string workDirName;
+      string dirName;
       {
         var tsinfo = new FileInfo(TsPath);
-        string timecode_ID = tsinfo.CreationTime.ToString("ddHHmm");
+        string timecode_Name = tsinfo.CreationTime.ToString("ddHHmm");
         string timecode_MD5 = tsinfo.CreationTime.ToString("yyyyMMdd_dddd_HHmmss_fffffff");
         string MD5 = Hash.ComputeMD5(TsPath + timecode_MD5 + SequenceName).Substring(0, 10);
-        workDirName = timecode_ID + "_" + TsShortName + "_" + MD5;
+        dirName = timecode_Name + "_" + TsShortName + "_" + MD5;
       }
-      LWorkDir = Path.Combine(LTopWorkDir, workDirName);
+      LWorkDir = Path.Combine(LTopWorkDir, dirName);
 
       if (Directory.Exists(LWorkDir) == false)
         Directory.CreateDirectory(LWorkDir);
@@ -396,13 +392,12 @@ namespace LGLauncher
       if (LWorkDir == null) throw new Exception();
       if (TsShortName == null) throw new Exception();
 
-      PartNo = IsAll ? -1 : Detect_PartNo_fromFileName();
-
-      if (PartNo <= -2 || PartNo == 0)
+      PartNo = IsPart ? Detect_PartNo_fromFileName() : -1;
+      if (IsPart && PartNo <= 0)
         throw new LGLException("Invalid PartNo.  PartNo = " + PartNo);
     }
     /// <summary>
-    /// PartNo検出  ファイル名から値を取得
+    /// PartNo検出  作業ファイル名から値を取得
     /// </summary>
     private static int Detect_PartNo_fromFileName()
     {
@@ -480,7 +475,7 @@ namespace LGLauncher
     /// <summary>
     /// LSystemフォルダ内の各バイナリを取得
     /// </summary>
-    private static void Get_BinaryPath(Setting_File setting)
+    private static void Get_BinaryPath()
     {
       //ファイル一覧を取得
       FileSercher sercher = new FileSercher(LSystemDir);
@@ -559,10 +554,10 @@ namespace LGLauncher
       Regard_NsecMain_AsCM = 0 < Regard_NsecMain_AsCM ? Regard_NsecMain_AsCM : 0;
 
       //enable output
+      Output_RawFrame = setting.Output_RawFrame;
+      Output_Frame = setting.Output_Frame;
       Output_Tvtp = setting.Output_Tvtp;
       Output_Ogm = setting.Output_Ogm;
-      Output_Frame = setting.Output_Frame;
-      Output_RawFrame = setting.Output_RawFrame;
       Output_Scp = setting.Output_Scp;
 
       //chapter directory
@@ -607,7 +602,7 @@ namespace LGLauncher
       if (Detector == Detector.None)
         throw new LGLException("None Detector");
       if (AvsVpy == AvsVpy.None)
-        throw new LGLException("None AvsVpyType");
+        throw new LGLException("None AvsVpy");
 
       if (IsD2v && IsJLS)
         throw new LGLException("Cannot select d2v with JLS");

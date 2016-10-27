@@ -22,6 +22,7 @@ namespace LGLauncher
     public static void Set_ifLwi()
     {
       if (PathList.IsLwi == false) return;
+      if (PathList.IsAll && PathList.LwiPath == PathList.TsPath + ".lwi") return;
 
       string srcPath = PathList.LwiPathInLWork;
       string dstPath = PathList.TsPath + ".lwi";
@@ -29,7 +30,8 @@ namespace LGLauncher
                            == Path.GetPathRoot(dstPath).ToLower();
       try
       {
-        if (File.Exists(dstPath)) File.Delete(dstPath);
+        if (File.Exists(dstPath))
+          File.Delete(dstPath);
         Thread.Sleep(300);
 
         if (isSameRoot)
@@ -52,13 +54,13 @@ namespace LGLauncher
     public static void Back_ifLwi()
     {
       if (PathList.IsLwi == false) return;
+      if (PathList.IsAll && PathList.LwiPath == PathList.TsPath + ".lwi") return;
 
       string srcPath = PathList.TsPath + ".lwi";
       string dstPath = PathList.LwiPathInLWork;
       bool isSameRoot = Path.GetPathRoot(srcPath).ToLower()
                            == Path.GetPathRoot(dstPath).ToLower();
       if (File.Exists(srcPath) == false) return;
-
       try
       {
         if (lock_lwi != null)
