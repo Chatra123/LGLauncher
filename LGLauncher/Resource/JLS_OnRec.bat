@@ -2,7 +2,7 @@
 setlocal
 
 ::WorkDir
-pushd %0\..
+pushd "%~dp0"
 
 ::begin time
 ::@msec‚Í‚QŒ…‚µ‚©‚Æ‚ê‚È‚¢‚Ì‚Å‚O‚ğ‰Á‚¦‚Ä‚RŒ…‚É‚·‚é
@@ -16,12 +16,12 @@ set begin=%hour%	%min_%	%sec_%	%msec%0
 ::
 ::  [[ chapter_exe    logoframe    join_logo_scp ]]
 ::
-(                 
-  "#chapter_exe#"                            ^
-                   -v  "#AvsPath#"           ^
-                   -o  "#SCPosPath#"         ^
-                   -m  100  -s 15
-)
+         
+"#chapter_exe#"                             ^
+                  -v  "#AvsPath#"           ^
+                  -o  "#SCPosPath#"         ^
+                  -m  100  -s 15
+
 if not %ERRORLEVEL% == 0 (
     exit %ERRORLEVEL%
 )
@@ -33,12 +33,12 @@ echo .
 
 
 
-(
-  "#logoframeExe#"                           ^
-                          "#AvsPath#"        ^
-                   -logo  "#LogoPath#"       ^
-                   -oa    "#LogoFrameText#"
-)
+
+"#logoframeExe#"                            ^
+                        "#AvsPath#"         ^
+                  -logo  "#LogoPath#"       ^
+                  -oa    "#LogoFrameText#"
+
 if not %ERRORLEVEL% == 0 (
     exit %ERRORLEVEL%
 )
@@ -50,13 +50,13 @@ echo .
 
 
 
-(
-  "#join_logo_scp#"                               ^
-                     -inlogo  "#LogoFrameText#"   ^
-                     -inscp   "#SCPosPath#"       ^
-                     -incmd   "#JL_CmdPath#"      ^
-                     -o       "#JLS_ResultPath#"
-)
+
+"#join_logo_scp#"                                ^
+                    -inlogo  "#LogoFrameText#"   ^
+                    -inscp   "#SCPosPath#"       ^
+                    -incmd   "#JL_CmdPath#"      ^
+                    -o       "#JLS_ResultPath#"
+
 echo ERRORLEVEL = %ERRORLEVEL%
 echo ----------------------------------------------------------------------
 echo .
@@ -76,7 +76,7 @@ echo #PartNo#		%begin%		%end%>>"_#TsShortName#_ˆ—ŠÔ.sys.txt"
 
 popd
 endlocal
-::  TIMEOUT /T 5 /NOBREAK
+::  timeout /t 5 /nobreak
 ::  pause
 ::  exit /b
 

@@ -2,7 +2,7 @@
 setlocal
 
 ::WorkDir
-pushd %0\..
+pushd "%~dp0"
 
 ::begin time
 ::@msec‚Í‚QŒ…‚µ‚©‚Æ‚ê‚È‚¢‚Ì‚Å‚O‚ğ‰Á‚¦‚Ä‚RŒ…‚É‚·‚é
@@ -16,18 +16,18 @@ set begin=%hour%	%min_%	%sec_%	%msec%0
 ::
 ::  [[  LogoGuillo  ]]
 ::
-(
-   "#LOGOG_PATH#"                                ^
-                   -video     "#VIDEO_PATH#"     ^
-                   -lgd       "#LOGO_PATH#"      ^
-                   -avs2x     "#AVS2X_PATH#"     ^
-                   -avsPlg    "#AVSPLG_PATH#"    ^
-                   -prm       "#PRM_PATH#"       ^
-                   -out       "#OUTPUT_PATH#"    ^
-                   -outFmt    keyF               ^
-                   -noLog                        ^
-                   -noChap 
-)
+
+  "#LOGOG_PATH#"                                ^
+                  -video     "#VIDEO_PATH#"     ^
+                  -lgd       "#LOGO_PATH#"      ^
+                  -avs2x     "#AVS2X_PATH#"     ^
+                  -avsPlg    "#AVSPLG_PATH#"    ^
+                  -prm       "#PRM_PATH#"       ^
+                  -out       "#OUTPUT_PATH#"    ^
+                  -outFmt    keyF               ^
+                  -noLog                        ^
+                  -noChap 
+
 
 
 ::end time
@@ -41,7 +41,7 @@ echo #PartNo#		%begin%		%end%>>"_#TsShortName#_ˆ—ŠÔ.sys.txt"
 
 popd
 endlocal
-::  TIMEOUT /T 5 /NOBREAK
+::  timeout /t 5 /nobreak
 ::  pause
 ::  exit /b
 

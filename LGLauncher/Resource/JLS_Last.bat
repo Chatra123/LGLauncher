@@ -2,22 +2,22 @@
 setlocal
 
 ::WorkDir
-pushd %0\..
+pushd "%~dp0"
 
 
-(
-  "#join_logo_scp#"                               ^
-                     -inlogo  "#LogoFrameText#"   ^
-                     -inscp   "#SCPosPath#"       ^
-                     -incmd   "#JL_CmdPath#"      ^
-                     -o       "#JLS_ResultPath#"
-)
+
+"#join_logo_scp#"                                ^
+                    -inlogo  "#LogoFrameText#"   ^
+                    -inscp   "#SCPosPath#"       ^
+                    -incmd   "#JL_CmdPath#"      ^
+                    -o       "#JLS_ResultPath#"
+
 echo ERRORLEVEL = %ERRORLEVEL%
 
 
 popd
 endlocal
-::  TIMEOUT /T 5 /NOBREAK
+::  timeout /t 5 /nobreak
 ::  pause
 ::  exit /b
 
