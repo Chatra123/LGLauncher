@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 
 
 namespace LGLauncher
@@ -40,6 +40,12 @@ namespace LGLauncher
     /// </summary>
     private void Parse(string[] args)
     {
+      //引数の１つ目がファイルパス？
+      if (1 <= args.Count())
+      {
+        this.TsPath = File.Exists(args[0]) ? args[0] : "";
+      }
+
       //    /*Mono.Options*/
       //case insensitive
       //”オプション”　”説明”　”オプションの引数に対するアクション”を定義する。
