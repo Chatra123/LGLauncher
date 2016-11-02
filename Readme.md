@@ -8,25 +8,25 @@
 ------------------------------------------------------------------
 ### 使い方　　コマンドライン
 
-録画中のファイル  
-    LGLauncher.exe         -ts "C:\Video.ts"  -ch "abc"  
+lwi作成中  
+    LGLauncher.exe  -part  -ts "C:\Video.ts"  -ch "abc"  
 最後のみ  
     LGLauncher.exe  -last  -ts "C:\Video.ts"  -ch "abc"  
 
 
-録画終了後のファイル  
-    LGLauncher.exe  -all   -ts "C:\Video.ts"  -ch "abc"  
+lwi作成済み  
+    LGLauncher.exe         -ts "C:\Video.ts"  -ch "abc"  
 
 
 ------------------------------------------------------------------
 ### 必要なソフト
 
-* AviSynth  [32bit]  
+* AviSynth  
     
-* LogoGuillo.exe  [32bit or 64bit]  
+* LogoGuillo.exe  
     ロゴデータ、パラメーターファイル
     
-* avs2pipemod.exe  [32bit]
+* avs2pipemod.exe  
 
 
 ------------------------------------------------------------------
@@ -54,16 +54,15 @@ tsのパスを元に各ファイルパスを作成します。
 tsと同じフォルダに d2v, lwi, srtをおいてください。  
 
 
-    -last
+    -part  
+lwi作成中のＴＳファイルを処理  
+
+
+    -last  
 最後の処理であることを明示する。  
-チャプター出力や、JL_標準.txtを用いてjoin_logo_scpの再実行などが行われます。
+チャプター出力や、JL_標準.txtを用いてjoin_logo_scpの再実行などが行われます。  
 
 
-    -all  
-録画終了後のＴＳファイルを処理  
--lastの指定は必要ありません。  
-
- 
     -ch      "abc"
     -channel "abc"
 LogoSelecterに渡すチャンネル名  
