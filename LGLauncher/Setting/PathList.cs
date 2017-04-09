@@ -72,7 +72,6 @@ namespace LGLauncher
     public static string D2vPathInLWork { get { return Path.Combine(LWorkDir, D2vNameInLWork); } }
     public static string D2vNameInLWork { get { return TsShortName + ".d2v"; } }
 
-
     //    Lwi
     public static string LwiPath { get; private set; }
     public static string LwiDir { get { return Path.GetDirectoryName(LwiPath); } }
@@ -112,7 +111,6 @@ namespace LGLauncher
     public static string WorkName { get { return IsAll ? TsShortName + ".all" : TsShortName + ".p" + PartNo; } }
     public static string WorkPath_prv { get { return Path.Combine(LWorkDir, WorkName_prv); } }
     public static string WorkName_prv { get { return TsShortName + ".p" + (PartNo - 1); } }
-    private static string SequenceName;    //作業フォルダ名のMD5に使用
 
 
     //  [  PartNo  ]
@@ -250,13 +248,10 @@ namespace LGLauncher
       //copy
       IsPart = cmdline.IsPart || cmdline.IsLast;
       IsLast_cmdline = cmdline.IsLast;
-      SequenceName = cmdline.SequenceName ?? "";
-
       TsPath = cmdline.TsPath;
       D2vPath = cmdline.D2vPath;
       LwiPath = cmdline.LwiPath;
       SrtPath = cmdline.SrtPath;
-
       Channel = cmdline.Channel ?? "";
       Program = cmdline.Program ?? "";
 
@@ -304,7 +299,6 @@ namespace LGLauncher
         if (File.Exists(LwiPath) == false && File.Exists(TsPath + ".lwi"))
           LwiPath = TsPath + ".lwi";
       }
-
       //Plugin  Detector  AvsVpy
       {
         string plugin = setting.InputPlugin.Trim().ToLower();
@@ -354,7 +348,7 @@ namespace LGLauncher
         var tsinfo = new FileInfo(TsPath);
         string timecode_Name = tsinfo.CreationTime.ToString("ddHHmm");
         string timecode_MD5 = tsinfo.CreationTime.ToString("yyyyMMdd_dddd_HHmmss_fffffff");
-        string MD5 = Hash.ComputeMD5(TsPath + timecode_MD5 + SequenceName).Substring(0, 10);
+        string MD5 = Hash.ComputeMD5(TsPath + timecode_MD5 ).Substring(0, 10);
         dirName = timecode_Name + "_" + TsShortName + "_" + MD5;
       }
       LWorkDir = Path.Combine(LTopWorkDir, dirName);

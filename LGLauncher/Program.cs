@@ -17,13 +17,12 @@ namespace LGLauncher
 
     private static void Main(string[] args)
     {
-      ///*テスト用引数*/
+      ///*テスト用*/
       //var testArgs = new List<string>() { 
       //                                    "-part", 
       //                                    "-ts",
       //                                    @".\cap8s.ts",
       //                                    "-ch", "A", 
-      //                                    "-SequenceName", "160601200000122337"
       //                                  };
       //args = testArgs.ToArray();
 
@@ -136,6 +135,11 @@ namespace LGLauncher
       {
         var cmdline = new Setting_CmdLine(args);
         var setting = Setting_File.LoadFile();
+        if (setting == null)
+        {
+          Log.WriteLine("fail to read xml");
+          return false;
+        }
         if (setting.Enable <= 0) return false;
         if (args.Count() == 0) return false;               //”引数０”なら設定ファイル作成後に終了
 
@@ -271,7 +275,7 @@ namespace LGLauncher
               bool isReady = waitForReady.GetReady(PathList.DetectorName, PathList.Detector_MultipleRun);
               if (isReady == false) return;
             }
-            
+
             int timeout_ms;
             {
               //logoframeが終了しないことがあったのでタイムアウトを設定

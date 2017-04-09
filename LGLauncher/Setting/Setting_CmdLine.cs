@@ -16,13 +16,10 @@ namespace LGLauncher
   {
     public bool IsPart { get; private set; }
     public bool IsLast { get; private set; }
-    public string SequenceName { get; private set; }  //作業フォルダ名後半のハッシュ用
-
     public string TsPath { get; private set; }
     public string D2vPath { get; private set; }
     public string LwiPath { get; private set; }
     public string SrtPath { get; private set; }
-
     public string Channel { get; private set; }
     public string Program { get; private set; }
 
@@ -55,17 +52,13 @@ namespace LGLauncher
       optionset
         .Add("part", "is part", (v) => this.IsPart = v != null)
         .Add("last", "is last part", (v) => this.IsLast = v != null)
-
         .Add("ts=", "ts path", (v) => this.TsPath = v)
         .Add("d2v=", "d2v path", (v) => this.D2vPath = v)
         .Add("lwi=", "lwi path", (v) => this.LwiPath = v)
         .Add("srt=", "srt path", (v) => this.SrtPath = v)
-
         .Add("ch=", "channel name", (v) => this.Channel = v)
         .Add("channel=", "channel name", (v) => this.Channel = v)
         .Add("program=", "program name", (v) => this.Program = v)
-
-        .Add("sequencename=", "", (v) => this.SequenceName = v)
         .Add("and_more", "help message", (v) => { /*action*/ });
 
       try
@@ -92,7 +85,6 @@ namespace LGLauncher
       text.AppendLine("  [ App Command Line ]");
       text.AppendLine("    IsPart    =  " + IsPart);
       text.AppendLine("    IsLast    =  " + IsLast);
-      text.AppendLine("    Sequence  =  " + SequenceName);
       text.AppendLine("    TsPath    =  " + TsPath);
       text.AppendLine("    D2vPath   =  " + D2vPath);
       text.AppendLine("    LwiPath   =  " + LwiPath);
