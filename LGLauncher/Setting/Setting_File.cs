@@ -16,8 +16,8 @@ namespace LGLauncher
   [Serializable]
   public class Setting_File
   {
-    const double CurrentRev = 14.3;
-    
+    const double CurrentRev = 16.0;
+
     public double Rev = 0.0;
     public string memo31 = "  Set InputPlugin     d2v  or  lwi  ";
     public string memo32 = "  Set Detector        JLS  or  LG   ";
@@ -58,31 +58,28 @@ namespace LGLauncher
             Default_XmlPath = Path.Combine(AppDir, Default_XmlName);
 
     /// <summary>
-    /// 設定ファイルを読み込む
+    /// 設定ファイルを読込
     /// </summary>
-    /// <param name="xmlpath">ファイル名を指定</param>
+    /// <return>
+    ///   succcess  -->  Setting_File
+    ///   fail      -->  null
+    /// </return>
     public static Setting_File LoadFile(string xmlpath = null)
     {
-      //デフォルト名を使用、新規作成
-      if (string.IsNullOrEmpty(xmlpath))
-      {
-        xmlpath = Default_XmlPath;
-
-        if (File.Exists(xmlpath) == false)
-          XmlRW.Save(xmlpath, new Setting_File());
-      }
+      xmlpath = xmlpath ?? Default_XmlPath;
+      //新規作成
+      if (Path.GetFileName(xmlpath) == Default_XmlName
+        && File.Exists(xmlpath) == false)
+        XmlRW.Save(xmlpath, new Setting_File());
 
       var file = XmlRW.Load<Setting_File>(xmlpath);
-      file = file ?? new Setting_File();
 
       //追加された項目、削除された項目を書き換え。
-      //ユーザーが消したタグなども復元される。
-      if (file.Rev != CurrentRev)
+      if (file != null && file.Rev != CurrentRev)
       {
         file.Rev = CurrentRev;
         XmlRW.Save(xmlpath, file);
       }
-
       return file;
     }
 
