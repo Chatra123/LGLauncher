@@ -8,7 +8,6 @@ using System.Text.RegularExpressions;
 
 namespace LGLauncher
 {
-  using OctNov.IO;
 
   static class LogoSelector
   {
@@ -19,13 +18,13 @@ namespace LGLauncher
     {
       var result = Run();
       if (result == null)
-        throw new LGLException("LogoSelector return value is null");
+        throw new LGLException("LogoSelector return null");
       if (result.Count < 2)
         throw new LGLException("LogoSelector return value is -lt 2 lines");
 
-      string logoPath = result[0];
-      string paramPath = result[1];
-      return new List<string> { logoPath, paramPath };
+      // result[0] --> logo path
+      //       [1] --> param path
+      return new List<string> { result[0], result[1] };
     }
 
 
@@ -36,12 +35,12 @@ namespace LGLauncher
     {
       var result = Run();
       if (result == null)
-        throw new LGLException("LogoSelector return value is null");
+        throw new LGLException("LogoSelector return null");
       if (result.Count < 1)
         throw new LGLException("LogoSelector return value is -lt 1 line");
 
-      string logoPath = result[0];
-      return new List<string> { logoPath };
+      // result[0] --> logo path
+      return new List<string> { result[0] };
     }
 
 
@@ -71,7 +70,7 @@ namespace LGLauncher
         log.AppendLine("  [ LogoSelector ]");
         log.AppendLine("    path   :  " + path);
         log.AppendLine("    args   :  " + args);
-        log.AppendLine("    return :" );
+        log.AppendLine("    return :");
         log.Append(result);
         Log.WriteLine(log.ToString());
       }
@@ -87,15 +86,12 @@ namespace LGLauncher
     private static string Start_GetStdout(string exepath, string arg)
     {
       var prc = new Process();
-      {
-        prc.StartInfo.FileName = exepath;
-        prc.StartInfo.Arguments = arg;
-
-        //シェルコマンドを無効に、入出力をリダイレクトするなら必ずfalseに設定
-        prc.StartInfo.UseShellExecute = false;
-        //入出力のリダイレクト
-        prc.StartInfo.RedirectStandardOutput = true;
-      }
+      prc.StartInfo.FileName = exepath;
+      prc.StartInfo.Arguments = arg;
+      //シェルコマンドを無効に、入出力をリダイレクトするなら必ずfalseに設定
+      prc.StartInfo.UseShellExecute = false;
+      //入出力のリダイレクト
+      prc.StartInfo.RedirectStandardOutput = true;
 
       try
       {

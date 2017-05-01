@@ -143,7 +143,7 @@ namespace LGLauncher
         //not found python 
         throw new LGLException("  RunInfo_vpy() runtime error");
       }
-      new LGLException("  RunInfo_vpy() timeout");
+      throw new LGLException("  RunInfo_vpy() timeout");
     }
 
 

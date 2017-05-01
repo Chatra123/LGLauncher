@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -9,6 +10,15 @@ using System.Diagnostics;
 namespace LGLauncher
 {
   using OctNov.IO;
+
+  /// <summary>
+  /// AbstractAvsMaker
+  /// </summary>
+  abstract class AbstractAvsMaker
+  {
+    public abstract int[] GetTrimFrame();
+    public abstract string MakeTrimScript(int[] trimFrame);
+  }
 
   /// <summary>
   /// AvsVpy作成
@@ -22,12 +32,10 @@ namespace LGLauncher
     /// </summary>
     public AvsVpyMaker()
     {
-
       IndexFormatter.Format(PathList.IsD2v);
-
       maker =
-        (PathList.IsAvs) ? new AvsMaker() as AbstractAvsMaker :
-        (PathList.IsVpy) ? new VpyMaker() as AbstractAvsMaker :
+        PathList.IsAvs ? new AvsMaker() as AbstractAvsMaker :
+        PathList.IsVpy ? new VpyMaker() as AbstractAvsMaker :
         null;
     }
 
@@ -48,16 +56,6 @@ namespace LGLauncher
     }
   }
 
-
-
-  /// <summary>
-  /// AbstractAvsMaker
-  /// </summary>
-  abstract class AbstractAvsMaker
-  {
-    public abstract int[] GetTrimFrame();
-    public abstract string MakeTrimScript(int[] trimFrame);
-  }
 
 
 
@@ -151,7 +149,6 @@ namespace LGLauncher
         return null;
       }
 
-      //正規表現パターン
       //TsShortName.p1.0__1000.avs
       //TsShortName.all.0__1000.avs
       //  <begin>      0
@@ -187,10 +184,10 @@ namespace LGLauncher
     #region OutScript
 
     /// <summary>
-    /// Script出力
+    /// Script出力　フレーム数のチェックもする。
     /// </summary>
     public static string OutScript(int[] trimFrame, List<string> scriptText,
-                                   string outExt, System.Text.Encoding enc)
+                                   string outExt, Encoding enc)
     {
       //長さチェック
       //　 30frame以下だと logoGuilloの avs2pipemodがエラーで落ちる。
@@ -257,7 +254,6 @@ namespace LGLauncher
         );
 
       File.Create(path).Close();
-
     }
 
     #endregion CreateDummy_OnError

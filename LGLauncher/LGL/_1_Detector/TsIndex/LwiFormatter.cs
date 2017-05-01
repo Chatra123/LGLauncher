@@ -17,7 +17,7 @@ namespace LGLauncher
     private static FileStream lock_lwi;
 
     /// <summary>
-    /// lwi  Workdir --> TsDir に移動
+    /// lwi  WorkDir --> TsDir に移動
     /// </summary>
     public static void Set_ifLwi()
     {
@@ -49,7 +49,7 @@ namespace LGLauncher
     }
 
     /// <summary>
-    /// lwi  TsDir --> Workdir に戻す
+    /// lwi  TsDir --> WorkDir に戻す
     /// </summary>
     public static void Back_ifLwi()
     {
@@ -136,7 +136,6 @@ namespace LGLauncher
           if (readBuff.Count < 100)
             throw new LGLException("lwi text is less than 100 lines");
 
-          //フォーマット
           bool isLwi = true;
           isLwi &= Regex.IsMatch(readBuff[0], @"<LibavReaderIndexFile=\d+>");
           isLwi &= Regex.IsMatch(readBuff[1], @"<InputFilePath>.*</InputFilePath>");
@@ -148,6 +147,7 @@ namespace LGLauncher
 
         /*
          * バックグラウンドで複数動かすため適度に速度を抑える。
+         * 読込サイズは小さいがThread.Sleep();の１行加えるだけなので入れておく。
          *   10 MB/sec * 1.00 sec  =  10.0 MB    130,000 line
          *   10        * 0.10      =   1.0        13,000 
          *   10        * 0.01      =   0.1         1,300 
@@ -227,8 +227,6 @@ namespace LGLauncher
           File.Copy(PathList.LwiPathInLWork, outPath_part, true);
         }
 #pragma warning restore 0162
-
-
       }
       finally
       {
@@ -294,10 +292,10 @@ namespace LGLauncher
       var pattern = @"Key=\d+,.*,Width=(\d+),Height=(\d+),Format=([\w\d]+),.*";
       var matchLine = lwiText.LastOrDefault(line => Regex.Match(line, pattern).Success);
 
-      if (matchLine != null)                           //found
+      if (matchLine != null)
       {
         var m = Regex.Match(matchLine, pattern);
-        if (m.Groups.Count == 4)                       //match
+        if (m.Groups.Count == 4)                       //found match
         {
           Width = m.Groups[1].ToString();
           Height = m.Groups[2].ToString();
@@ -325,7 +323,6 @@ namespace LGLauncher
 
                     </ExtraDataList>
                     </LibavReaderIndexFile>";
-
       string footer = template;
       footer = Regex.Replace(footer, @"[ \t　]", "", RegexOptions.IgnoreCase);         //VisualStudio上での表示用スペース削除
       footer = Regex.Replace(footer, @"#Width#", Width, RegexOptions.IgnoreCase);

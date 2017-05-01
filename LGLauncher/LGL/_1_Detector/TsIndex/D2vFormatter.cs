@@ -50,7 +50,6 @@ namespace LGLauncher
         if (readText.Count < 30)
           throw new LGLException("d2v text is less than 30 lines");
 
-        //フォーマット
         bool isD2v = true;
         for (int i = 18; i < 30; i++)
         {

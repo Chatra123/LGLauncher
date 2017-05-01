@@ -146,7 +146,7 @@ namespace LGLauncher
       try
       {
         prc.Start();
-        prc.WaitForExit(20 * 1000);  //数秒かかるので短すぎるのはダメ
+        prc.WaitForExit(60 * 1000);  //数秒かかるので短すぎるのはダメ
         if (prc.HasExited && prc.ExitCode == 0)
           return;  //正常終了
       }
@@ -154,7 +154,7 @@ namespace LGLauncher
       {
         throw new LGLException("  RunInfo_avs() runtime error");
       }
-      new LGLException("  RunInfo_avs() timeout");
+      throw new LGLException("  RunInfo_avs() timeout");
     }
 
 

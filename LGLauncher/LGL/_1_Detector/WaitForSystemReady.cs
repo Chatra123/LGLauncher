@@ -83,14 +83,12 @@ namespace LGLauncher
         if (File.Exists(path) == false) return true;
 
         var prc = new Process();
-        {
-          prc.StartInfo.FileName = path;
-          prc.StartInfo.Arguments = "";
-          prc.StartInfo.CreateNoWindow = true;
-          prc.StartInfo.UseShellExecute = false;
-          prc.Start();
-          prc.WaitForExit(2 * 60 * 1000);
-        }
+        prc.StartInfo.FileName = path;
+        prc.StartInfo.Arguments = "";
+        prc.StartInfo.CreateNoWindow = true;
+        prc.StartInfo.UseShellExecute = false;
+        prc.Start();
+        prc.WaitForExit(2 * 60 * 1000);
         return prc.HasExited && prc.ExitCode == 0;
       });
 
@@ -117,12 +115,11 @@ namespace LGLauncher
         additionalWait = mutexControl.HasControl == false;
       }
 
+
       //
       //システムチェック
       //
       var rand = new Random(DateTime.Now.Millisecond + Process.GetCurrentProcess().Id);
-
-      //タイムアウトなし
       while (true)
       {
         //プロセス数
