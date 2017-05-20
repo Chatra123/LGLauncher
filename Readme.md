@@ -28,13 +28,14 @@
 
 ------------------------------------------------------------------
 ### 使い方　　コマンドライン
+	tsファイル名にチャンネル名が埋め込まれていれば -chは必要ありません。
 
 lwi作成中  
     LGLauncher.exe  -part  -ts "C:\Video.ts"  -ch "abc"  
 最後のみ  
     LGLauncher.exe  -last  -ts "C:\Video.ts"  -ch "abc"  
 
-
+	
 lwi作成済み  
     LGLauncher.exe         -ts "C:\Video.ts"  -ch "abc"  
 
@@ -231,6 +232,12 @@ Ogm chapter、フレームファイルの出力フォルダ
 * LSystemフォルダにSystemIdleMonitor.exeがあれば、ＣＰＵ使用率が６０％以下になるまで待機
 してからLogoGuilloを実行します。
 
+
+* lwi作成済のtsファイルを  
+ LGLauncher.exe         -ts "C:\Video.ts"  -ch "abc"  
+で処理すると通常どおり処理します。  
+ LGLauncher.exe  -last  -ts "C:\Video.ts"  -ch "abc"  
+だと30minごとに分割し、最初のチャプター作成が少し早くなります。  
 
   
 ------------------------------------------------------------------
