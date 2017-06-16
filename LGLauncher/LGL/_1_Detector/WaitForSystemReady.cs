@@ -10,7 +10,7 @@ using System.IO;
 namespace LGLauncher
 {
   /// <summary>
-  /// LogoGuilloを実行できるまで待機
+  /// LogoGuilloが実行可能になるまで待機
   /// </summary>
   class WaitForSystemReady
   {
