@@ -51,7 +51,6 @@ namespace LGLauncher
       string PRM_PATH = paramPath;
       string OUTPUT_PATH = PathList.WorkName + ".frame.txt";
 
-      //bat
       for (int i = 0; i < batText.Count; i++)
       {
         var line = batText[i];

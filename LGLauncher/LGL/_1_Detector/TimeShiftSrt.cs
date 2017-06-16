@@ -1,11 +1,4 @@
-﻿/*
- * 
- * ・作成途中の srtを読み込む。 
- * ・フォーマットを整えてsrtとして使用できる形にする。 
- * ・shiftSecだけずらしたsrtを作成。 
- *  
- * 
- */
+﻿
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,6 +11,12 @@ namespace LGLauncher
 
   static class TimeShiftSrt
   {
+    /*
+     * ・作成途中の srtを読み込む。 
+     * ・フォーマットを整えてsrtとして使用できる形にする。 
+     * ・shiftSecだけずらしたsrtを作成。 
+     */
+
     /// <summary>
     /// TimeShiftSrtファイルを作成
     /// </summary>
@@ -27,9 +26,9 @@ namespace LGLauncher
       //srtはすでに削除されている可能性もある。
       if (File.Exists(PathList.SrtPath) == false) return "";
 
-      //IsAllならsrtファイルをコピーしてreturn
       if (PathList.IsAll)
       {
+        //コピーして終了
         string copyDstPath = Path.Combine(PathList.LWorkDir, PathList.SrtName);
         try
         {
@@ -62,10 +61,9 @@ namespace LGLauncher
           break;
         }
       }
-
       //確実に書き込まれている行数までを取り出す。
       int idx_lastValidLine = idx_LastTimeline - 2;
-      if (idx_lastValidLine < 0) 
+      if (idx_lastValidLine < 0)
         throw new LGLException("srt format error");   //srt形式でない or テキストが４行以下
       var formatText = PathList.IsLastProcess
         ? srtText : srtText.GetRange(0, idx_lastValidLine + 1);
@@ -148,7 +146,6 @@ namespace LGLauncher
           shiftText.Add(shift_timecode);
           shiftText.AddRange(srtText.GetRange(i + 1, blocksize));
 
-          //検索行を進める
           Srt_Index++;
           i = line_blockend + 1;
         }
@@ -185,7 +182,6 @@ namespace LGLauncher
           string sMin_ = timecode.Substring(3, 2);
           string sSec_ = timecode.Substring(6, 2);
           string sMsec = timecode.Substring(9, 3);
-
           try
           {
             int iHour = int.Parse(sHour);

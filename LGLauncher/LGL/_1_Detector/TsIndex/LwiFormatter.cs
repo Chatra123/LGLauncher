@@ -12,6 +12,10 @@ namespace LGLauncher
 
 
   #region LwiFile
+  /// <summary>
+  /// lwiファイルの移動
+  /// lwiファイルはTSと同じフォルダに無ければいけないので移動、コピーする。
+  /// </summary>
   static class LwiFile
   {
     private static FileStream lock_lwi;
@@ -107,13 +111,14 @@ namespace LGLauncher
      */
 
     /// <summary>
-    /// lwiのフォーマットを整える
+    /// フォーマットを整える
     /// </summary>
     public static void Format()
     {
       //IsAll
       if (PathList.IsAll)
       {
+        //コピーして終了
         File.Copy(PathList.LwiPath, PathList.LwiPathInLWork, true);
         return;
       }
@@ -127,10 +132,7 @@ namespace LGLauncher
       {
         var readBuff = new List<string>();
         var writeBuff = new List<string>();
-
-        //最初の１００行
         readBuff = reader.ReadNLines(100);
-
         //簡易チェック
         {
           if (readBuff.Count < 100)
@@ -184,36 +186,30 @@ namespace LGLauncher
 
 
         //最後の"index=..."行以降を削除
+        string pattern = @"Index=\d+,Type=\d+,Codec=\d+,";
+        var matchLine = writeBuff.LastOrDefault(line => Regex.Match(line, pattern).Success);
+        if (matchLine != null)
         {
-          string pattern = @"Index=\d+,Type=\d+,Codec=\d+,";
-          var matchLine = writeBuff.LastOrDefault(line => Regex.Match(line, pattern).Success);
-
-          if (matchLine != null)
-          {
-            int matchIdx = writeBuff.LastIndexOf(matchLine);
-            writeBuff.RemoveRange(matchIdx, writeBuff.Count - matchIdx);
-          }
-          else
-          {
-            throw new LGLException("cant find 'Index=' line");
-          }
+          int matchIdx = writeBuff.LastIndexOf(matchLine);
+          writeBuff.RemoveRange(matchIdx, writeBuff.Count - matchIdx);
+        }
+        else
+        {
+          throw new LGLException("cant find 'Index=' line");
         }
 
         //lwi末尾、フッター書込
-        var footer_bin = ReadFile_footer();         //footerファイル読込み binary
+        var footer_bin = ReadFile_footer();
         if (footer_bin != null)
         {
-          //先に残りを書込み
           writer.WriteLine(writeBuff);
           writer.Close();
-
           FileW.AppendBytes(PathList.LwiPathInLWork, footer_bin);
         }
         else
         {
           //読込失敗、footer作成
           var footer_new = Create_footer(writeBuff);
-
           writer.WriteLine(writeBuff);
           writer.WriteLine(footer_new);
           writer.Close();
@@ -286,12 +282,10 @@ namespace LGLauncher
         lwiText line sample
           Key=0,Pic=3,POC=0,Repeat=1,Field=1,Width=1440,Height=1080,Format=yuv420p,ColorSpace=1
       */
-
       //Width, Height, Format取得
       string Width = "", Height = "", Format = "";
       var pattern = @"Key=\d+,.*,Width=(\d+),Height=(\d+),Format=([\w\d]+),.*";
       var matchLine = lwiText.LastOrDefault(line => Regex.Match(line, pattern).Success);
-
       if (matchLine != null)
       {
         var m = Regex.Match(matchLine, pattern);
@@ -309,7 +303,6 @@ namespace LGLauncher
         throw new LGLException("regex not match");
       }
 
-      //footer作成
       const string template =
                   @"</LibavReaderIndex>
                     <StreamDuration=0,0>-1</StreamDuration>

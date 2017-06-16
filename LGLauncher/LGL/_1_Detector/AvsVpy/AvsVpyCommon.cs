@@ -5,23 +5,14 @@ using System.Text;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Diagnostics;
+
 
 namespace LGLauncher
 {
   using OctNov.IO;
 
   /// <summary>
-  /// AbstractAvsMaker
-  /// </summary>
-  abstract class AbstractAvsMaker
-  {
-    public abstract int[] GetTrimFrame();
-    public abstract string MakeTrimScript(int[] trimFrame);
-  }
-
-  /// <summary>
-  /// AvsVpy作成
+  /// Avs or Vpy作成
   /// </summary>
   class AvsVpyMaker
   {
@@ -33,10 +24,9 @@ namespace LGLauncher
     public AvsVpyMaker()
     {
       IndexFormatter.Format(PathList.IsD2v);
-      maker =
-        PathList.IsAvs ? new AvsMaker() as AbstractAvsMaker :
-        PathList.IsVpy ? new VpyMaker() as AbstractAvsMaker :
-        null;
+      maker = PathList.IsAvs ? new AvsMaker() as AbstractAvsMaker :
+              PathList.IsVpy ? new VpyMaker() as AbstractAvsMaker :
+              null;
     }
 
     /// <summary>
@@ -50,17 +40,26 @@ namespace LGLauncher
     /// <summary>
     /// Trim付きスクリプト作成
     /// </summary>
-    public string MakeTrimScript(int[] trimFrame)
+    public string MakeScript(int[] trimFrame)
     {
-      return maker.MakeTrimScript(trimFrame);
+      return maker.MakeScript(trimFrame);
     }
+  }
+
+  /// <summary>
+  /// Avs, Vpyの抽象化
+  /// </summary>
+  abstract class AbstractAvsMaker
+  {
+    public abstract int[] GetTrimFrame();
+    public abstract string MakeScript(int[] trimFrame);
   }
 
 
 
 
   /// <summary>
-  /// AvsVpyCommon
+  /// AvsMaker,VpyMakerの共通部分
   /// </summary>
   static class AvsVpyCommon
   {
@@ -76,7 +75,6 @@ namespace LGLauncher
 
       for (int retry = 1; retry <= 3; retry++)
       {
-        //file check
         if (File.Exists(infoPath) == false)
         {
           Thread.Sleep(2000);
@@ -85,7 +83,7 @@ namespace LGLauncher
 
         infoText = FileR.ReadAllLines(infoPath);
 
-        //line check
+        //line count check
         if (infoText == null || infoText.Count <= 1)
         {
           Thread.Sleep(500);
@@ -140,7 +138,6 @@ namespace LGLauncher
     {
       if (PathList.LWorkDir == null) return null;
 
-      //ファイル検索
       var files = Directory.GetFiles(PathList.LWorkDir, nameKey);
       if (files.Count() != 1)
       {
@@ -184,27 +181,26 @@ namespace LGLauncher
     #region OutScript
 
     /// <summary>
-    /// Script出力　フレーム数のチェックもする。
+    /// Scriptファイル作成
     /// </summary>
     public static string OutScript(int[] trimFrame, List<string> scriptText,
                                    string outExt, Encoding enc)
     {
       //長さチェック
-      //　 30frame以下だと logoGuilloの avs2pipemodがエラーで落ちる。
-      //　120frame以下なら no frame errorと表示されて終了する。
-      //　150frame以上に設定する。
+      //  30frame以下だと logoGuilloの avs2pipemodがエラーで落ちる。
+      //  120frame以下なら no frame errorと表示されて終了する。
+      //  150frame以上に設定する。
       int beginFrame = trimFrame[0];
       int endFrame = trimFrame[1];
       int len = endFrame - beginFrame + 1;
-
       if (150 <= len)
       {
         //書
         string outPath = string.Format("{0}.{1}__{2}{3}",
-                                          PathList.WorkPath,
-                                          beginFrame,
-                                          endFrame,
-                                          outExt);
+                                       PathList.WorkPath,
+                                       beginFrame,
+                                       endFrame,
+                                       outExt);
         File.WriteAllLines(outPath, scriptText, enc);
         return outPath;
       }
@@ -214,14 +210,14 @@ namespace LGLauncher
       }
     }
 
-    #endregion CreateTrimAvs
+    #endregion OutScript
 
 
 
     #region CreateDummy_OnError
 
     /// <summary>
-    /// エラー発生時、次回のLGLancher実行で参照するavsファイル作成
+    /// エラー発生時、次回のLGLancher実行で参照するavsファイルを作成
     /// </summary>
     /// <remarks>
     /// ・作成済みのavsファイルはあらかじめ削除しておくこと。
@@ -245,14 +241,12 @@ namespace LGLauncher
         }
       }
 
-      string path = string.Format(
-        "{0}.{1}__{2}{3}",
-        PathList.WorkPath,
-        trimFrame_prv[1],
-        trimFrame_prv[1],
-        PathList.AvsVpyExt
-        );
-
+      string path = string.Format("{0}.{1}__{2}{3}",
+                                  PathList.WorkPath,
+                                  trimFrame_prv[1],
+                                  trimFrame_prv[1],
+                                  PathList.AvsVpyExt
+                                  );
       File.Create(path).Close();
     }
 

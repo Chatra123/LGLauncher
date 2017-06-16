@@ -19,7 +19,6 @@ namespace LGLauncher.Frame.JLS
     /// </summary>
     public static void Concat(int[] trimFrame)
     {
-      //パス
       //chapter_exeによって作成されるファイル              *.p3.jls.scpos.txt
       string add_ScposPath = PathList.WorkPath + ".jls.scpos.txt";
 
@@ -114,12 +113,13 @@ namespace LGLauncher.Frame.JLS
     /// </summary>
     static List<string> ApeendOffset_ScposElement(string timecode_line, string name_line, int chapcnt_offset, int frame_offset)
     {
-      /*
-      CHAPTER01=00:00:36.303                            <--  timecode_line
-      CHAPTER01NAME=28フレーム  SCPos:1112 1111         <--  name_line
-      CHAPTER02=00:01:08.602
-      CHAPTER02NAME=31フレーム ★★ SCPos:2081 2080
-      */
+      /* Scpos sample
+       * 
+       * CHAPTER01=00:00:36.303                            <--  timecode_line
+       * CHAPTER01NAME=28フレーム  SCPos:1112 1111         <--  name_line
+       * CHAPTER02=00:01:08.602
+       * CHAPTER02NAME=31フレーム ★★ SCPos:2081 2080
+       */
 
       //文字抽出
       Match match_timecode, match_name;

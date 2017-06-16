@@ -26,7 +26,8 @@ namespace LGLauncher
     /// </summary>
     public static void Launch(string batPath, out bool timeout_byWin, int timeout_ms = -1)
     {
-      if (File.Exists(batPath) == false) throw new LGLException("not exist detector bat");
+      if (File.Exists(batPath) == false)
+        throw new LGLException("not exist detector bat");
 
       var startTime = DateTime.Now;
       Launch_core(batPath, timeout_ms);
@@ -49,7 +50,7 @@ namespace LGLauncher
 
 
     /// <summary>
-    /// Bat実行　　プロセス実行
+    /// Bat実行　　プロセス実行部
     /// </summary>
     private static void Launch_core(string batPath, int timeout_ms)
     {

@@ -6,26 +6,30 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Diagnostics;
 
+
 namespace LGLauncher
 {
   using OctNov.IO;
 
+  /// <summary>
+  /// avsの作成、総フレーム数の取得
+  /// </summary>
   class AvsMaker : AbstractAvsMaker
   {
-    AvsMakerModule module = new AvsMakerModule();
+    AvsScripter scripter = new AvsScripter();
 
     /// <summary>
-    /// トリムフレーム数取得
+    /// トリムフレーム取得
     /// </summary>
     public override int[] GetTrimFrame()
     {
-      //総フレーム数取得用スクリプト　作成、実行
+      //総フレーム数取得用スクリプトの作成、実行
       {
-        string path = module.CreateInfo_avs();
+        string path = scripter.CreateInfo();
         try
         {
           LwiFile.Set_ifLwi();
-          module.RunInfo_avs(path);
+          scripter.RunInfo(path);
         }
         finally
         {
@@ -61,9 +65,9 @@ namespace LGLauncher
     /// <summary>
     /// Trim付きスクリプト作成
     /// </summary>
-    public override string MakeTrimScript(int[] trimFrame)
+    public override string MakeScript(int[] trimFrame)
     {
-      var text = module.CreateTrimText_avs(trimFrame);
+      var text = scripter.CreateText(trimFrame);
       string path = AvsVpyCommon.OutScript(trimFrame, text, ".avs", TextEnc.Shift_JIS);
       return path;
     }
@@ -72,10 +76,12 @@ namespace LGLauncher
 
 
 
+  #region AvsScripter
+
   /// <summary>
-  /// AvsMaker用 Module
+  /// ApyMaker用 スクリプト作成の実行部
   /// </summary>
-  class AvsMakerModule
+  class AvsScripter
   {
     /*
      * note
@@ -84,14 +90,13 @@ namespace LGLauncher
      */
 
     /// <summary>
-    /// 総フレーム数取得用のAvs作成
+    /// 総フレーム数取得用のavs作成  InfoSciprt
     /// </summary>
-    public string CreateInfo_avs()
+    public string CreateInfo()
     {
       //読
       var text = FileR.ReadFromResource("LGLauncher.Resource.GetInfo_avs.avs");
 
-      //置換
       for (int i = 0; i < text.Count; i++)
       {
         var line = text[i];
@@ -135,7 +140,7 @@ namespace LGLauncher
     /// <summary>
     /// InfoSciprt実行  avs
     /// </summary>
-    public void RunInfo_avs(string avsPath)
+    public void RunInfo(string avsPath)
     {
       var prc = new Process();
       prc.StartInfo.FileName = PathList.avs2pipemod;
@@ -146,9 +151,9 @@ namespace LGLauncher
       try
       {
         prc.Start();
-        prc.WaitForExit(60 * 1000);  //数秒かかるので短すぎるのはダメ
+        prc.WaitForExit(30 * 1000);  //数秒かかるので短すぎるのはダメ
         if (prc.HasExited && prc.ExitCode == 0)
-          return;  //正常終了
+          return;
       }
       catch
       {
@@ -159,14 +164,13 @@ namespace LGLauncher
 
 
     /// <summary>
-    /// TrimAvs作成
+    /// avsスクリプトの文字列を作成
     /// </summary>
-    public List<string> CreateTrimText_avs(int[] trimFrame)
+    public List<string> CreateText(int[] trimFrame)
     {
       //読
       var text = FileR.ReadFromResource("LGLauncher.Resource.TrimAvs.avs");
 
-      //置換
       for (int i = 0; i < text.Count; i++)
       {
         var line = text[i];
@@ -214,6 +218,8 @@ namespace LGLauncher
 
       return text;
     }
+
+    #endregion
 
 
   }

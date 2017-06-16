@@ -13,7 +13,7 @@ namespace LGLauncher.Frame
   using OctNov.IO;
 
   /// <summary>
-  /// フレームリストから各形式への変換
+  /// フレームリストの編集、各形式への変換
   /// </summary>
   public static class ConvertFrame
   {
@@ -62,8 +62,6 @@ namespace LGLauncher.Frame
     }
 
 
-
-
     /// <summary>
     /// 短いＭａｉｎをつぶす
     /// </summary>
@@ -92,7 +90,6 @@ namespace LGLauncher.Frame
       }
       return newList;
     }
-
 
 
     /// <summary>
@@ -145,7 +142,6 @@ namespace LGLauncher.Frame
     }
 
 
-
     /// <summary>
     ///  avs Trim(1000,2000)  -->  List<int>
     /// </summary>
@@ -175,7 +171,6 @@ namespace LGLauncher.Frame
 
       return frameList;
     }
-
 
 
     /// <summary>
@@ -234,7 +229,6 @@ namespace LGLauncher.Frame
     //
 
 
-
     /// <summary>
     /// List<int>  -->  Ogmチャプター type1
     /// </summary>
@@ -290,7 +284,6 @@ namespace LGLauncher.Frame
      * Chapter03=00:03:08.856
      * Chapter03Name=chapter 03
      */
-
 
 
     /// <summary>

@@ -9,6 +9,9 @@ using System.IO;
 
 namespace LGLauncher
 {
+  /// <summary>
+  /// LogoGuilloを実行できるまで待機
+  /// </summary>
   class WaitForSystemReady
   {
     private IMutexControl mutexControl;
@@ -54,20 +57,20 @@ namespace LGLauncher
                      .ToList();
 
       /// <summary>
-      /// targetのプロセス数がmultiRun未満か？
+      /// targetのプロセス数が少ないか？
       ///   target単体、外部ランチャーとの衝突回避
       /// </summary>
-      var TargetHasExited = new Func<bool>(() =>
-      {
+      var TargetHasExited = new Func<int, bool>((max_prc) =>
+     {
         //プロセス数確認  ".exe"はつけない
         int sum = 0;
-        foreach (var target in targetNames)
-        {
-          var prclist = Process.GetProcessesByName(target);
-          sum += prclist.Count();
-        }
-        return sum < multiRun;
-      });
+       foreach (var target in targetNames)
+       {
+         var prclist = Process.GetProcessesByName(target);
+         sum += prclist.Count();
+       }
+       return sum < max_prc;
+     });
 
 
       /// <summary>
@@ -123,7 +126,7 @@ namespace LGLauncher
       while (true)
       {
         //プロセス数
-        while (TargetHasExited() == false)
+        while (TargetHasExited(multiRun) == false)
         {
           Thread.Sleep(1 * 60 * 1000);                               // 1 min
         }
@@ -142,7 +145,7 @@ namespace LGLauncher
         }
 
         //プロセス数  再チェック
-        if (TargetHasExited() == false)
+        if (TargetHasExited(multiRun) == false)
           continue;
 
         //チェックＯＫ

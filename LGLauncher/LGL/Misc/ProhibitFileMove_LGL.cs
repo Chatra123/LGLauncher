@@ -10,13 +10,14 @@ namespace LGLauncher
 {
   /// <summary>
   /// ファイルの移動禁止
+  ///   LGLauncher実行中にTs,d2v,lwi,srtファイルを移動できないようにロック
   /// </summary>
   class ProhibitFileMove_LGL
   {
     private static List<FileStream> LockItems;
 
     /// <summary>
-    /// ファイルの移動禁止
+    /// 移動禁止
     /// </summary>
     public static void Lock()
     {
@@ -73,7 +74,7 @@ namespace LGLauncher
 
 
     /// <summary>
-    /// ファイルの移動禁止を解除
+    /// 移動禁止を解除
     /// </summary>
     public static void Unlock()
     {

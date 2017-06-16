@@ -12,7 +12,7 @@ namespace LGLauncher.Frame
   class LogoGuillo
   {
     /// <summary>
-    /// 前回までのフレームリストと、今回　生成したリストをつなげる。
+    /// 前回のフレームファイルと、今回　生成したリストをつなげる。
     /// </summary>
     public static List<int> Concat(int[] trimFrame)
     {

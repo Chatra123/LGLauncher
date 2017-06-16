@@ -8,33 +8,26 @@ using System.Linq;
 namespace LGLauncher.Frame
 {
   using OctNov.IO;
-  /*
-   * 変換の流れ
-   * 
-   *   static List<int> ConcatFrame(int[] trimFrame)
-   *   {
-   *     Join_Logo_Scp
-   *         *.p1.jls.result.txt  -->  *.p1.frame.txt  -->  List<int> frame  -->  List<int> concat
-   *         
-   *     LogoGuillo
-   *                                   *.p1.frame.txt  -->  List<int> frame  -->  List<int> concat
-   *   }
-   * 
-   * 
-   *   static void OutputChapter(List<int> rawFrame, int[] trimFrame)
-   *   {
-   *     List<int> concat  -->  chapter file
-   *   }
-   *   
-   */
+
   static class EditFrame
   {
     /// <summary>
-    /// 結合フレームリストを作成
+    /// 前回のフレームファイルと結合させる
     /// </summary>
     public static List<int> Concat(int[] trimFrame)
     {
+      /*
+       *  変換の流れ
+       *  Join_Logo_Scp
+       *     *.p1.jls.result.txt  -->  *.p1.frame.txt  -->  List<int> frame  -->  List<int> concat
+       *         
+       *  LogoGuillo
+       *                               *.p1.frame.txt  -->  List<int> frame  -->  List<int> concat
+       *
+       */
+
       //Join_Logo_Scp
+      //    *.p1.jls.result.txt  -->  *.p1.frame.txt
       //  JLSの出力をLogoGuilloと同じ形式にする。
       if (PathList.IsJLS)
       {
@@ -60,16 +53,16 @@ namespace LGLauncher.Frame
         }
       }
 
-      //フレームテキスト合成
       //Join_Logo_Scp  &  LogoGuillo
       //    *.p1.frame.txt  -->  List<int> frame  -->  List<int> concat
+      //前回のフレームファイルと結合させる
       List<int> concat = LogoGuillo.Concat(trimFrame);
       return concat;
     }
 
 
     /// <summary>
-    /// チャプター出力
+    /// チャプターファイル出力
     /// </summary>
     public static void OutputChapter(List<int> rawFrame, int[] trimFrame)
     {
@@ -99,13 +92,8 @@ namespace LGLauncher.Frame
           path = Path.Combine(PathList.ChapDir_Misc, name);
         }
         var text = MakeChapText.Make_Frame(rawFrame, endFrame);
-
-        try
-        {
-          if (text != null)
-            File.WriteAllText(path, text, TextEnc.Shift_JIS);
-        }
-        catch { }
+        if (text != null)
+          File.WriteAllText(path, text, TextEnc.Shift_JIS);
       }
 
 
@@ -132,13 +120,8 @@ namespace LGLauncher.Frame
           path = Path.Combine(PathList.ChapDir_Misc, name);
         }
         var text = MakeChapText.Make_Frame(editFrame, endFrame);
-
-        try
-        {
-          if (text != null)
-            File.WriteAllText(path, text, TextEnc.Shift_JIS);
-        }
-        catch { }
+        if (text != null)
+          File.WriteAllText(path, text, TextEnc.Shift_JIS);
       }
 
 
@@ -152,13 +135,8 @@ namespace LGLauncher.Frame
           path = Path.Combine(PathList.ChapDir_Tvtp, name);
         }
         var text = MakeChapText.Make_Tvtp(editFrame, endFrame);
-
-        try
-        {
-          if (text != null)
-            File.WriteAllText(path, text, TextEnc.UTF8_bom);
-        }
-        catch { }
+        if (text != null)
+          File.WriteAllText(path, text, TextEnc.UTF8_bom);
       }
 
 
@@ -171,13 +149,8 @@ namespace LGLauncher.Frame
           path = Path.Combine(PathList.ChapDir_Misc, name);
         }
         var text = MakeChapText.Make_Ogm(editFrame, endFrame);
-
-        try
-        {
-          if (text != null)
-            File.WriteAllText(path, text, TextEnc.Shift_JIS);
-        }
-        catch { }
+        if (text != null)
+          File.WriteAllText(path, text, TextEnc.Shift_JIS);
       }
 
 

@@ -13,7 +13,7 @@ namespace LGLauncher
 {
   internal class Program
   {
-    static MainMethod_Module module = new MainMethod_Module();
+    static Program_Core core = new Program_Core();
 
     private static void Main(string[] args)
     {
@@ -31,11 +31,12 @@ namespace LGLauncher
       AppDomain.CurrentDomain.UnhandledException += OctNov.Excp.ExceptionInfo.OnUnhandledException;
 
 
-      //初期設定
+
       int[] trimFrame = null;        //avsの有効フレーム範囲
       try
       {
-        bool initialized = module.Initialize(args);
+        //初期設定
+        bool initialized = core.Initialize(args);
         if (initialized == false) return;
 
         //有効フレーム範囲取得
@@ -53,13 +54,13 @@ namespace LGLauncher
       while (true)
       {
         //分割トリム作成
+        //有効フレーム範囲を適度に分割して初回のチャプター作成を早くする。
         int[] splitTrim;
         if (PathList.IsPart)
         {
-          //適度に分割して初回のチャプター作成を早くする。
           int EndFrame_Max = trimFrame[1];
           bool isLastSplit;
-          splitTrim = module.MakeSplitTrim(EndFrame_Max, out isLastSplit);
+          splitTrim = core.MakeSplitTrim(EndFrame_Max, out isLastSplit);
           PathList.Update_IsLastSplit(isLastSplit);
         }
         else//IsAll
@@ -69,12 +70,12 @@ namespace LGLauncher
         }
 
 
-        //フレーム検出
+        //LogoGuillo実行
         bool HasError = false;
         try
         {
-          string batpath = module.MakeDetectorBat(splitTrim);
-          module.RunDetectorBat(splitTrim, batpath);
+          string batpath = core.MakeDetectorBat(splitTrim);
+          core.RunDetectorBat(splitTrim, batpath);
         }
         catch (LGLException e)
         {
@@ -125,8 +126,8 @@ namespace LGLauncher
 
 
 
-    #region MainMethod_Module
-    class MainMethod_Module
+    #region Program_Core
+    class Program_Core
     {
       /// <summary>
       /// Initialize
@@ -180,7 +181,6 @@ namespace LGLauncher
           beginFrame = (trimFrame_prv != null) ? trimFrame_prv[1] + 1 : 0;
         }
 
-        //splitTrim作成
         int[] splitTrim;
         {
           const int len_30min = (int)(30.0 * 60.0 * 29.970);
@@ -199,25 +199,23 @@ namespace LGLauncher
         }
 
         //Log
-        {
-          double len_min = 1.0 * (splitTrim[1] - splitTrim[0]) / 29.970 / 60;
-          var text = new StringBuilder();
-          text.AppendLine("  [ Split Trim ]");
-          text.AppendLine("    PartNo        =  " + PathList.PartNo);
-          text.AppendLine("    SplitTrim[0]  =  " + splitTrim[0]);
-          text.AppendLine("             [1]  =  " + splitTrim[1]);
-          text.AppendLine("    length        =  " + string.Format("{0:f1}  min", len_min));
-          text.AppendLine("    EndFrame_Max  =  " + endFrame_Max);
-          text.AppendLine("    IsLastSplit   =  " + isLastSplit);
-          Log.WriteLine(text.ToString());
-        }
+        double len_min = 1.0 * (splitTrim[1] - splitTrim[0]) / 29.970 / 60;
+        var text = new StringBuilder();
+        text.AppendLine("  [ Split Trim ]");
+        text.AppendLine("    PartNo        =  " + PathList.PartNo);
+        text.AppendLine("    SplitTrim[0]  =  " + splitTrim[0]);
+        text.AppendLine("             [1]  =  " + splitTrim[1]);
+        text.AppendLine("    length        =  " + string.Format("{0:f1}  min", len_min));
+        text.AppendLine("    EndFrame_Max  =  " + endFrame_Max);
+        text.AppendLine("    IsLastSplit   =  " + isLastSplit);
+        Log.WriteLine(text.ToString());
 
         return splitTrim;
       }
 
 
       /// <summary>
-      /// フレーム検出　bat作成
+      /// LogoGuillo実行用のbat作成
       /// </summary>
       public string MakeDetectorBat(int[] trimFrame)
       {
@@ -225,9 +223,8 @@ namespace LGLauncher
         string avsPath;
         {
           var maker = new AvsVpyMaker();
-          avsPath = maker.MakeTrimScript(trimFrame);
+          avsPath = maker.MakeScript(trimFrame);
         }
-
         //srt
         string srtPath;
         {
@@ -235,7 +232,6 @@ namespace LGLauncher
           double shiftSec = 1.0 * beginFrame / 29.970;
           srtPath = TimeShiftSrt.Make(shiftSec);
         }
-
         //bat
         string batPath = "";
         {
@@ -258,7 +254,7 @@ namespace LGLauncher
 
 
       /// <summary>
-      /// フレーム検出　bat実行
+      /// LogoGuillo実行
       /// </summary>
       public void RunDetectorBat(int[] trimFrame, string batPath)
       {
@@ -270,11 +266,9 @@ namespace LGLauncher
           try
           {
             //Semaphore取得
-            {
-              waitForReady = new WaitForSystemReady();
-              bool isReady = waitForReady.GetReady(PathList.DetectorName, PathList.Detector_MultipleRun);
-              if (isReady == false) return;
-            }
+            waitForReady = new WaitForSystemReady();
+            bool isReady = waitForReady.GetReady(PathList.DetectorName, PathList.Detector_MultipleRun);
+            if (isReady == false) return;
 
             int timeout_ms;
             {
@@ -286,7 +280,7 @@ namespace LGLauncher
               timeout_ms = timeout_ms <= 30 * 1000 ? 90 * 1000 : timeout_ms;
             }
 
-            //Bat実行
+            //実行
             LwiFile.Set_ifLwi();
             bool need_retry;
             BatLauncher.Launch(batPath, out need_retry, timeout_ms);
@@ -306,7 +300,7 @@ namespace LGLauncher
       }
 
 
-    } //class MainMethod_Module 
+    } //class Program_Core 
     #endregion
 
 

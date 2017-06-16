@@ -11,23 +11,25 @@ namespace LGLauncher
 {
   using OctNov.IO;
 
+  /// <summary>
+  /// vpyの作成、総フレーム数の取得
+  /// </summary>
   class VpyMaker : AbstractAvsMaker
   {
-    VpyMakerModule module = new VpyMakerModule();
-
+    VpyScripter scripter = new VpyScripter();
 
     /// <summary>
     /// トリムフレーム取得
     /// </summary>
     public override int[] GetTrimFrame()
     {
-      //総フレーム数取得用スクリプト　作成、実行
+      //総フレーム数取得用スクリプトの作成、実行
       {
-        string path = module.CreateInfo_vpy();
+        string path = scripter.CreateInfo();
         try
         {
           LwiFile.Set_ifLwi();
-          module.RunInfo_vpy(path);
+          scripter.RunInfo(path);
         }
         finally
         {
@@ -63,9 +65,9 @@ namespace LGLauncher
     /// <summary>
     /// Trim付きスクリプト作成
     /// </summary>
-    public override string MakeTrimScript(int[] trimFrame)
+    public override string MakeScript(int[] trimFrame)
     {
-      var text = module.CreateTrimText_vpy(trimFrame);
+      var text = scripter.CreateText(trimFrame);
       string path = AvsVpyCommon.OutScript(trimFrame, text, ".vpy", TextEnc.UTF8_nobom);
       return path;
     }
@@ -74,20 +76,21 @@ namespace LGLauncher
 
 
 
+  #region VpyScripter
+
   /// <summary>
-  /// VpyMaker用 Module
+  /// VpyMaker用 スクリプト作成の実行部
   /// </summary>
-  class VpyMakerModule
+  class VpyScripter
   {
     /// <summary>
-    /// 総フレーム数取得用のVpy作成
+    /// 総フレーム数取得用のvpy作成  InfoSciprt
     /// </summary>
-    public string CreateInfo_vpy()
+    public string CreateInfo()
     {
       //読
       var text = FileR.ReadFromResource("LGLauncher.Resource.GetInfo_vpy.vpy");
 
-      //置換
       for (int i = 0; i < text.Count; i++)
       {
         var line = text[i];
@@ -123,7 +126,7 @@ namespace LGLauncher
     /// <summary>
     /// InfoSciprt実行  vpy
     /// </summary>
-    public void RunInfo_vpy(string vpyPath)
+    public void RunInfo(string vpyPath)
     {
       var prc = new Process();
       prc.StartInfo.FileName = "python";
@@ -134,29 +137,28 @@ namespace LGLauncher
       try
       {
         prc.Start();
-        prc.WaitForExit(20 * 1000);
+        prc.WaitForExit(30 * 1000);  //数秒かかるので短すぎるのはダメ
         if (prc.HasExited && prc.ExitCode == 0)
-          return;  //正常終了
+          return;
       }
       catch
       {
         //not found python 
-        throw new LGLException("  RunInfo_vpy() runtime error");
+        throw new LGLException("  RunInfo() runtime error");
       }
-      throw new LGLException("  RunInfo_vpy() timeout");
+      throw new LGLException("  RunInfo() timeout");
     }
 
 
 
     /// <summary>
-    /// TrimVpy作成
+    /// vpyスクリプトの文字列を作成
     /// </summary>
-    public List<string> CreateTrimText_vpy(int[] trimFrame)
+    public List<string> CreateText(int[] trimFrame)
     {
       //読
       var text = FileR.ReadFromResource("LGLauncher.Resource.TrimVpy.vpy");
 
-      //置換
       for (int i = 0; i < text.Count; i++)
       {
         var line = text[i];
@@ -194,6 +196,8 @@ namespace LGLauncher
 
       return text;
     }
+
+    #endregion
 
 
   }

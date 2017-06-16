@@ -36,6 +36,9 @@ namespace LGLauncher
   /// </summary>
   enum AvsVpy
   {
+    /*
+     vpyを利用することはないが、作成したので残しておく。
+    */
     None,
     Avs,
     Vpy,
@@ -114,9 +117,10 @@ namespace LGLauncher
 
 
     //  [  PartNo  ]
-    //   1 <= No  IsPart
-    //  No  =  0  uninitialized value and detect No 
-    //  No  = -1  IsAll
+    //  avsの分割数を管理
+    //     1 <= No  IsPart
+    //    No  =  0  uninitialized value and detect No 
+    //    No  = -1  IsAll
     public static int PartNo { get; private set; }
     public static bool Is1stPart { get { return PartNo == 1; } }
     public static bool IsPart { get; private set; }
@@ -245,7 +249,6 @@ namespace LGLauncher
     /// </summary>
     private static void Copy_fromCommandLine(Setting_CmdLine cmdline)
     {
-      //copy
       IsPart = cmdline.IsPart || cmdline.IsLast;
       IsLast_cmdline = cmdline.IsLast;
       TsPath = cmdline.TsPath;
@@ -266,7 +269,6 @@ namespace LGLauncher
       if (LwiPath != null && File.Exists(LwiPath) == false)
         throw new LGLException("lwi does not exist");
 
-      //Extension
       if (TsPath != null && Path.GetExtension(TsPath).ToLower() != ".ts")
         throw new LGLException("TsPath has invalid extension");
       if (D2vPath != null && Path.GetExtension(D2vPath).ToLower() != ".d2v")
@@ -283,7 +285,6 @@ namespace LGLauncher
     /// </summary>
     private static void Make_InputPath(Setting_File setting)
     {
-      //Input
       TsShortName = new Regex("[ $|()^　]").Replace(TsName, "_");      //batの特殊文字
       TsShortName = (5 < TsShortName.Length) ? TsShortName.Substring(0, 5) : TsShortName;
 
@@ -299,6 +300,7 @@ namespace LGLauncher
         if (File.Exists(LwiPath) == false && File.Exists(TsPath + ".lwi"))
           LwiPath = TsPath + ".lwi";
       }
+
       //Plugin  Detector  AvsVpy
       {
         string plugin = setting.InputPlugin.Trim().ToLower();
@@ -314,7 +316,6 @@ namespace LGLauncher
         Detector = isJLS ? Detector.Join_Logo_Scp
           : isLG ? Detector.LogoGuillo
           : Detector.None;
-
         //Avs固定 
         const AvsVpy avs = AvsVpy.Avs;
         AvsVpy = avs;
@@ -330,7 +331,7 @@ namespace LGLauncher
     /// </summary>
     private static void Make_WorkDir()
     {
-      //App
+      //App path
       AppPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
 
       //Dir作成
@@ -357,12 +358,11 @@ namespace LGLauncher
         Directory.CreateDirectory(LWorkDir);
     }
 
-
+    /// <summary>
+    /// ＭＤ５作成
+    /// </summary>
     class Hash
     {
-      /// <summary>
-      /// ＭＤ５作成
-      /// </summary>
       public static string ComputeMD5(string srcText)
       {
         byte[] data = Encoding.UTF8.GetBytes(srcText);     //文字列をbyte型配列に変換する
@@ -391,16 +391,15 @@ namespace LGLauncher
         throw new LGLException("Invalid PartNo.  PartNo = " + PartNo);
     }
     /// <summary>
-    /// PartNo検出  作業ファイル名から値を取得
+    /// PartNo検出の処理部分。作業ファイル名から値を取得
     /// </summary>
     private static int Detect_PartNo_fromFileName()
     {
       //  search *.p2.frame.cat.txt
       var files = Directory.GetFiles(LWorkDir,
                                      TsShortName + ".p*.frame.cat.txt");
-      // not found file
       if (files.Count() == 0)
-        return 1;
+        return 1;//not found
 
       //ファイルパス  -->  PartNo抽出
       var strNums = files.Select(fullname =>
@@ -440,7 +439,6 @@ namespace LGLauncher
         var dirInfo = new DirectoryInfo(LSystemDir);
         files = dirInfo.GetFiles("*", SearchOption.AllDirectories);
       }
-
       /// <summary>
       /// フルパス  or  null
       /// </summary>
@@ -450,7 +448,6 @@ namespace LGLauncher
           .FirstOrDefault();
         return fileInfo != null ? fileInfo.FullName : null;
       }
-
       /// <summary>
       /// フルパス  or  LGLException
       /// </summary>
@@ -465,13 +462,11 @@ namespace LGLauncher
     }
 
 
-
     /// <summary>
     /// LSystemフォルダ内の各バイナリを取得
     /// </summary>
     private static void Get_BinaryPath()
     {
-      //ファイル一覧を取得
       FileSercher sercher = new FileSercher(LSystemDir);
 
       LogoSelector = sercher.Get("LogoSelector.exe");
@@ -519,7 +514,7 @@ namespace LGLauncher
         LogoGuillo = sercher.Get("LogoGuillo.exe");
       }
 
-      //USE_AVS    LTopWorkDir内に作成
+      //USE_AVSをLTopWorkDir内に作成
       var USE_AVS = Path.Combine(LTopWorkDir, "USE_AVS");
       try
       {
@@ -571,7 +566,6 @@ namespace LGLauncher
     /// </summary>
     private static void Log_and_ErrorCheck()
     {
-      //log
       Log.WriteLine("  No  = 【    " + PartNo + "    】");
       if (Is1stPart || IsAll)
       {
@@ -583,7 +577,6 @@ namespace LGLauncher
         Log.WriteLine("       IsLast      : " + IsLastProcess);
       Log.WriteLine();
 
-      //check
       if (IsD2v)
         if (File.Exists(D2vPath) == false)
           throw new LGLException("d2v dose not exist: " + D2vName);

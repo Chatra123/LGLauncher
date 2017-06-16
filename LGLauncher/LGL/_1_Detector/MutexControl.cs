@@ -7,8 +7,10 @@ using System.Threading;
 
 namespace LGLauncher
 {
+
   /// <summary>
   /// ミューテックスの取得
+  /// MutexControl、SemaphoreControlを抽象化
   /// </summary>
   interface IMutexControl
   {

@@ -11,15 +11,16 @@ namespace LGLauncher
   using OctNov.IO;
 
   /*
-   *   　d2v  -->  最終行を削除
-   *   　lwi  -->  最後のindex= 以降を削除 
+   * 作成途中のlwiファイルを利用できる用にフォーマットを整える。
+   *   d2v  -->  最終行を削除
+   *   lwi  -->  最後のindex= 以降を削除 
    */
   static class IndexFormatter
   {
     static bool HasFormatted = false;
 
     /// <summary>
-    /// Format  d2v, lwi Index
+    /// Format d2v, lwi
     /// </summary>
     public static void Format(bool FormatD2v)
     {
@@ -59,10 +60,9 @@ namespace LGLauncher
           throw new LGLException("d2v format error");
       }
 
-      //FINISHEDがあるか？
+      //末尾にFINISHEDがあるか？
       bool hasFinished = false;
       {
-        //末尾を走査
         for (int idx = readText.Count - 1; readText.Count - 3 < idx; idx--)
         {
           string line = readText[idx];

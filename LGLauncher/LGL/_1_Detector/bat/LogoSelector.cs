@@ -8,7 +8,9 @@ using System.Text.RegularExpressions;
 
 namespace LGLauncher
 {
-
+  /// <summary>
+  /// Logo、Paramパス取得
+  /// </summary>
   static class LogoSelector
   {
     /// <summary>
@@ -21,9 +23,7 @@ namespace LGLauncher
         throw new LGLException("LogoSelector return null");
       if (result.Count < 2)
         throw new LGLException("LogoSelector return value is -lt 2 lines");
-
-      // result[0] --> logo path
-      //       [1] --> param path
+      //                      { logo path, param path }
       return new List<string> { result[0], result[1] };
     }
 
@@ -38,8 +38,7 @@ namespace LGLauncher
         throw new LGLException("LogoSelector return null");
       if (result.Count < 1)
         throw new LGLException("LogoSelector return value is -lt 1 line");
-
-      // result[0] --> logo path
+      //                      { logo path }
       return new List<string> { result[0] };
     }
 
@@ -58,7 +57,6 @@ namespace LGLauncher
         args = string.Format("  \"{0}\"   \"{1}\"   \"{2}\"  ",
                               PathList.Channel, PathList.Program, PathList.TsPath);
       }
-
       //実行
       string result = Start_GetStdout(path, args);
       var split = result.Split(new string[] { Environment.NewLine }, StringSplitOptions.None).ToList();
@@ -76,7 +74,6 @@ namespace LGLauncher
       }
       return split;
     }
-
 
 
 

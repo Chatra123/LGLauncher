@@ -27,17 +27,13 @@ namespace LGLauncher
       var batText = new List<string>();
       batText = FileR.ReadFromResource("LGLauncher.Resource.JLS_OnRec.bat");
 
-      //chapter_exe
       string chapter_exePath = PathList.Chapter_exe;
       string scPosPath = PathList.WorkName + ".jls.scpos.txt";
-      //logoframe
       string logoframeExe = PathList.LogoFrame;
       string logoFrameText = PathList.WorkName + ".jls.logoframe.txt";
-      //join_logo_scp
       string join_logo_scpPath = PathList.Join_Logo_Scp;
       string jls_resultPath = PathList.WorkName + ".jls.result.txt";
 
-      //置換
       for (int i = 0; i < batText.Count; i++)
       {
         var line = batText[i];
@@ -79,23 +75,16 @@ namespace LGLauncher
       var batText = new List<string>();
       batText = FileR.ReadFromResource("LGLauncher.Resource.JLS_Last.bat");
 
-      //scpos
       string scpos_catPath =   PathList.TsShortName + ".jls.scpos.cat.txt";
-      //logoframe
       string logoFrame_catPath = PathList.TsShortName + ".jls.logoframe.cat.txt";
-      //join_logo_scp
       string join_logo_scpPath = PathList.Join_Logo_Scp;
       string jls_resultPath = PathList.TsShortName + ".jls.last.result.txt";
 
-      //置換
       for (int i = 0; i < batText.Count; i++)
       {
         var line = batText[i];
-        //scpos
         line = Regex.Replace(line, "#SCPosPath#", scpos_catPath, RegexOptions.IgnoreCase);
-        //logoframe
         line = Regex.Replace(line, "#LogoFrameText#", logoFrame_catPath, RegexOptions.IgnoreCase);
-        //join_logo_scp
         line = Regex.Replace(line, "#join_logo_scp#", join_logo_scpPath, RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#JL_CmdPath#", jl_CmdPath, RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#JLS_ResultPath#", jls_resultPath, RegexOptions.IgnoreCase);

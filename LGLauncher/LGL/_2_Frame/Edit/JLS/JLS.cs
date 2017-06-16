@@ -20,7 +20,6 @@ namespace LGLauncher.Frame.JLS
     /// </summary>
     public static List<int> Result_to_Frame(bool islast_jls)
     {
-      //パス
       string avsTrimPath, framePath;
       {
         if (islast_jls == false)
@@ -49,16 +48,13 @@ namespace LGLauncher.Frame.JLS
         //１行に変換   List<string>  -->  string
         string liner = "";
         readfile.ForEach((line) => { liner += line; });
-
         framelist = ConvertFrame.AvsTrim_to_FrameList(liner);
       }
 
       //書
-      {
-        //List<int>  -->  List<string>
-        var frameText = framelist.Select(f => f.ToString()).ToList();
-        File.WriteAllLines(framePath, frameText, TextEnc.Shift_JIS);
-      }
+      //List<int>  -->  List<string>
+      var frameText = framelist.Select(f => f.ToString()).ToList();
+      File.WriteAllLines(framePath, frameText, TextEnc.Shift_JIS);
 
       return framelist;
     }

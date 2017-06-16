@@ -5,12 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using System.IO;
-using clean = LGLauncher.FileCleaner;
-
 
 
 namespace LGLauncher
 {
+  using cleaner = LGLauncher.FileCleaner;
+
   /// <summary>
   /// 作業ファイル削除
   /// </summary>
@@ -26,14 +26,14 @@ namespace LGLauncher
       if (PathList.Is1stPart || PathList.IsAll)
       {
         if (PathList.Is1stPart)
-          clean.OldFile(0.0, PathList.LWorkDir, "*.p?*.*");
+          cleaner.OldFile(0.0, PathList.LWorkDir, "*.p?*.*");
         else if (PathList.IsAll)
-          clean.OldFile(0.0, PathList.LWorkDir, "*.all.*");
+          cleaner.OldFile(0.0, PathList.LWorkDir, "*.all.*");
 
-        clean.OldFile(0.0, PathList.LWorkDir, "*.frame.cat.txt");
-        clean.OldFile(0.0, PathList.LWorkDir, "*.jls.*");
-        clean.OldFile(0.0, PathList.LWorkDir, "*.d2v");
-        clean.OldFile(0.0, PathList.LWorkDir, "*.lwi");
+        cleaner.OldFile(0.0, PathList.LWorkDir, "*.frame.cat.txt");
+        cleaner.OldFile(0.0, PathList.LWorkDir, "*.jls.*");
+        cleaner.OldFile(0.0, PathList.LWorkDir, "*.d2v");
+        cleaner.OldFile(0.0, PathList.LWorkDir, "*.lwi");
       }
     }
 
@@ -48,7 +48,7 @@ namespace LGLauncher
         if (PathList.IsLastPart)
         {
           //LWorkDir
-          clean.OldFile(0.0, PathList.LWorkDir, "*" + PathList.TsShortName + "*");
+          cleaner.OldFile(0.0, PathList.LWorkDir, "*" + PathList.TsShortName + "*");
         }
 
       // Mode = 1    古いファイル削除
@@ -57,16 +57,16 @@ namespace LGLauncher
         {
           const double nDaysBefore = 2.0;
           //LTopWorkDir                    サブフォルダ内も対象
-          clean.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.p?*.*");
-          clean.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.all.*");
-          clean.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.frame.cat.txt");
-          clean.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.jls.*");
-          clean.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.sys.*");
-          clean.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.d2v");
-          clean.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.lwi");
-          clean.EmptyDir(PathList.LTopWorkDir);
+          cleaner.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.p?*.*");
+          cleaner.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.all.*");
+          cleaner.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.frame.cat.txt");
+          cleaner.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.jls.*");
+          cleaner.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.sys.*");
+          cleaner.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.d2v");
+          cleaner.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.lwi");
+          cleaner.EmptyDir(PathList.LTopWorkDir);
           //Windows Temp
-          clean.OldFile(nDaysBefore, Path.GetTempPath(), "DGI_temp_*_*");
+          cleaner.OldFile(nDaysBefore, Path.GetTempPath(), "DGI_temp_*_*");
         }
     }
 
@@ -77,15 +77,15 @@ namespace LGLauncher
     public static void Clean_OnError()
     {
       // *.p3.2000__3000.avs 削除
-      clean.OldFile(0.0, PathList.LWorkDir, PathList.WorkName + ".*__*.avs");
-      clean.OldFile(0.0, PathList.LWorkDir, PathList.WorkName + ".*__*.vpy");
+      cleaner.OldFile(0.0, PathList.LWorkDir, PathList.WorkName + ".*__*.avs");
+      cleaner.OldFile(0.0, PathList.LWorkDir, PathList.WorkName + ".*__*.vpy");
     }
   }
 
 
 
   /// <summary>
-  /// 削除処理　古いファイル、空フォルダを削除
+  /// ファイル削除
   /// </summary>
   static class FileCleaner
   {
@@ -110,12 +110,14 @@ namespace LGLauncher
       }
       catch (System.UnauthorizedAccessException)
       {
-        /* Java  jre-8u73-windows-i586.exeを実行してインストール用のウィンドウを表示させると、
-         * Tempフォルダにjds262768703.tmpがReadOnlyで作成される。
-         * 
+        /*
          * アクセス権限の無いファイルが含まれているフォルダに
          * files = dirInfo.GetFiles();
          * を実行すると System.UnauthorizedAccessExceptionが発生する。
+         * 
+         * Java  jre-8u73-windows-i586.exeを実行してインストール用のウィンドウを表示させると、
+         * Windows Tempフォルダにjds262768703.tmpがReadOnlyで作成される。
+         * Windows Tempを処理すると発生するかもしれない。
          */
         return;
       }

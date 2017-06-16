@@ -19,7 +19,6 @@ namespace LGLauncher.Frame.JLS
     /// </summary>
     public static void Concat(int[] trimFrame)
     {
-      //パス
       //logoframeによって作成されるファイル                *.p3.jls.logoframe.txt
       string add_ScposPath = PathList.WorkPath + ".jls.logoframe.txt";
 
@@ -101,6 +100,8 @@ namespace LGLauncher.Frame.JLS
     static List<string> ApeendOffset_logoframe(string line, int frame_offset)
     {
       /*
+       * logoframe sample
+       * 
        *   64 S 0 BTM     64     64
        * 2863 E 0 ALL   2837   2863
        */

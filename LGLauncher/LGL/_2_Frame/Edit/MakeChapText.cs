@@ -14,7 +14,6 @@ namespace LGLauncher.Frame
   /// </summary>
   static class MakeChapText
   {
-
     /// <summary>
     /// frameList --> Output frame text
     /// </summary>
