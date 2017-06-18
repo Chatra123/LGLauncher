@@ -9,7 +9,7 @@ namespace LGLauncher
 {
   using OctNov.IO;
 
-  static class Bat_Join_Logo_Scp
+  static class Bat_JLS
   {
     /// <summary>
     /// Join_Logo_Scp起動用バッチ作成

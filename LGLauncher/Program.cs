@@ -238,13 +238,13 @@ namespace LGLauncher
           {
             var logo = LogoSelector.GetLogo();
             var jl_cmd = PathList.JL_Cmd_OnRec;
-            batPath = Bat_Join_Logo_Scp.Make_OnRec(avsPath,
+            batPath = Bat_JLS.Make_OnRec(avsPath,
                                                    logo[0], jl_cmd);
           }
           else if (PathList.IsLG)
           {
             var logo_param = LogoSelector.GetLogo_and_Param();
-            batPath = Bat_LogoGuillo.Make(avsPath, srtPath,
+            batPath = Bat_LG.Make(avsPath, srtPath,
                                           logo_param[0], logo_param[1]);
           }
         }

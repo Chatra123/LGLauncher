@@ -46,7 +46,7 @@ namespace LGLauncher.Frame
         if (PathList.IsPart && PathList.IsLastPart)
         {
           var jl_cmd = PathList.JL_Cmd_Standard;
-          var batPath = Bat_Join_Logo_Scp.Make_AtLast(jl_cmd);
+          var batPath = Bat_JLS.Make_AtLast(jl_cmd);
           BatLauncher.Launch(batPath);
           List<int> jls_last_frame = JLS.JLS.Result_to_Frame(true);
           return jls_last_frame;
