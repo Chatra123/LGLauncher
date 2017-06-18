@@ -150,7 +150,7 @@ namespace LGLauncher
         CleanWorkItem.Clean_Beforehand();
 
         if (PathList.Is1stPart || PathList.IsAll)
-          Log.WriteLine(cmdline.ToString());
+          Log.WriteLine(cmdline.Result());
         return true;
       }
 

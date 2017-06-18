@@ -108,7 +108,7 @@ namespace LGLauncher
         var dirInfo = new DirectoryInfo(directory);
         files = dirInfo.GetFiles(pattern, SearchOption.AllDirectories);//ignore case
       }
-      catch (System.UnauthorizedAccessException)
+      catch (UnauthorizedAccessException)
       {
         /*
          * アクセス権限の無いファイルが含まれているフォルダに
@@ -153,7 +153,7 @@ namespace LGLauncher
         var dirInfo = new DirectoryInfo(parent_dir);
         dirs = dirInfo.GetDirectories("*", SearchOption.AllDirectories);
       }
-      catch (System.UnauthorizedAccessException)
+      catch (UnauthorizedAccessException)
       {
         return;
       }

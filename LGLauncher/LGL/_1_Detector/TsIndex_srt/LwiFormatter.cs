@@ -95,7 +95,7 @@ namespace LGLauncher
   /*
    *   lwi  -->  最後のindex= 以降を削除 
    */
-  static class LwiFormatter
+  class LwiFormatter
   {
     //lwiの３，４行目
     //
@@ -116,7 +116,7 @@ namespace LGLauncher
     /// <summary>
     /// フォーマットを整える
     /// </summary>
-    public static void Format()
+    public void Format()
     {
       //IsAll
       if (PathList.IsAll)
@@ -247,7 +247,7 @@ namespace LGLauncher
     ///   lwiファイルの<ExtraDataList>だけはバイナリーで書かれているので
     ///   バイナリーモードで読み込む。
     /// </remarks>
-    private static byte[] ReadFile_footer()
+    private byte[] ReadFile_footer()
     {
       const string Tag = "</LibavReaderIndexFile>\n";
       byte[] footer = null;
@@ -277,7 +277,7 @@ namespace LGLauncher
     /// <summary>
     /// footer作成　footerファイルが無いときに使用。
     /// </summary>
-    private static string Create_footer(List<string> lwiText)
+    private string Create_footer(List<string> lwiText)
     {
       /*
         lwiText line sample

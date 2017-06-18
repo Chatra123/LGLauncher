@@ -77,21 +77,21 @@ namespace LGLauncher
 
 
     /// <summary>
-    /// コマンドライン一覧を出力
+    /// 結果一覧を出力
     /// </summary>
-    public new string ToString()
+    public string Result()
     {
-      var text = new StringBuilder();
-      text.AppendLine("  [ App Command Line ]");
-      text.AppendLine("    IsPart    =  " + IsPart);
-      text.AppendLine("    IsLast    =  " + IsLast);
-      text.AppendLine("    TsPath    =  " + TsPath);
-      text.AppendLine("    D2vPath   =  " + D2vPath);
-      text.AppendLine("    LwiPath   =  " + LwiPath);
-      text.AppendLine("    SrtPath   =  " + SrtPath);
-      text.AppendLine("    Channel   =  " + Channel);
-      text.AppendLine("    Program   =  " + Program);
-      return text.ToString();
+      var sb = new StringBuilder();
+      sb.AppendLine("  [ App Command Line ]");
+      sb.AppendLine("    IsPart    =  " + IsPart);
+      sb.AppendLine("    IsLast    =  " + IsLast);
+      sb.AppendLine("    TsPath    =  " + TsPath);
+      sb.AppendLine("    D2vPath   =  " + D2vPath);
+      sb.AppendLine("    LwiPath   =  " + LwiPath);
+      sb.AppendLine("    SrtPath   =  " + SrtPath);
+      sb.AppendLine("    Channel   =  " + Channel);
+      sb.AppendLine("    Program   =  " + Program);
+      return sb.ToString();
     }
 
 

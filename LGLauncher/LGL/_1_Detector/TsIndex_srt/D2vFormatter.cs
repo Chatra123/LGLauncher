@@ -28,9 +28,9 @@ namespace LGLauncher
       HasFormatted = true;
 
       if (FormatD2v)
-        D2vFormatter.Format();
+        new D2vFormatter().Format();
       else
-        LwiFormatter.Format();
+        new LwiFormatter().Format();
     }
   }
 
@@ -38,12 +38,12 @@ namespace LGLauncher
   /*
    *   d2v  -->  最終行を削除
    */
-  static class D2vFormatter
+  class D2vFormatter
   {
     /// <summary>
     /// フォーマットを整える
     /// </summary>
-    public static void Format()
+    public void Format()
     {
       //読
       var readText = FileR.ReadAllLines(PathList.D2vPath);
