@@ -7,10 +7,8 @@ using System.Linq;
 
 namespace LGLauncher.Frame
 {
-  using OctNov.IO;
-
   /// <summary>
-  /// frameList --> 出力用テキストを作成
+  /// frameList --> チャプター用テキストを作成
   /// </summary>
   static class MakeChapText
   {

@@ -38,20 +38,20 @@ namespace LGLauncher
       {
         var line = batText[i];
         //Part
-        line = Regex.Replace(line, "#PartNo#", "" + PathList.PartNo, RegexOptions.IgnoreCase);
-        line = Regex.Replace(line, "#TsShortName#", PathList.TsShortName, RegexOptions.IgnoreCase);
+        line = Regex.Replace(line, "#PartNo#", "" + PathList.PartNo);
+        line = Regex.Replace(line, "#TsShortName#", PathList.TsShortName);
         //chapter_exe
-        line = Regex.Replace(line, "#chapter_exe#", chapter_exePath, RegexOptions.IgnoreCase);
-        line = Regex.Replace(line, "#AvsPath#", avsPath, RegexOptions.IgnoreCase);
-        line = Regex.Replace(line, "#SCPosPath#", scPosPath, RegexOptions.IgnoreCase);
+        line = Regex.Replace(line, "#chapter_exe#", chapter_exePath);
+        line = Regex.Replace(line, "#AvsPath#", avsPath);
+        line = Regex.Replace(line, "#SCPosPath#", scPosPath);
         //logoframe
-        line = Regex.Replace(line, "#logoframePath#", logoframePath, RegexOptions.IgnoreCase);
-        line = Regex.Replace(line, "#LogoPath#", logoPath, RegexOptions.IgnoreCase);
-        line = Regex.Replace(line, "#LogoFrameText#", logoFrameText, RegexOptions.IgnoreCase);
+        line = Regex.Replace(line, "#logoframePath#", logoframePath);
+        line = Regex.Replace(line, "#LogoPath#", logoPath);
+        line = Regex.Replace(line, "#LogoFrameText#", logoFrameText);
         //join_logo_scp
-        line = Regex.Replace(line, "#join_logo_scp#", join_logo_scpPath, RegexOptions.IgnoreCase);
-        line = Regex.Replace(line, "#JL_CmdPath#", jl_CmdPath, RegexOptions.IgnoreCase);
-        line = Regex.Replace(line, "#JLS_ResultPath#", jls_resultPath, RegexOptions.IgnoreCase);
+        line = Regex.Replace(line, "#join_logo_scp#", join_logo_scpPath);
+        line = Regex.Replace(line, "#JL_CmdPath#", jl_CmdPath);
+        line = Regex.Replace(line, "#JLS_ResultPath#", jls_resultPath);
         batText[i] = line;
       }
 
@@ -83,11 +83,11 @@ namespace LGLauncher
       for (int i = 0; i < batText.Count; i++)
       {
         var line = batText[i];
-        line = Regex.Replace(line, "#SCPosPath#", scpos_catPath, RegexOptions.IgnoreCase);
-        line = Regex.Replace(line, "#LogoFrameText#", logoFrame_catPath, RegexOptions.IgnoreCase);
-        line = Regex.Replace(line, "#join_logo_scp#", join_logo_scpPath, RegexOptions.IgnoreCase);
-        line = Regex.Replace(line, "#JL_CmdPath#", jl_CmdPath, RegexOptions.IgnoreCase);
-        line = Regex.Replace(line, "#JLS_ResultPath#", jls_resultPath, RegexOptions.IgnoreCase);
+        line = Regex.Replace(line, "#SCPosPath#", scpos_catPath);
+        line = Regex.Replace(line, "#LogoFrameText#", logoFrame_catPath);
+        line = Regex.Replace(line, "#join_logo_scp#", join_logo_scpPath);
+        line = Regex.Replace(line, "#JL_CmdPath#", jl_CmdPath);
+        line = Regex.Replace(line, "#JLS_ResultPath#", jls_resultPath);
         batText[i] = line;
       }
 

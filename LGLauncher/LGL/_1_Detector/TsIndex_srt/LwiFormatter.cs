@@ -318,10 +318,10 @@ namespace LGLauncher
                     </ExtraDataList>
                     </LibavReaderIndexFile>";
       string footer = template;
-      footer = Regex.Replace(footer, @"[ \t　]", "", RegexOptions.IgnoreCase);         //VisualStudio上での表示用スペース削除
-      footer = Regex.Replace(footer, @"#Width#", Width, RegexOptions.IgnoreCase);
-      footer = Regex.Replace(footer, @"#Height#", Height, RegexOptions.IgnoreCase);
-      footer = Regex.Replace(footer, @"#Format#", Format, RegexOptions.IgnoreCase);
+      footer = Regex.Replace(footer, @"[ \t　]", "");         //VisualStudio上での表示用スペース削除
+      footer = Regex.Replace(footer, @"#Width#", Width);
+      footer = Regex.Replace(footer, @"#Height#", Height);
+      footer = Regex.Replace(footer, @"#Format#", Format);
       return footer;
     }
   }

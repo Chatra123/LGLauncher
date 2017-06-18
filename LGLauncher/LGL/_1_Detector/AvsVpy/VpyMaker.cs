@@ -93,23 +93,23 @@ namespace LGLauncher
       for (int i = 0; i < text.Count; i++)
       {
         var line = text[i];
-        line = Regex.Replace(line, "#LWorkDir#", PathList.LWorkDir, RegexOptions.IgnoreCase);
+        line = Regex.Replace(line, "#LWorkDir#", PathList.LWorkDir);
 
         //Plugin
         if (PathList.IsD2v)
         {
-          line = Regex.Replace(line, "#d2v#", "", RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#d2vsource#", PathList.d2vsource, RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#D2vName#", PathList.D2vNameInLWork, RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#d2v#", "");
+          line = Regex.Replace(line, "#d2vsource#", PathList.d2vsource);
+          line = Regex.Replace(line, "#D2vName#", PathList.D2vNameInLWork);
         }
         else if (PathList.IsLwi)
         {
-          line = Regex.Replace(line, "#lwi#", "", RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#vslsmashsoruce#", PathList.vslsmashsoruce, RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#TsPath#", PathList.TsPath, RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#lwi#", "");
+          line = Regex.Replace(line, "#vslsmashsoruce#", PathList.vslsmashsoruce);
+          line = Regex.Replace(line, "#TsPath#", PathList.TsPath);
         }
 
-        line = Regex.Replace(line, "#InfoName#", PathList.WorkName + ".info.txt", RegexOptions.IgnoreCase);
+        line = Regex.Replace(line, "#InfoName#", PathList.WorkName + ".info.txt");
         text[i] = line.Trim();  // pythonは unexpected indentになるので必ずTrim()
       }
 
@@ -164,31 +164,31 @@ namespace LGLauncher
         //Plugin
         if (PathList.IsD2v)
         {
-          line = Regex.Replace(line, "#d2v#", "", RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#d2vsource#", PathList.d2vsource, RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#D2vName#", PathList.D2vNameInLWork, RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#d2v#", "");
+          line = Regex.Replace(line, "#d2vsource#", PathList.d2vsource);
+          line = Regex.Replace(line, "#D2vName#", PathList.D2vNameInLWork);
         }
         else if (PathList.IsLwi)
         {
-          line = Regex.Replace(line, "#lwi#", "", RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#vslsmashsoruce#", PathList.vslsmashsoruce, RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#TsPath#", PathList.TsPath, RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#lwi#", "");
+          line = Regex.Replace(line, "#vslsmashsoruce#", PathList.vslsmashsoruce);
+          line = Regex.Replace(line, "#TsPath#", PathList.TsPath);
         }
 
         //Detector
         if (PathList.IsJLS)
-          line = Regex.Replace(line, "#JLS#", "", RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#JLS#", "");
         else if (PathList.IsLG)
-          line = Regex.Replace(line, "#LG#", "", RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#LG#", "");
 
         //Trim
         if (PathList.IsPart)
         {
           int beginFrame = trimFrame[0];
           int endFrame = trimFrame[1];
-          line = Regex.Replace(line, "#EnableTrim#", "", RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#BeginFrame#", "" + beginFrame, RegexOptions.IgnoreCase);
-          line = Regex.Replace(line, "#EndFrame_plus1#", "" + (endFrame + 1), RegexOptions.IgnoreCase);
+          line = Regex.Replace(line, "#EnableTrim#", "");
+          line = Regex.Replace(line, "#BeginFrame#", "" + beginFrame);
+          line = Regex.Replace(line, "#EndFrame_plus1#", "" + (endFrame + 1));
         }
         text[i] = line.Trim();  // pythonは unexpected indentになるので必ずTrim()
       }

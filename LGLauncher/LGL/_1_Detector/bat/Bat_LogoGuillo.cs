@@ -55,16 +55,16 @@ namespace LGLauncher
       {
         var line = batText[i];
         //Part
-        line = Regex.Replace(line, "#PartNo#", "" + PathList.PartNo, RegexOptions.IgnoreCase);
-        line = Regex.Replace(line, "#TsShortName#", PathList.TsShortName, RegexOptions.IgnoreCase);
+        line = Regex.Replace(line, "#PartNo#", "" + PathList.PartNo);
+        line = Regex.Replace(line, "#TsShortName#", PathList.TsShortName);
         //LogoGuillo
-        line = Regex.Replace(line, "#LOGOG_PATH#", LOGOG_PATH, RegexOptions.IgnoreCase);
-        line = Regex.Replace(line, "#AVS2X_PATH#", AVS2X_PATH, RegexOptions.IgnoreCase);
-        line = Regex.Replace(line, "#AVSPLG_PATH#", AVSPLG_PATH, RegexOptions.IgnoreCase);
-        line = Regex.Replace(line, "#VIDEO_PATH#", VIDEO_PATH, RegexOptions.IgnoreCase);
-        line = Regex.Replace(line, "#LOGO_PATH#", LOGO_PATH, RegexOptions.IgnoreCase);
-        line = Regex.Replace(line, "#PRM_PATH#", PRM_PATH, RegexOptions.IgnoreCase);
-        line = Regex.Replace(line, "#OUTPUT_PATH#", OUTPUT_PATH, RegexOptions.IgnoreCase);
+        line = Regex.Replace(line, "#LOGOG_PATH#", LOGOG_PATH);
+        line = Regex.Replace(line, "#AVS2X_PATH#", AVS2X_PATH);
+        line = Regex.Replace(line, "#AVSPLG_PATH#", AVSPLG_PATH);
+        line = Regex.Replace(line, "#VIDEO_PATH#", VIDEO_PATH);
+        line = Regex.Replace(line, "#LOGO_PATH#", LOGO_PATH);
+        line = Regex.Replace(line, "#PRM_PATH#", PRM_PATH);
+        line = Regex.Replace(line, "#OUTPUT_PATH#", OUTPUT_PATH);
         batText[i] = line;
       }
 
