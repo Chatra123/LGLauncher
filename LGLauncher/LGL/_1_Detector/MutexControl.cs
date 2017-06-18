@@ -5,12 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 
+
 namespace LGLauncher
 {
 
   /// <summary>
-  /// ミューテックスの取得
-  ///   MutexControl、SemaphoreControlを抽象化
+  /// MutexControl、SemaphoreControlを抽象化
   /// </summary>
   interface IMutexControl
   {

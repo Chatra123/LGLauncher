@@ -75,36 +75,31 @@ namespace LGLauncher.Frame.JLS
       }
 
       //書
-      {
-        //次回の参照用
-        File.WriteAllLines(catPath, new_CatText, TextEnc.Shift_JIS);
-        //デバッグ用のコピー
-        string catPath_part = PathList.WorkPath + ".jls.scpos.cat.txt";
-        File.WriteAllLines(catPath_part, new_CatText, TextEnc.Shift_JIS);
-      }
+      //次回の参照用
+      File.WriteAllLines(catPath, new_CatText, TextEnc.Shift_JIS);
+      //デバッグ用のコピー
+      string catPath_part = PathList.WorkPath + ".jls.scpos.cat.txt";
+      File.WriteAllLines(catPath_part, new_CatText, TextEnc.Shift_JIS);
     }
 
-    
+
     /// <summary>
     /// Scposテキストをオフセット分ずらす
     /// </summary>
     static List<string> AppendOffset_Scpos(List<string> scposText, int chapcnt_offset, int frame_offset)
     {
-      var new_scposText = new List<string>();
-
+      var newText = new List<string>();
       for (int i = 0; i < scposText.Count; i += 2)
       {
         string timecode_line = scposText[i];
         string name_line = scposText[i + 1];
-
         var new_lines = ApeendOffset_ScposElement(
                                                    timecode_line, name_line,
                                                    chapcnt_offset, frame_offset
                                                   );
-        new_scposText.AddRange(new_lines);
+        newText.AddRange(new_lines);
       }
-
-      return new_scposText;
+      return newText;
     }
 
 
@@ -161,15 +156,14 @@ namespace LGLauncher.Frame.JLS
       }
 
       //add offset
-      {
-        var msec_offset = 1.0 * frame_offset / 29.970 * 1000;
-        timecode += new TimeSpan(0, 0, 0, 0, (int)msec_offset);
-        timetext = new DateTime().Add(timecode).ToString("HH:mm:ss.fff");
+      var msec_offset = 1.0 * frame_offset / 29.970 * 1000;
+      timecode += new TimeSpan(0, 0, 0, 0, (int)msec_offset);
+      timetext = new DateTime().Add(timecode).ToString("HH:mm:ss.fff");
 
-        chapCnt += chapcnt_offset;
-        SC_End += frame_offset;
-        SC_Begin += frame_offset;
-      }
+      chapCnt += chapcnt_offset;
+      SC_End += frame_offset;
+      SC_Begin += frame_offset;
+
 
       //update line
       string new_timecode_line = string.Format("Chapter{0:D2}={1}",

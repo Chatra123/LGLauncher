@@ -34,8 +34,8 @@ echo .
 
 
 
-"#logoframeExe#"                            ^
-                        "#AvsPath#"         ^
+"#logoframePath#"                           ^
+                         "#AvsPath#"        ^
                   -logo  "#LogoPath#"       ^
                   -oa    "#LogoFrameText#"
 

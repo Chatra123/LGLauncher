@@ -38,7 +38,7 @@ namespace LGLauncher
     }
 
     /// <summary>
-    /// Trim付きスクリプト作成
+    /// スクリプト作成
     /// </summary>
     public string MakeScript(int[] trimFrame)
     {
@@ -82,7 +82,6 @@ namespace LGLauncher
         };
 
         infoText = FileR.ReadAllLines(infoPath);
-
         //line count check
         if (infoText == null || infoText.Count <= 1)
         {
@@ -95,7 +94,6 @@ namespace LGLauncher
       if (infoText == null || infoText.Count <= 1)
         throw new LGLException("info file is invalid");
 
-      //文字　-->　数値
       try
       {
         double frame = double.Parse(infoText[0]);
@@ -114,7 +112,7 @@ namespace LGLauncher
     #region GetTrimFrame
 
     /// <summary>
-    /// トリムフレーム数取得
+    /// 今回のトリムフレーム数取得
     /// </summary>
     public static int[] GetTrimFrame()
     {
@@ -184,7 +182,7 @@ namespace LGLauncher
     /// Scriptファイル作成
     /// </summary>
     public static string OutScript(int[] trimFrame, List<string> scriptText,
-                                   string outExt, Encoding enc)
+                                   string ext, Encoding enc)
     {
       //長さチェック
       //  30frame以下だと logoGuilloの avs2pipemodがエラーで落ちる。
@@ -200,7 +198,7 @@ namespace LGLauncher
                                        PathList.WorkPath,
                                        beginFrame,
                                        endFrame,
-                                       outExt);
+                                       ext);
         File.WriteAllLines(outPath, scriptText, enc);
         return outPath;
       }

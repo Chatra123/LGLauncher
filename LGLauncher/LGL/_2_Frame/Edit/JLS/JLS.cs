@@ -15,7 +15,7 @@ namespace LGLauncher.Frame.JLS
   public static class JLS
   {
     /// <summary>
-    ///  JLSの出力をLogoGuilloと同じ形式にする。
+    ///  JLSの出力 (avs Trim(0,1)) をLogoGuilloと同じ形式にする。
     ///    JLS  .p1.jls.result.txt　→　List<int>　→　.p1.frame.txt
     /// </summary>
     public static List<int> Result_to_Frame(bool islast_jls)

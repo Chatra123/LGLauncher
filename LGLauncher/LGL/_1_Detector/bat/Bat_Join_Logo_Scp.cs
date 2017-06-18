@@ -29,7 +29,7 @@ namespace LGLauncher
 
       string chapter_exePath = PathList.Chapter_exe;
       string scPosPath = PathList.WorkName + ".jls.scpos.txt";
-      string logoframeExe = PathList.LogoFrame;
+      string logoframePath = PathList.LogoFrame;
       string logoFrameText = PathList.WorkName + ".jls.logoframe.txt";
       string join_logo_scpPath = PathList.Join_Logo_Scp;
       string jls_resultPath = PathList.WorkName + ".jls.result.txt";
@@ -45,7 +45,7 @@ namespace LGLauncher
         line = Regex.Replace(line, "#AvsPath#", avsPath, RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#SCPosPath#", scPosPath, RegexOptions.IgnoreCase);
         //logoframe
-        line = Regex.Replace(line, "#logoframeExe#", logoframeExe, RegexOptions.IgnoreCase);
+        line = Regex.Replace(line, "#logoframePath#", logoframePath, RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#LogoPath#", logoPath, RegexOptions.IgnoreCase);
         line = Regex.Replace(line, "#LogoFrameText#", logoFrameText, RegexOptions.IgnoreCase);
         //join_logo_scp

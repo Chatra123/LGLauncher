@@ -65,32 +65,28 @@ namespace LGLauncher.Frame.JLS
       }
 
       //書
-      {
-        //次回の参照用
-        File.WriteAllLines(catPath, new_CatText, TextEnc.Shift_JIS);
-        //デバッグ用のコピー
-        string catPath_part = PathList.WorkPath + ".jls.logoframe.cat.txt";
-        File.WriteAllLines(catPath_part, new_CatText, TextEnc.Shift_JIS);
-      }
+      //次回の参照用
+      File.WriteAllLines(catPath, new_CatText, TextEnc.Shift_JIS);
+      //デバッグ用のコピー
+      string catPath_part = PathList.WorkPath + ".jls.logoframe.cat.txt";
+      File.WriteAllLines(catPath_part, new_CatText, TextEnc.Shift_JIS);
     }
 
 
     /// <summary>
-    /// logoframeテキストをオフセット分ずらす
+    /// logoframeテキストをオフセットだけずらす
     /// </summary>
     static List<string> AppendOffset_logoframe(List<string> logoframeText, int frame_offset)
     {
-      var new_logoframeText = new List<string>();
+      var newText = new List<string>();
 
       for (int i = 0; i < logoframeText.Count; i++)
       {
         string line = logoframeText[i];
         var new_lines = ApeendOffset_logoframe(line, frame_offset);
-
-        new_logoframeText.AddRange(new_lines);
+        newText.AddRange(new_lines);
       }
-
-      return new_logoframeText;
+      return newText;
     }
 
 
@@ -111,7 +107,6 @@ namespace LGLauncher.Frame.JLS
       {
         const string pattern = @"\s*(?<frame_1>\d+)\s+(?<SorE>\w+)\s+(?<fade>\d+)\s+(?<interlace>\w+)\s+(?<frame_2>\d+)\s+(?<frame_3>\d+)\s*";
         match = new Regex(pattern, RegexOptions.IgnoreCase).Match(line);
-
         if (match.Success == false)
           throw new LGLException("logoframe text regex match error");
       }
@@ -138,11 +133,9 @@ namespace LGLauncher.Frame.JLS
       }
 
       //add offset
-      {
-        frame_1 += frame_offset;
-        frame_2 += frame_offset;
-        frame_3 += frame_offset;
-      }
+      frame_1 += frame_offset;
+      frame_2 += frame_offset;
+      frame_3 += frame_offset;
 
       //update line
       string new_line = string.Format("{0,6} {1} {2} {3} {4,6} {5,6}",

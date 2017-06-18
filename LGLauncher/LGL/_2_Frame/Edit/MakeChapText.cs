@@ -93,7 +93,7 @@ namespace LGLauncher.Frame
       string text = "";
       {
         List<int> chapList = new List<int>(frameList);       //コピー
-        text = ConvertFrame.To_OgmChap_type1(chapList);
+        text = ConvertFrame.To_OgmChap(chapList);
       }
 
       return text;

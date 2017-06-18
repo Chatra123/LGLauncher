@@ -57,11 +57,9 @@ namespace LGLauncher
         args = string.Format("  \"{0}\"   \"{1}\"   \"{2}\"  ",
                               PathList.Channel, PathList.Program, PathList.TsPath);
       }
-      //実行
       string result = Start_GetStdout(path, args);
       var split = result.Split(new string[] { Environment.NewLine }, StringSplitOptions.None).ToList();
 
-      //Log
       if (PathList.Is1stPart || PathList.IsAll)
       {
         var log = new StringBuilder();
@@ -92,7 +90,6 @@ namespace LGLauncher
 
       try
       {
-        //標準出力を取得
         prc.Start();
         string result = prc.StandardOutput.ReadToEnd();
         prc.WaitForExit();

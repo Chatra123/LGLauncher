@@ -132,7 +132,7 @@ namespace LGLauncher
     public static bool IsLastProcess { get { return IsAll || IsLast_cmdline; } }
 
     //最後の SplitTrimか？
-    //  SplitTrim : avsから有効フレームを取得した後に、さらに分割したTrim()
+    //  SplitTrim : avsからフレーム数を取得した後に、さらに分割したTrim()
     public static bool IsLastSplit { get; private set; }
 
     //IsLastSplit更新
@@ -346,11 +346,11 @@ namespace LGLauncher
       //  衝突は考えない、重複チェックはしてない。
       string dirName;
       {
-        var tsinfo = new FileInfo(TsPath);
-        string timecode_Name = tsinfo.CreationTime.ToString("ddHHmm");
-        string timecode_MD5 = tsinfo.CreationTime.ToString("yyyyMMdd_dddd_HHmmss_fffffff");
-        string MD5 = Hash.ComputeMD5(TsPath + timecode_MD5 ).Substring(0, 10);
-        dirName = timecode_Name + "_" + TsShortName + "_" + MD5;
+        var fi = new FileInfo(TsPath);
+        string time = fi.CreationTime.ToString("ddHHmm");
+        string time_full = fi.CreationTime.ToString("yyyyMMdd_dddd_HHmmss_fffffff");
+        string MD5 = Hash.ComputeMD5(TsPath + time_full).Substring(0, 10);
+        dirName = time + "_" + TsShortName + "_" + MD5;
       }
       LWorkDir = Path.Combine(LTopWorkDir, dirName);
 
@@ -391,7 +391,7 @@ namespace LGLauncher
         throw new LGLException("Invalid PartNo.  PartNo = " + PartNo);
     }
     /// <summary>
-    /// PartNo検出の処理部分。作業ファイル名から値を取得
+    /// PartNo検出、作業ファイル名から取得
     /// </summary>
     private static int Detect_PartNo_fromFileName()
     {
@@ -406,7 +406,7 @@ namespace LGLauncher
       {
         //"movie.p1.frame.cat.txt"
         string name = Path.GetFileName(fullname);
-        //  "movie.p"
+        //"movie.p"
         int len_title = (TsShortName + ".p").Length;
         //    "1"  =  "movie.p1.frame.cat.txt"  -  "movie.p"  -  ".frame.cat.txt"
         int len_no = name.Length - len_title - ".frame.cat.txt".Length;

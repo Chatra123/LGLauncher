@@ -11,7 +11,7 @@ namespace LGLauncher
   using OctNov.IO;
 
   /*
-   * 作成途中のlwiファイルを利用できるようにフォーマットを整える。
+   * 作成途中のd2v, lwiファイルを利用できるようにフォーマットを整える。
    *   d2v  -->  最終行を削除
    *   lwi  -->  最後のindex= 以降を削除 
    */
@@ -35,6 +35,9 @@ namespace LGLauncher
   }
 
 
+  /*
+   *   d2v  -->  最終行を削除
+   */
   static class D2vFormatter
   {
     /// <summary>

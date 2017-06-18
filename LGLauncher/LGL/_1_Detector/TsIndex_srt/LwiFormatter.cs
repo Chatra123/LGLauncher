@@ -10,11 +10,10 @@ namespace LGLauncher
 {
   using OctNov.IO;
 
-
   #region LwiFile
   /// <summary>
-  /// lwiファイルの移動
-  /// lwiファイルはTSと同じフォルダに無ければいけないので移動、コピーする。
+  /// lwiファイルの管理
+  /// lwiファイルはTSと同じフォルダに無ければいけないので移動 or コピーする。
   /// </summary>
   static class LwiFile
   {
@@ -23,7 +22,7 @@ namespace LGLauncher
     /// <summary>
     /// lwi  WorkDir --> TsDir に移動
     /// </summary>
-    public static void Set_ifLwi()
+    public static void Set()
     {
       if (PathList.IsLwi == false) return;
       if (PathList.IsAll && PathList.LwiPath == PathList.TsPath + ".lwi") return;
@@ -36,26 +35,26 @@ namespace LGLauncher
       {
         if (File.Exists(dstPath))
           File.Delete(dstPath);
-        Thread.Sleep(300);
+        Thread.Sleep(500);
 
         if (isSameRoot)
           File.Move(srcPath, dstPath);
         else
           File.Copy(srcPath, dstPath);
-        Thread.Sleep(300);
+        Thread.Sleep(500);
 
         lock_lwi = new FileStream(dstPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
       }
       catch
       {
-        throw new LGLException("lwi file is locked. fail to delete or move.");
+        throw new LGLException("lwi file: fail to delete or move.");
       }
     }
 
     /// <summary>
     /// lwi  TsDir --> WorkDir に戻す
     /// </summary>
-    public static void Back_ifLwi()
+    public static void Back()
     {
       if (PathList.IsLwi == false) return;
       if (PathList.IsAll && PathList.LwiPath == PathList.TsPath + ".lwi") return;
@@ -77,11 +76,11 @@ namespace LGLauncher
           File.Move(srcPath, dstPath);
         else
           File.Delete(srcPath);
-        Thread.Sleep(300);
+        Thread.Sleep(500);
       }
       catch
       {
-        throw new LGLException("lwi file is locked. fail to move back.");
+        throw new LGLException("lwi file: fail to move back.");
       }
     }
 
@@ -92,6 +91,10 @@ namespace LGLauncher
 
 
   #region LwiFormatter
+
+  /*
+   *   lwi  -->  最後のindex= 以降を削除 
+   */
   static class LwiFormatter
   {
     //lwiの３，４行目
@@ -223,7 +226,7 @@ namespace LGLauncher
           File.Copy(PathList.LwiPathInLWork, outPath_part, true);
         }
 #pragma warning restore 0162
-      }
+      }//try
       finally
       {
         /* LGLException発生時のClose() */
@@ -256,7 +259,6 @@ namespace LGLauncher
         if (File.Exists(PathList.LwiFooterPath) == false) return null;
 
         footer = FileR.ReadBytes(PathList.LwiFooterPath);
-
         if (footer != null)
         {
           var footer_ascii = System.Text.Encoding.ASCII.GetString(footer);
@@ -266,7 +268,6 @@ namespace LGLauncher
           else
             footer = null;
         }
-
         Thread.Sleep(1000);
       }
 

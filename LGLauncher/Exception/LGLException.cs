@@ -8,11 +8,11 @@ namespace LGLauncher
 {
   /*
    * ◇例外について
-   *   想定できるエラーはLGLExceptionを発生させてtry{}catch{}で捕まえる。
-   *   LGLException以外の想定外の例外はOnUnhandledException()で処理する。
+   *   想定できるエラーはLGLExceptionをcatch{}して終了。
+   *   LGLException以外の想定外の例外はOnUnhandledException()で処理した後にエラー終了。
    *   
-   *    LGLException　　　　　　　通常のログに追記　　　エラーダイアログを表示しない
-   *    OnUnhandledException()　　専用のerrlogを作成　　エラーダイアログを表示する
+   *    LGLException　　　　　　　通常のログに追記　　　通常終了
+   *    OnUnhandledException()　　専用のerrlogを作成　　エラーダイアログを表示
    */
 
   class LGLException : Exception

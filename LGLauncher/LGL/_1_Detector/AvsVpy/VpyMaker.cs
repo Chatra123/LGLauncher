@@ -28,12 +28,12 @@ namespace LGLauncher
         string path = scripter.CreateInfo();
         try
         {
-          LwiFile.Set_ifLwi();
+          LwiFile.Set();
           scripter.RunInfo(path);
         }
         finally
         {
-          LwiFile.Back_ifLwi();
+          LwiFile.Back();
         }
       }
 
@@ -48,7 +48,6 @@ namespace LGLauncher
       //開始フレーム　　（　直前の終了フレーム　＋　１　）
       int beginFrame;
       {
-        //直前のトリム用フレーム数取得
         //  trimFrame_prv[0] : previous begin frame
         //  trimFrame_prv[1] : previous end   frame
         int[] trimFrame_prv = (2 <= PathList.PartNo)

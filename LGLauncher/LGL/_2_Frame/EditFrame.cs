@@ -35,7 +35,7 @@ namespace LGLauncher.Frame
         JLS.JLS.Result_to_Frame(false);
 
         //Chapter_exe, LogoFrame
-        //  scpos.cat, logoframe.catはIsLastで使用する。
+        //  make *.cat 
         if (PathList.IsPart)
         {
           JLS.Chapter_exe.Concat(trimFrame);

@@ -108,9 +108,9 @@ namespace LGLauncher.Frame
       if (frameList.Count % 2 == 1) return null;
       if (frameList.Count <= 2) return frameList;
 
-      //「frameList[i]」と「newListの末尾」の差が CM Length
+      //”frameList[i]”と”newListの末尾”の差が CM Length
       //
-      // CM Lengthが長ければ newListに本編 frameList[i], frameList[i+1]を加える。
+      // CM Lengthが長ければ newListに本編｛frameList[i], frameList[i+1]｝を加える。
       //　　　　　　短ければ newList[last]を次の本編終端 frameList[i + 1]に置き換え短いＣＭをつぶす。
       //ただし、開始直後のＣＭはそのまま、
       //開始直後に短いＣＭがあっても本編には加えない。
@@ -158,8 +158,8 @@ namespace LGLauncher.Frame
       {
         try
         {
-          int begin = Int32.Parse(m.Groups[1].Value);
-          int end = Int32.Parse(m.Groups[2].Value);
+          int begin = int.Parse(m.Groups[1].Value);
+          int end = int.Parse(m.Groups[2].Value);
           frameList.Add(begin);
           frameList.Add(end);
         }
@@ -230,9 +230,9 @@ namespace LGLauncher.Frame
 
 
     /// <summary>
-    /// List<int>  -->  Ogmチャプター type1
+    /// List<int>  -->  Ogmチャプター
     /// </summary>
-    public static string To_OgmChap_type1(List<int> frameList)
+    public static string To_OgmChap(List<int> frameList)
     {
       var timecodelist = Frame_to_TimeCode(frameList);
       var chapText = new StringBuilder();
@@ -248,41 +248,11 @@ namespace LGLauncher.Frame
       return chapText.ToString();
     }
     /*
-     * Ogm Chapter  type1
+     * Ogm Chapter
      * 00:00:00.000 chapter 01
      * 00:00:01.935 chapter 02
      * 00:03:08.856 chapter 03
      * 00:10:00.000 chapter 04
-     */
-
-
-    /// <summary>
-    /// List<int> --> Ogmチャプター type2
-    /// </summary>
-    public static string To_OgmChap_type2(List<int> frameList)
-    {
-      var timecodelist = Frame_to_TimeCode(frameList);
-      var chapText = new StringBuilder();
-
-      //convert
-      for (int i = 0; i < frameList.Count; i++)
-      {
-        string timecode = timecodelist[i];
-        string cnt = (i + 1).ToString("00");
-        chapText.AppendLine("Chapter" + cnt + "=" + timecode);
-        chapText.AppendLine("Chapter" + cnt + "Name=" + "chapter " + cnt);
-      }
-
-      return chapText.ToString();
-    }
-    /*
-     * Ogm Chapter  type2
-     * Chapter01=00:00:00.000
-     * Chapter01Name=chapter 01
-     * Chapter02=00:00:01.935
-     * Chapter02Name=chapter 02
-     * Chapter03=00:03:08.856
-     * Chapter03Name=chapter 03
      */
 
 

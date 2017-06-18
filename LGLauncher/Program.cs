@@ -158,7 +158,7 @@ namespace LGLauncher
       /// <summary>
       /// 分割トリム作成
       /// </summary>
-      /// <param name="endFrame_Max">作成可能な最大の終了フレーム</param>
+      /// <param name="endFrame_Max">作成可能な終了フレーム</param>
       /// <param name="isLastSplit">分割トリムの最後か？</param>
       public int[] MakeSplitTrim(int endFrame_Max, out bool isLastSplit)
       {
@@ -172,7 +172,6 @@ namespace LGLauncher
         //開始フレーム　　（　直前の終了フレーム　＋　１　）
         int beginFrame;
         {
-          //直前のトリム用フレーム数取得
           //  trimFrame_prv[0] : previous begin frame
           //  trimFrame_prv[1] : previous end   frame
           int[] trimFrame_prv = (2 <= PathList.PartNo)
@@ -281,7 +280,7 @@ namespace LGLauncher
             }
 
             //実行
-            LwiFile.Set_ifLwi();
+            LwiFile.Set();
             bool need_retry;
             BatLauncher.Launch(batPath, out need_retry, timeout_ms);
             if (need_retry)
@@ -291,7 +290,7 @@ namespace LGLauncher
           }
           finally
           {
-            LwiFile.Back_ifLwi();
+            LwiFile.Back();
             //Semaphore解放
             if (waitForReady != null)
               waitForReady.Release();
