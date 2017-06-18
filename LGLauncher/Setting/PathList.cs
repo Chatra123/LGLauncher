@@ -258,10 +258,8 @@ namespace LGLauncher
       Channel = cmdline.Channel ?? "";
       Program = cmdline.Program ?? "";
 
-      //Ts
       if (File.Exists(TsPath) == false)
         throw new LGLException("ts does not exist");
-      //D2v  Lwi
       //  コマンドラインで指定されているときのみチェック
       //  srtは削除されるている可能性があるのでチェックしない
       if (D2vPath != null && File.Exists(D2vPath) == false)
@@ -583,14 +581,12 @@ namespace LGLauncher
       if (IsLwi)
         if (File.Exists(LwiPath) == false)
           throw new LGLException("lwi dose not exist: " + LwiName);
-
       if (InputPlugin == Plugin.None)
         throw new LGLException("None InputPlugin");
       if (Detector == Detector.None)
         throw new LGLException("None Detector");
       if (AvsVpy == AvsVpy.None)
         throw new LGLException("None AvsVpy");
-
       if (IsD2v && IsJLS)
         throw new LGLException("Cannot select d2v with JLS");
     }

@@ -236,16 +236,16 @@ namespace LGLauncher
         {
           if (PathList.IsJLS)
           {
-            var logo = LogoSelector.GetLogo();
+            var logo = Bat.LogoSelector.GetLogo();
             var jl_cmd = PathList.JL_Cmd_OnRec;
-            batPath = Bat_JLS.Make_OnRec(avsPath,
-                                                   logo[0], jl_cmd);
+            batPath = Bat.Bat_JLS.Make_OnRec(avsPath,
+                                             logo[0], jl_cmd);
           }
           else if (PathList.IsLG)
           {
-            var logo_param = LogoSelector.GetLogo_and_Param();
-            batPath = Bat_LG.Make(avsPath, srtPath,
-                                          logo_param[0], logo_param[1]);
+            var logo_param = Bat.LogoSelector.GetLogo_and_Param();
+            batPath = Bat.Bat_LG.Make(avsPath, srtPath,
+                                      logo_param[0], logo_param[1]);
           }
         }
         return batPath;
@@ -282,7 +282,7 @@ namespace LGLauncher
             //実行
             LwiFile.Set();
             bool need_retry;
-            BatLauncher.Launch(batPath, out need_retry, timeout_ms);
+            Bat.BatLauncher.Launch(batPath, out need_retry, timeout_ms);
             if (need_retry)
               continue;
             else

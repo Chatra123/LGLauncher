@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 using System.IO;
-using System.Text.RegularExpressions;
 
-namespace LGLauncher
+
+namespace LGLauncher.Bat
 {
   /// <summary>
   /// Logo、Paramパス取得

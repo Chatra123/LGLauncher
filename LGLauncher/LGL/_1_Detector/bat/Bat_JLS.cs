@@ -5,7 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace LGLauncher
+
+namespace LGLauncher.Bat
 {
   using OctNov.IO;
 
@@ -75,7 +76,7 @@ namespace LGLauncher
       var batText = new List<string>();
       batText = FileR.ReadFromResource("LGLauncher.Resource.JLS_Last.bat");
 
-      string scpos_catPath =   PathList.TsShortName + ".jls.scpos.cat.txt";
+      string scpos_catPath = PathList.TsShortName + ".jls.scpos.cat.txt";
       string logoFrame_catPath = PathList.TsShortName + ".jls.logoframe.cat.txt";
       string join_logo_scpPath = PathList.Join_Logo_Scp;
       string jls_resultPath = PathList.TsShortName + ".jls.last.result.txt";
