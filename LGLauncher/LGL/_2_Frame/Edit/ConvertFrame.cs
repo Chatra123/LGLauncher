@@ -43,7 +43,6 @@ namespace LGLauncher.Frame
         .Where((line) => string.IsNullOrWhiteSpace(line) == false)    //空白行削除
         .ToList();
 
-
       //List<string>  -->  List<int>
       List<int> frameList;
       try
@@ -178,7 +177,7 @@ namespace LGLauncher.Frame
     /// </summary>
     public static string To_TvtpChap(List<int> frameList)
     {
-      //フレーム数を100msec単位の時間に変換
+      //frame --> time[100ms単位]
       //    300[frame]  -->  300 / 29.970 * 10  -->  100[100msec]
       var timeList = frameList.Select((frame) => { return (int)((1.0 * frame / 29.970) * 10); }).ToList();
 
@@ -189,7 +188,6 @@ namespace LGLauncher.Frame
           timeList[i]++;
       }
 
-      //convert
       string chapText = "c-";
       for (int i = 0; i < timeList.Count; i++)
       {
@@ -198,12 +196,11 @@ namespace LGLauncher.Frame
         if (i == 0 && time != 0)
           chapText += "0dix-" + time + "dox-";            //開始直後のＣＭスキップ用
         else if (i % 2 == 0)
-          chapText += "" + time + "dox-";                 //even    cm out
+          chapText += "" + time + "dox-";                 //even    out cm
         else
-          chapText += "" + time + "dix-";                 //odd     cm in
+          chapText += "" + time + "dix-";                 //odd     into cm
       }
       chapText += "0eox-c";
-
       return chapText;
     }
     /* TvtPlay  ChapterMap.cpp */
@@ -237,14 +234,12 @@ namespace LGLauncher.Frame
       var timecodelist = Frame_to_TimeCode(frameList);
       var chapText = new StringBuilder();
 
-      //convert
       for (int i = 0; i < frameList.Count; i++)
       {
         string timecode = timecodelist[i];
         string cnt = (i + 1).ToString("00");
         chapText.AppendLine(timecode + " " + "chapter " + cnt);
       }
-
       return chapText.ToString();
     }
     /*

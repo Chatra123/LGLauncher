@@ -70,7 +70,7 @@ namespace LGLauncher
         }
 
 
-        //LogoGuillo実行
+        //LogoGuillo bat実行
         bool HasError = false;
         try
         {
