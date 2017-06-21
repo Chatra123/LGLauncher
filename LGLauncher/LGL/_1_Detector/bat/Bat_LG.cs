@@ -13,7 +13,7 @@ namespace LGLauncher.Bat
   static class Bat_LG
   {
     /// <summary>
-    /// LogoGuillo起動用バッチ作成
+    /// LogoGuillo用バッチ作成
     /// </summary>
     public static string Make(string avsPath, string srtPath, string logoPath, string paramPath)
     {
@@ -28,20 +28,20 @@ namespace LGLauncher.Bat
       //srtをavsと同じ名前にリネーム
       if (File.Exists(srtPath))
       {
-        string avsWithoutExt = Path.GetFileNameWithoutExtension(avsPath);
-        string newSrtPath = Path.Combine(PathList.LWorkDir, avsWithoutExt + ".srt");
+        string avsName = Path.GetFileNameWithoutExtension(avsPath);
+        string newSrt = Path.Combine(PathList.LWorkDir, avsName + ".srt");
         try
         {
-          if (File.Exists(newSrtPath))
-            File.Delete(newSrtPath);
-          File.Move(srtPath, newSrtPath);
+          if (File.Exists(newSrt))
+            File.Delete(newSrt);
+          File.Move(srtPath, newSrt);
         }
-        catch { /*do nothing*/}
+        catch { /* do nothing */ }
       }
 
       //読
       var batText = new List<string>();
-      batText = FileR.ReadFromResource("LGLauncher.Resource.LogoGuillo.bat");
+      batText = TextR.ReadFromResource("LGLauncher.Resource.LogoGuillo.bat");
 
       //#LOGOG_PATH#
       string LOGOG_PATH = PathList.LogoGuillo;
@@ -70,9 +70,9 @@ namespace LGLauncher.Bat
       }
 
       //書
-      string outBatPath = PathList.WorkPath + ".LG.bat";
-      File.WriteAllLines(outBatPath, batText, TextEnc.Shift_JIS);
-      return outBatPath;
+      string batPath = PathList.WorkPath + ".LG.bat";
+      File.WriteAllLines(batPath, batText, TextEnc.Shift_JIS);
+      return batPath;
     }
 
   }

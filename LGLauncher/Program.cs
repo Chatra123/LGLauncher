@@ -9,6 +9,16 @@ using System.IO;
 
 
 
+/*
+ 
+  LwiFileMover
+
+  Debug.CopyIndex = true
+   
+   
+   */
+
+
 namespace LGLauncher
 {
   internal class Program
@@ -31,7 +41,6 @@ namespace LGLauncher
       AppDomain.CurrentDomain.UnhandledException += OctNov.Excp.ExceptionInfo.OnUnhandledException;
 
 
-
       int[] trimFrame = null;        //avsの有効フレーム範囲
       try
       {
@@ -40,8 +49,8 @@ namespace LGLauncher
         if (initialized == false) return;
 
         //有効フレーム範囲取得
-        var maker = new AvsVpyMaker();
-        trimFrame = maker.GetTrimFrame();
+        AvsVpyMaker.Init();
+        trimFrame = AvsVpyMaker.GetTrimFrame();
       }
       catch (LGLException e)
       {
@@ -68,7 +77,6 @@ namespace LGLauncher
           splitTrim = trimFrame;
           PathList.Update_IsLastSplit(true);
         }
-
 
         //LogoGuillo bat実行
         bool HasError = false;
@@ -98,7 +106,6 @@ namespace LGLauncher
           AvsVpyCommon.CreateDummy_OnError();
         }
 
-
         //チャプター出力
         try
         {
@@ -111,8 +118,7 @@ namespace LGLauncher
           Log.WriteLine();
           Log.WriteLine(e.ToString());
         }
-
-
+        
         if (PathList.IsLastSplit || PathList.IsAll || HasError)
           break;
         else
@@ -145,7 +151,7 @@ namespace LGLauncher
         if (args.Count() == 0) return false;               //”引数０”なら設定ファイル作成後に終了
 
         //パス作成
-        PathList.Initialize(cmdline, setting);
+        PathList.Init(cmdline, setting);
         ProhibitFileMove_LGL.Lock();
         CleanWorkItem.Clean_Beforehand();
 
@@ -221,15 +227,14 @@ namespace LGLauncher
         //avs
         string avsPath;
         {
-          var maker = new AvsVpyMaker();
-          avsPath = maker.MakeScript(trimFrame);
+          avsPath = AvsVpyMaker.MakeScript(trimFrame);
         }
         //srt
         string srtPath;
         {
           int beginFrame = trimFrame[0];
           double shiftSec = 1.0 * beginFrame / 29.970;
-          srtPath = TimeShiftSrt.Make(shiftSec);
+          srtPath = SrtFile.Format(shiftSec);
         }
         //bat
         string batPath = "";
@@ -280,7 +285,7 @@ namespace LGLauncher
             }
 
             //実行
-            LwiFile.Set();
+            LwiFileMover.Set();
             bool need_retry;
             Bat.BatLauncher.Launch(batPath, out need_retry, timeout_ms);
             if (need_retry)
@@ -290,7 +295,7 @@ namespace LGLauncher
           }
           finally
           {
-            LwiFile.Back();
+            LwiFileMover.Back();
             //Semaphore解放
             if (waitForReady != null)
               waitForReady.Release();

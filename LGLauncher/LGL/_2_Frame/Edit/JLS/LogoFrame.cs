@@ -29,12 +29,12 @@ namespace LGLauncher.Frame.JLS
       //読
       List<string> add_LogoframeText = null, old_CatText = null;
       {
-        add_LogoframeText = FileR.ReadAllLines(add_ScposPath);    // from  *.p3.jls.logoframe.txt
+        add_LogoframeText = TextR.ReadAllLines(add_ScposPath);    // from  *.p3.jls.logoframe.txt
 
         //前回までの結合フレームを取得
         if (2 <= PathList.PartNo)
         {
-          old_CatText = FileR.ReadAllLines(catPath);              // from  *.jls.logoframe.cat.txt
+          old_CatText = TextR.ReadAllLines(catPath);              // from  *.jls.logoframe.cat.txt
           if (old_CatText == null && add_LogoframeText == null)
             throw new LGLException("not detect logoframe file");
         }

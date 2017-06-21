@@ -11,42 +11,17 @@ namespace LGLauncher
   using OctNov.IO;
 
   /*
-   * 作成途中のd2v, lwiファイルを利用できるようにフォーマットを整える。
-   *   d2v  -->  最終行を削除
-   *   lwi  -->  最後のindex= 以降を削除 
+   *  d2v  -->  最終行を削除
    */
-  static class IndexFormatter
-  {
-    static bool HasFormatted = false;
-
-    /// <summary>
-    /// Format d2v, lwi
-    /// </summary>
-    public static void Format(bool FormatD2v)
-    {
-      if (HasFormatted) return;
-      HasFormatted = true;
-
-      if (FormatD2v)
-        new D2vFormatter().Format();
-      else
-        new LwiFormatter().Format();
-    }
-  }
-
-
-  /*
-   *   d2v  -->  最終行を削除
-   */
-  class D2vFormatter
+  static class D2vFile
   {
     /// <summary>
     /// フォーマットを整える
     /// </summary>
-    public void Format()
+    public static void Format()
     {
       //読
-      var readText = FileR.ReadAllLines(PathList.D2vPath);
+      var readText = TextR.ReadAllLines(PathList.D2vPath);
       if (readText == null) throw new LGLException("d2v read error");
 
       //簡易チェック

@@ -42,7 +42,7 @@ namespace LGLauncher.Frame.JLS
       //読
       List<int> framelist;
       {
-        var readfile = FileR.ReadAllLines(avsTrimPath);
+        var readfile = TextR.ReadAllLines(avsTrimPath);
         if (readfile == null) return null;
 
         //１行に変換   List<string>  -->  string

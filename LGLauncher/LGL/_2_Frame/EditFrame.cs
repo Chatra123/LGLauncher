@@ -17,12 +17,11 @@ namespace LGLauncher.Frame
     public static List<int> Concat(int[] trimFrame)
     {
       /*
-       *  変換の流れ
-       *  Join_Logo_Scp
-       *     *.p1.jls.result.txt  -->  *.p1.frame.txt  -->  List<int> frame  -->  List<int> concat
-       *         
-       *  LogoGuillo
-       *                               *.p1.frame.txt  -->  List<int> frame  -->  List<int> concat
+       * 変換の流れ
+       *   Join_Logo_Scp
+       *      *.p1.jls.result.txt  -->  *.p1.frame.txt  -->  List<int> frame  -->  List<int> concat
+       *   LogoGuillo
+       *                                *.p1.frame.txt  -->  List<int> frame  -->  List<int> concat
        *
        */
 
@@ -137,20 +136,6 @@ namespace LGLauncher.Frame
         var text = MakeChapText.Make_Tvtp(editFrame, endFrame);
         if (text != null)
           File.WriteAllText(path, text, TextEnc.UTF8_bom);
-      }
-
-
-      //Ogm
-      if (PathList.IsLastPart && 1 <= PathList.Output_Ogm)
-      {
-        string path;
-        {
-          string name = PathList.TsNameWithoutExt + ".ogm.chapter";
-          path = Path.Combine(PathList.ChapDir_Misc, name);
-        }
-        var text = MakeChapText.Make_Ogm(editFrame, endFrame);
-        if (text != null)
-          File.WriteAllText(path, text, TextEnc.Shift_JIS);
       }
 
 

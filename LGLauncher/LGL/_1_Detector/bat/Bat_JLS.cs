@@ -13,7 +13,7 @@ namespace LGLauncher.Bat
   static class Bat_JLS
   {
     /// <summary>
-    /// Join_Logo_Scp起動用バッチ作成
+    /// Join_Logo_Scp用バッチ作成
     /// </summary>
     public static string Make_OnRec(string avsPath, string logoPath, string jl_CmdPath)
     {
@@ -26,7 +26,7 @@ namespace LGLauncher.Bat
 
       //読
       var batText = new List<string>();
-      batText = FileR.ReadFromResource("LGLauncher.Resource.JLS_OnRec.bat");
+      batText = TextR.ReadFromResource("LGLauncher.Resource.JLS_OnRec.bat");
 
       string chapter_exePath = PathList.Chapter_exe;
       string scPosPath = PathList.WorkName + ".jls.scpos.txt";
@@ -57,15 +57,15 @@ namespace LGLauncher.Bat
       }
 
       //書
-      string outBatPath = PathList.WorkPath + ".JLS.bat";
-      File.WriteAllLines(outBatPath, batText, TextEnc.Shift_JIS);
-      return outBatPath;
+      string batPath = PathList.WorkPath + ".JLS.bat";
+      File.WriteAllLines(batPath, batText, TextEnc.Shift_JIS);
+      return batPath;
     }
 
 
 
     /// <summary>
-    /// Join_Logo_Scp起動用バッチ作成  　最終 concat
+    /// Join_Logo_Scp用バッチ作成  　最終 concat
     /// </summary>
     public static string Make_AtLast(string jl_CmdPath)
     {
@@ -74,7 +74,7 @@ namespace LGLauncher.Bat
 
       //読
       var batText = new List<string>();
-      batText = FileR.ReadFromResource("LGLauncher.Resource.JLS_Last.bat");
+      batText = TextR.ReadFromResource("LGLauncher.Resource.JLS_Last.bat");
 
       string scpos_catPath = PathList.TsShortName + ".jls.scpos.cat.txt";
       string logoFrame_catPath = PathList.TsShortName + ".jls.logoframe.cat.txt";
@@ -93,10 +93,10 @@ namespace LGLauncher.Bat
       }
 
       //書
-      string outBatPath = Path.Combine(PathList.LWorkDir,
+      string batPath = Path.Combine(PathList.LWorkDir,
                                        PathList.TsShortName + ".JLS.last.bat");
-      File.WriteAllLines(outBatPath, batText, TextEnc.Shift_JIS);
-      return outBatPath;
+      File.WriteAllLines(batPath, batText, TextEnc.Shift_JIS);
+      return batPath;
     }
 
   }

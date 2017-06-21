@@ -10,9 +10,9 @@ namespace LGLauncher
 {
   /// <summary>
   /// ファイルの移動禁止
-  ///   LGLauncher実行中にTs,d2v,lwi,srtファイルを移動できないようにロック
+  ///   LGLauncher実行中にts,d2v,lwi,srtファイルを移動できないようにロック
   /// </summary>
-  class ProhibitFileMove_LGL
+  static class ProhibitFileMove_LGL
   {
     private static List<FileStream> LockItems;
 
@@ -80,7 +80,6 @@ namespace LGLauncher
     {
       foreach (var fstream in LockItems)
         fstream.Close();
-
       LockItems = new List<FileStream>();
     }
 

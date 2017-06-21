@@ -81,23 +81,5 @@ namespace LGLauncher.Frame
 
 
 
-    /// <summary>
-    /// frameList --> Ogm Chapter text
-    /// </summary>
-    public static string Make_Ogm(List<int> frameList, int endFrame)
-    {
-      if (frameList == null || frameList.Count == 0) return null;
-
-      string text = "";
-      {
-        List<int> chapList = new List<int>(frameList);       //コピー
-        text = ConvertFrame.To_OgmChap(chapList);
-      }
-
-      return text;
-    }
-
-
-
   }
 }

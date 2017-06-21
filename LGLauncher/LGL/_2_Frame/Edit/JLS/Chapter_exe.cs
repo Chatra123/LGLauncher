@@ -29,12 +29,12 @@ namespace LGLauncher.Frame.JLS
       //読
       List<string> add_ScposText = null, old_CatText = null;
       {
-        add_ScposText = FileR.ReadAllLines(add_ScposPath);    // from  *.p3.jls.scpos.txt
+        add_ScposText = TextR.ReadAllLines(add_ScposPath);    // from  *.p3.jls.scpos.txt
 
         //前回までの結合フレームを取得
         if (2 <= PathList.PartNo)
         {
-          old_CatText = FileR.ReadAllLines(catPath);          // from  *.jls.scpos.cat.txt
+          old_CatText = TextR.ReadAllLines(catPath);          // from  *.jls.scpos.cat.txt
           if (old_CatText == null && add_ScposText == null)
             throw new LGLException("not detect previous scpos file");
         }

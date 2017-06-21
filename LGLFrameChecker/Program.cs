@@ -19,16 +19,13 @@ namespace LGLFrameChecker
       string result = CheckFrame();
       Console.WriteLine(result);
 
-
       if (result.IndexOf("Error") == -1)
       {
         //フレームチェック成功、ファイル書込み
         File.WriteAllText("__FrameCheckResult.sys.txt", result);
       }
-
       Console.Read();
     }
-
 
 
     private static string CheckFrame()
@@ -46,52 +43,41 @@ namespace LGLFrameChecker
 
 
       //file check
-      {
-        string[] avsfiles = Directory.GetFiles(LWorkDir, "*.*__*.avs");
-        if (avsfiles.Count() == 0)
-          return "  Error:  not found name.p1.0__1000.avs";
-      }
+      string[] avsfiles = Directory.GetFiles(LWorkDir, "*.*__*.avs");
+      if (avsfiles.Count() == 0)
+        return "  Error:  not found name.p1.0__1000.avs";
 
-
-      //frameset_all取得
+      //frameset all
       var frameset_all = FrameSet.Create(LWorkDir, -1);
       if (frameset_all.HasValidData == false) return frameset_all.ErrMessage;
 
-      //FrameSetList
+      //frameset part
       var FrameSetList = new List<FrameSet>();
-
-      //
-      //PartNo
-      //
       for (int partNo = 1; partNo <= 200; partNo++)
       {
         //FrameSet_part取得
         var fs_part = FrameSet.Create(LWorkDir, partNo);
-        if (fs_part.HasValidData == false) { FrameSetList.Add(null); continue; }
-
+        if (fs_part.HasValidData == false)
+        {
+          FrameSetList.Add(null);
+          continue;
+        }
         //比較
         fs_part.MatchResult = Compare(frameset_all.boolList, fs_part.boolList, fs_part.beginEnd);
-
-        //結果格納
         FrameSetList.Add(fs_part);
       }
 
       //後ろからまわしてnullなら削除
+      while (0 < FrameSetList.Count
+        && FrameSetList[FrameSetList.Count - 1] == null)
       {
-        while (0 < FrameSetList.Count
-          && FrameSetList[FrameSetList.Count - 1] == null)
-        {
-          FrameSetList.RemoveAt(FrameSetList.Count - 1);
-        }
-
-        if (FrameSetList.Count() == 0) 
-          return "  Error:  Not found  VideoName.p*.frame.txt";
+        FrameSetList.RemoveAt(FrameSetList.Count - 1);
       }
+      if (FrameSetList.Count() == 0)
+        return "  Error:  Not found  VideoName.p*.frame.txt";
 
 
-      //
       //結果一覧作成
-      //
       var text = new StringBuilder();
       {
         text.AppendLine();
@@ -105,7 +91,6 @@ namespace LGLFrameChecker
           if (fs == null) { text.AppendLine(); continue; }
           text.AppendLine(fs.GetResult());
         }
-
         //total
         {
           int Match_Main = FrameSetList.Select(fs => { if (fs != null) return fs.Match_Main; else return 0; }).Sum();
@@ -342,13 +327,12 @@ namespace LGLFrameChecker
     /// 　　失敗  -->  null
     /// </returns>
     public static List<int> Read_FrameFile(string framePath)
-     
+
     {
       //check
       if (File.Exists(framePath) == false) return null;
 
       //読
-      //var text = FileR.ReadAllLines(framePath);
       var text = File.ReadAllLines(framePath, Encoding.GetEncoding("Shift_JIS")).ToList();
 
       if (text == null) return null;

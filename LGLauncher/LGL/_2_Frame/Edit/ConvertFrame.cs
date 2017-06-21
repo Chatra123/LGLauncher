@@ -29,7 +29,7 @@ namespace LGLauncher.Frame
       if (File.Exists(framePath) == false) return null;
 
       //読
-      var text = FileR.ReadAllLines(framePath);
+      var text = TextR.ReadAllLines(framePath);
       if (text == null) return null;
 
       //コメント削除、トリム

@@ -15,7 +15,7 @@ namespace LGLauncher
   static class Debug
   {
     // format d2v, lwiをデバッグ用に別名で保存するか？
-    public const bool CopyIndex = false;  // true  false
+    public const bool CopyIndex = true;  // true  false
   }
 
   /// <summary>
@@ -213,7 +213,6 @@ namespace LGLauncher
     public static int Output_RawFrame { get; private set; }
     public static int Output_Frame { get; private set; }
     public static int Output_Tvtp { get; private set; }
-    public static int Output_Ogm { get; private set; }
     public static int Output_Scp { get; private set; }
     //chapter directory
     public static string ChapDir_Tvtp { get; private set; }
@@ -226,7 +225,7 @@ namespace LGLauncher
     /// <summary>
     /// 初期化、パス作成
     /// </summary>
-    public static void Initialize(Setting_CmdLine cmdline, Setting_File setting)
+    public static void Init(Setting_CmdLine cmdline, Setting_File setting)
     {
       Copy_fromCommandLine(cmdline);
 
@@ -309,11 +308,11 @@ namespace LGLauncher
         bool isJLS = detector == "JLS".ToLower();
 
         InputPlugin = isD2v ? Plugin.D2v
-          : isLwi ? Plugin.Lwi
-          : Plugin.None;
+                    : isLwi ? Plugin.Lwi
+                    : Plugin.None;
         Detector = isJLS ? Detector.Join_Logo_Scp
-          : isLG ? Detector.LogoGuillo
-          : Detector.None;
+                  : isLG ? Detector.LogoGuillo
+                  : Detector.None;
         //Avs固定 
         const AvsVpy avs = AvsVpy.Avs;
         AvsVpy = avs;
@@ -544,7 +543,6 @@ namespace LGLauncher
       Output_RawFrame = setting.Output_RawFrame;
       Output_Frame = setting.Output_Frame;
       Output_Tvtp = setting.Output_Tvtp;
-      Output_Ogm = setting.Output_Ogm;
       Output_Scp = setting.Output_Scp;
 
       //chapter directory

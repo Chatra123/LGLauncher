@@ -42,18 +42,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LGL\_1_Detector\MutexControl.cs" />
     <Compile Include="Exception\LGLException.cs" />
-    <Compile Include="LGL\Misc\ProhibitFileMove_LGL.cs" />
+    <Compile Include="Misc\ProhibitFileMove_LGL.cs" />
     <Compile Include="LGL\_1_Detector\AvsVpy\VpyMaker.cs" />
     <Compile Include="LGL\_1_Detector\AvsVpy\AvsMaker.cs" />
-    <Compile Include="LGL\_1_Detector\TsIndex_srt\D2vFormatter.cs" />
-    <Compile Include="LGL\_1_Detector\TsIndex_srt\LwiFormatter.cs" />
+    <Compile Include="LGL\_1_Detector\TsIndex_srt\D2vFile.cs" />
+    <Compile Include="LGL\_1_Detector\TsIndex_srt\LwiFile.cs" />
     <Compile Include="LGL\_1_Detector\WaitForSystemReady.cs" />
     <Compile Include="LGL\_1_Detector\bat\Bat_JLS.cs" />
     <Compile Include="LGL\_1_Detector\bat\LogoSelector.cs" />
     <Compile Include="LGL\_1_Detector\bat\BatLauncher.cs" />
-    <Compile Include="LGL\Misc\CleanWorkItem.cs" />
+    <Compile Include="Misc\CleanWorkItem.cs" />
     <Compile Include="LGL\_1_Detector\AvsVpy\AvsVpyCommon.cs" />
     <Compile Include="LGL\_2_Frame\Edit\LG\LogoGuillo.cs" />
     <Compile Include="LGL\_2_Frame\Edit\JLS\LogoFrame.cs" />
@@ -67,10 +66,10 @@
     <Compile Include="Setting\Setting_File.cs" />
     <Compile Include="Setting\XmlRW.cs" />
     <Compile Include="Exception\ExceptionInfo.cs" />
-    <Compile Include="Text\FileRW.cs" />
-    <Compile Include="Text\Log.cs" />
+    <Compile Include="Misc\TextRW.cs" />
+    <Compile Include="Misc\Log.cs" />
     <Compile Include="Setting\PathList.cs" />
-    <Compile Include="LGL\_1_Detector\TsIndex_srt\TimeShiftSrt.cs" />
+    <Compile Include="LGL\_1_Detector\TsIndex_srt\SrtFile.cs" />
     <Compile Include="LGL\_1_Detector\bat\Bat_LG.cs" />
     <Compile Include="LGL\_2_Frame\EditFrame.cs" />
     <Compile Include="Program.cs" />

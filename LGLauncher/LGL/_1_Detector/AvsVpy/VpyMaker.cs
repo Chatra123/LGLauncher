@@ -28,12 +28,12 @@ namespace LGLauncher
         string path = scripter.CreateInfo();
         try
         {
-          LwiFile.Set();
+          LwiFileMover.Set();
           scripter.RunInfo(path);
         }
         finally
         {
-          LwiFile.Back();
+          LwiFileMover.Back();
         }
       }
 
@@ -88,7 +88,7 @@ namespace LGLauncher
     public string CreateInfo()
     {
       //読
-      var text = FileR.ReadFromResource("LGLauncher.Resource.GetInfo_vpy.vpy");
+      var text = TextR.ReadFromResource("LGLauncher.Resource.GetInfo_vpy.vpy");
 
       for (int i = 0; i < text.Count; i++)
       {
@@ -156,7 +156,7 @@ namespace LGLauncher
     public List<string> CreateText(int[] trimFrame)
     {
       //読
-      var text = FileR.ReadFromResource("LGLauncher.Resource.TrimVpy.vpy");
+      var text = TextR.ReadFromResource("LGLauncher.Resource.TrimVpy.vpy");
 
       for (int i = 0; i < text.Count; i++)
       {

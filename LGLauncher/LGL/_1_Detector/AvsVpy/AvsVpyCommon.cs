@@ -14,25 +14,39 @@ namespace LGLauncher
   /// <summary>
   /// Avs or Vpy作成
   /// </summary>
-  class AvsVpyMaker
+  static class AvsVpyMaker
   {
-    AbstractAvsMaker maker;
+    static bool IndexHasFormatted = false;
+    static AbstractAvsMaker maker;
 
     /// <summary>
-    /// constructor
+    /// AvsVpyMaker
     /// </summary>
-    public AvsVpyMaker()
+    public static void Init()
     {
-      IndexFormatter.Format(PathList.IsD2v);
+      if (IndexHasFormatted == false)
+      {
+        /*
+         * 作成途中のd2v, lwiファイルを利用できるようにフォーマットを整える。
+         *   d2v  -->  最終行を削除
+         *   lwi  -->  最後のindex= 以降を削除 
+         */
+        IndexHasFormatted = true;
+        if (PathList.IsD2v)
+          D2vFile.Format();
+        else
+          LwiFile.Format();
+      }
       maker = PathList.IsAvs ? new AvsMaker() as AbstractAvsMaker :
               PathList.IsVpy ? new VpyMaker() as AbstractAvsMaker :
               null;
     }
 
+
     /// <summary>
     /// トリムフレーム取得
     /// </summary>
-    public int[] GetTrimFrame()
+    public static int[] GetTrimFrame()
     {
       return maker.GetTrimFrame();
     }
@@ -40,11 +54,12 @@ namespace LGLauncher
     /// <summary>
     /// スクリプト作成
     /// </summary>
-    public string MakeScript(int[] trimFrame)
+    public static string MakeScript(int[] trimFrame)
     {
       return maker.MakeScript(trimFrame);
     }
   }
+
 
   /// <summary>
   /// Avs, Vpyの抽象化
@@ -54,7 +69,6 @@ namespace LGLauncher
     public abstract int[] GetTrimFrame();
     public abstract string MakeScript(int[] trimFrame);
   }
-
 
 
 
@@ -81,7 +95,7 @@ namespace LGLauncher
           continue;
         };
 
-        infoText = FileR.ReadAllLines(infoPath);
+        infoText = TextR.ReadAllLines(infoPath);
         //line count check
         if (infoText == null || infoText.Count <= 1)
         {
