@@ -19,29 +19,28 @@ namespace LGLauncher.Frame.JLS
     /// </summary>
     public static void Concat(int[] trimFrame)
     {
-      //logoframeによって作成されるファイル                *.p3.jls.logoframe.txt
-      string add_ScposPath = PathList.WorkPath + ".jls.logoframe.txt";
+      //logoframeによって作成されるファイル                     *.p3.jls.logoframe.txt
+      string addText_Path = PathList.WorkPath + ".jls.logoframe.txt";
 
-      //結合logoframe                                      *.jls.logoframe.cat.txt
-      string catPath = Path.Combine(PathList.LWorkDir,
-                                    PathList.TsShortName + ".jls.logoframe.cat.txt");
+      //前回までのファイル                                      *.jls.logoframe.cat.txt
+      string catText_Path = Path.Combine(PathList.LWorkDir,
+                                         PathList.TsShortName + ".jls.logoframe.cat.txt");
 
       //読
-      List<string> add_LogoframeText = null, old_CatText = null;
+      List<string> addText = null, old_CatText = null;
       {
-        add_LogoframeText = TextR.ReadAllLines(add_ScposPath);    // from  *.p3.jls.logoframe.txt
+        addText = TextR.ReadAllLines(addText_Path);         // from  *.p3.jls.logoframe.txt
 
         //前回までの結合フレームを取得
         if (2 <= PathList.PartNo)
         {
-          old_CatText = TextR.ReadAllLines(catPath);              // from  *.jls.logoframe.cat.txt
-          if (old_CatText == null && add_LogoframeText == null)
+          old_CatText = TextR.ReadAllLines(catText_Path);    // from  *.jls.logoframe.cat.txt
+          if (old_CatText == null && addText == null)
             throw new LGLException("not detect logoframe file");
         }
-
         //空白行を除去
-        add_LogoframeText = add_LogoframeText ?? new List<string>();
-        add_LogoframeText = add_LogoframeText.Where(line => string.IsNullOrWhiteSpace(line) == false)
+        addText = addText ?? new List<string>();
+        addText = addText.Where(line => string.IsNullOrWhiteSpace(line) == false)
                                              .ToList();
         old_CatText = old_CatText ?? new List<string>();
         old_CatText = old_CatText.Where(line => string.IsNullOrWhiteSpace(line) == false)
@@ -49,7 +48,7 @@ namespace LGLauncher.Frame.JLS
       }
 
       //連結 with offset
-      //　　add_LogoframeTextがあれば連結、なければold_CatTextのまま
+      //　　addTextがあれば連結、なければold_CatTextのまま
       List<string> new_CatText;
       {
         new_CatText = new List<string>(old_CatText);
@@ -57,16 +56,15 @@ namespace LGLauncher.Frame.JLS
         if (PathList.IsPart && trimFrame != null)
         {
           int beginFrame = trimFrame[0];
-          add_LogoframeText = AppendOffset_logoframe(add_LogoframeText, beginFrame);
+          addText = AppendOffset_logoframe(addText, beginFrame);
         }
-
-        new_CatText.AddRange(add_LogoframeText);
+        new_CatText.AddRange(addText);
         //簡略化のため連結部の繋ぎ目はそのまま
       }
 
       //書
-      //次回の参照用
-      File.WriteAllLines(catPath, new_CatText, TextEnc.Shift_JIS);
+      //次回の参照用に上書き
+      File.WriteAllLines(catText_Path, new_CatText, TextEnc.Shift_JIS);
       //デバッグ用のコピー
       string catPath_part = PathList.WorkPath + ".jls.logoframe.cat.txt";
       File.WriteAllLines(catPath_part, new_CatText, TextEnc.Shift_JIS);
@@ -110,12 +108,10 @@ namespace LGLauncher.Frame.JLS
         if (match.Success == false)
           throw new LGLException("logoframe text regex match error");
       }
-
       //文字列から抽出する値
       int frame_1, frame_2, frame_3;
       int fade;
       string SorE, interlace;
-
       //文字　→　数値
       try
       {
@@ -136,7 +132,6 @@ namespace LGLauncher.Frame.JLS
       frame_1 += frame_offset;
       frame_2 += frame_offset;
       frame_3 += frame_offset;
-
       //update line
       string new_line = string.Format("{0,6} {1} {2} {3} {4,6} {5,6}",
                                       frame_1,

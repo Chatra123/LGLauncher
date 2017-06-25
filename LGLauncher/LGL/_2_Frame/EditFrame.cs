@@ -17,7 +17,7 @@ namespace LGLauncher.Frame
     public static List<int> Concat(int[] trimFrame)
     {
       /*
-       * 変換の流れ
+       * 処理の流れ
        *   Join_Logo_Scp
        *      *.p1.jls.result.txt  -->  *.p1.frame.txt  -->  List<int> frame  -->  List<int> concat
        *   LogoGuillo
@@ -141,7 +141,7 @@ namespace LGLauncher.Frame
 
       //SCPos & logoframe
       if (PathList.IsJLS)
-        if (PathList.IsLastPart && 1 <= PathList.Output_Scp)
+        if (PathList.IsLastPart && 1 <= PathList.Output_Jls)
         {
           string src = Path.Combine(PathList.LWorkDir, PathList.TsShortName);
           string dst = Path.Combine(PathList.ChapDir_Misc, PathList.TsNameWithoutExt);

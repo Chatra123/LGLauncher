@@ -24,14 +24,14 @@ namespace LGLauncher.Frame.JLS
       {
         if (islast_jls == false)
         {
-          avsTrimPath = PathList.WorkPath + ".jls.result.txt";
+          avsTrimPath = PathList.WorkPath + ".jls.txt";
           framePath = PathList.WorkPath + ".frame.txt";
         }
         else
         {
           // last
           avsTrimPath = Path.Combine(PathList.LWorkDir,
-                                     PathList.TsShortName + ".jls.last.result.txt");
+                                     PathList.TsShortName + ".jls.last.txt");
           framePath = Path.Combine(PathList.LWorkDir,
                                    PathList.TsShortName + ".jls.last.frame.txt");
         }
@@ -51,9 +51,9 @@ namespace LGLauncher.Frame.JLS
         framelist = ConvertFrame.AvsTrim_to_FrameList(liner);
       }
 
-      //書
       //List<int>  -->  List<string>
       var frameText = framelist.Select(f => f.ToString()).ToList();
+      //書
       File.WriteAllLines(framePath, frameText, TextEnc.Shift_JIS);
 
       return framelist;

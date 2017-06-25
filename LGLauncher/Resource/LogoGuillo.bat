@@ -1,7 +1,5 @@
 @echo off
 setlocal
-
-::WorkDir
 pushd "%~dp0"
 
 ::begin time
