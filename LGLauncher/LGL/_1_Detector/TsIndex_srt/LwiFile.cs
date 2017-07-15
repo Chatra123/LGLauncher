@@ -48,20 +48,6 @@ namespace LGLauncher
       }
       catch
       {
-        try
-        {
-          string path = Path.Combine(PathList.AppDir, "lwi_move_err.log");
-          var sb = new StringBuilder();
-          sb.AppendLine("-----------------------------------------");
-          sb.AppendLine("lwi file: fail to delete or move.");
-          sb.AppendLine("    TsPath        =  " + PathList.TsPath);
-          sb.AppendLine("    PartNo        =  " + PathList.PartNo);
-          sb.AppendLine("    IsLastPart    =  " + PathList.IsLastPart);
-          sb.AppendLine();
-          File.AppendAllText(path, sb.ToString());
-        }
-        catch { }
-
         throw new LGLException("lwi file: fail to delete or move.");
       }
     }
@@ -96,20 +82,6 @@ namespace LGLauncher
       }
       catch
       {
-        try
-        {
-          string path = Path.Combine(PathList.AppDir, "lwi_move_err.log");
-          var sb = new StringBuilder();
-          sb.AppendLine("-----------------------------------------");
-          sb.AppendLine("lwi file: fail to move back.");
-          sb.AppendLine("    TsPath        =  " + PathList.TsPath);
-          sb.AppendLine("    PartNo        =  " + PathList.PartNo);
-          sb.AppendLine("    IsLastPart    =  " + PathList.IsLastPart);
-          sb.AppendLine();
-          File.AppendAllText(path, sb.ToString());
-        }
-        catch { }
-
         throw new LGLException("lwi file: fail to move back.");
       }
     }
@@ -157,7 +129,8 @@ namespace LGLauncher
       }
 
       //IsPart
-      //  作成済みのlwiでも最後の"index=..."行以降を必ず切り捨てる
+      //  作成済みのlwiかどうかはチェックしていないので、
+      //  作成済みのlwiでも最後の"index=..."行以降を必ず切り捨ててている。
       var reader = new TextR(PathList.LwiPath);
       var writer = new TextW(PathList.LwiPathInLWork);
       if (reader.IsOpen == false || writer.IsOpen == false)
@@ -184,7 +157,7 @@ namespace LGLauncher
 
         /*
          * バックグラウンドで複数動かすため適度に速度を抑える。
-         * 読込負荷は小さいがThread.Sleep();の１行加えるだけなので入れておく。
+         * サイズは100MB程と小さいがThread.Sleep();の１行加えるだけなので入れておく。
          *   10 MB/sec * 1.00 sec  =  10.0 MB    130,000 line
          *   10        * 0.10      =   1.0        13,000 
          *   10        * 0.01      =   0.1         1,300 

@@ -9,15 +9,6 @@ using System.IO;
 
 
 
-/*
- 
-  LwiFileMover
-
-  Debug.CopyIndex = true
-   
-   
-   */
-
 
 namespace LGLauncher
 {

@@ -127,8 +127,8 @@ namespace LGLauncher.Frame.JLS
       //文字列から抽出する値
       int chapCnt;
       TimeSpan timecode;
-      string timetext;            //00:01:08.602
-      string Mute_and_Mark;       //31フレーム ★★ 
+      string timetext;        //00:01:08.602
+      string Mute_Mark;       //31フレーム ★★ 
       int SC_End, SC_Begin;
 
       //文字　-->　数値
@@ -142,7 +142,7 @@ namespace LGLauncher.Frame.JLS
         int msec = int.Parse(match_timecode.Groups["MSec"].Value);
         timecode = new TimeSpan(0, hour, min, sec, msec);
 
-        Mute_and_Mark = match_name.Groups["Mute_Mark"].Value;
+        Mute_Mark = match_name.Groups["Mute_Mark"].Value;
         SC_End = int.Parse(match_name.Groups["SC_End"].Value);
         SC_Begin = int.Parse(match_name.Groups["SC_Begin"].Value);
       }
@@ -163,7 +163,7 @@ namespace LGLauncher.Frame.JLS
       string new_timecode_line = string.Format("Chapter{0:D2}={1}",
                                                chapCnt, timetext);
       string new_name_line = string.Format("Chapter{0:D2}Name={1}SCPos:{2} {3}",
-                                           chapCnt, Mute_and_Mark, SC_End, SC_Begin);
+                                           chapCnt, Mute_Mark, SC_End, SC_Begin);
       return new List<string> { new_timecode_line, new_name_line };
     }
 

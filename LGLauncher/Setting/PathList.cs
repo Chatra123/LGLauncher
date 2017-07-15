@@ -15,7 +15,7 @@ namespace LGLauncher
   static class Debug
   {
     // format d2v, lwiをデバッグ用に別名で保存するか？
-    public const bool CopyIndex = true;  // true  false
+    public const bool CopyIndex = false;  // true  false
   }
 
   /// <summary>
