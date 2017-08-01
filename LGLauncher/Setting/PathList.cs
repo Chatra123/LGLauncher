@@ -340,7 +340,7 @@ namespace LGLauncher
         Directory.CreateDirectory(LSystemDir);
 
       //WorkDir
-      //  衝突は考えない、重複チェックはしてない。
+      //  衝突は考えない。
       string dirName;
       {
         var fi = new FileInfo(TsPath);
@@ -539,7 +539,7 @@ namespace LGLauncher
       Regard_NsecCM_AsMain = 0 < Regard_NsecCM_AsMain ? Regard_NsecCM_AsMain : 0;
       Regard_NsecMain_AsCM = 0 < Regard_NsecMain_AsCM ? Regard_NsecMain_AsCM : 0;
 
-      //enable output
+      //enable output 
       Output_RawFrame = setting.Output_RawFrame;
       Output_Frame = setting.Output_Frame;
       Output_Tvtp = setting.Output_Tvtp;
