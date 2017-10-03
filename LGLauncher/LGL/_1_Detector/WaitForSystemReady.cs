@@ -54,8 +54,8 @@ namespace LGLauncher
       /// </summary>
       var TargetHasExited = new Func<int, bool>((max_prc) =>
      {
-        //プロセス数確認  ".exe"はつけない
-        int sum = 0;
+       //プロセス数確認  ".exe"はつけない
+       int sum = 0;
        foreach (var target in targetNames)
        {
          var prc = Process.GetProcessesByName(target);
@@ -95,17 +95,23 @@ namespace LGLauncher
         const int timeout_min = 120;
         const string name = "LGL-41CDEAC6-6717";      //LGL
         //const string name = "V2P-33A2FE1F-0891";      //V2P
-        semaphore = new Semaphore(multiRun, multiRun, name);
-        if (semaphore.WaitOne(TimeSpan.FromMinutes(timeout_min)))
+        try
         {
-          additionalWait = false ;
+          semaphore = new Semaphore(multiRun, multiRun, name);
+          if (semaphore.WaitOne(TimeSpan.FromMinutes(timeout_min)))
+          {
+            additionalWait = false;
+          }
+          else
+          {
+            //プロセスが強制終了されているとセマフォが解放されず取得できない。
+            //全ての待機プロセスが終了するとセマフォがリセットされ再取得できるようになる。
+            Log.WriteLine("  timeout of waiting semaphore");      //LGL
+            additionalWait = true;
+          }
         }
-        else
+        catch (SemaphoreFullException)//指定されたカウントをセマフォに追加すると、カウントの最大値を超えます。
         {
-          //プロセスが強制終了されているとセマフォが解放されず取得できない。
-          //一定時間でタイムアウトさせる。
-          //全ての待機プロセスが終了するとセマフォがリセットされ再取得できるようになる。
-          Log.WriteLine("  timeout of waiting semaphore");      //LGL
           additionalWait = true;
         }
       }
