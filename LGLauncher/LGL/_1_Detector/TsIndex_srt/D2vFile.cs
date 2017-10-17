@@ -5,30 +5,31 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 
-
+/*
+ * d2v
+ *  - 作成途中のd2vを読み込む。 
+ *  - 最終行を削除してd2vとして使用できる形にする。 
+ *
+ */
 namespace LGLauncher
 {
   using OctNov.IO;
-
-  /*
-   *  d2v  -->  最終行を削除
-   */
-  static class D2vFile
+  class D2vFile
   {
     /// <summary>
     /// フォーマットを整える
     /// </summary>
-    public static void Format()
+    public void Format()
     {
       //読
       var readText = TextR.ReadAllLines(PathList.D2vPath);
-      if (readText == null) throw new LGLException("d2v read error");
+      if (readText == null)
+        throw new LGLException("d2v read error");
+      if (readText.Count < 30)
+        throw new LGLException("d2v text is less than 30 lines");
 
-      //簡易チェック
+      //簡易ファイルチェック
       {
-        if (readText.Count < 30)
-          throw new LGLException("d2v text is less than 30 lines");
-
         bool isD2v = true;
         for (int i = 18; i < 30; i++)
         {
@@ -63,9 +64,8 @@ namespace LGLauncher
 
       //書
       File.WriteAllLines(PathList.D2vPathInLWork, formatText, TextEnc.Shift_JIS);
-
 #pragma warning disable 0162           //警告0162：到達できないコード
-      //デバッグ用のコピー  TsShortName.d2v  -->  TsShortName.p2.d2v
+      //copy  TsShortName.d2v --> TsShortName.p2.d2v
       if (Debug.CopyIndex)
       {
         string outPath_part = PathList.WorkPath + ".d2v";

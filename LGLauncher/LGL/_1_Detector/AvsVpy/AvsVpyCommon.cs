@@ -33,16 +33,14 @@ namespace LGLauncher
          */
         IndexHasFormatted = true;
         if (PathList.IsD2v)
-          D2vFile.Format();
+          new D2vFile().Format();
         else
-          LwiFile.Format();
+          new LwiFile().Format();
       }
       maker = PathList.IsAvs ? new AvsMaker() as AbstractAvsMaker :
               PathList.IsVpy ? new VpyMaker() as AbstractAvsMaker :
               null;
     }
-
-
     /// <summary>
     /// トリムフレーム取得
     /// </summary>
@@ -50,7 +48,6 @@ namespace LGLauncher
     {
       return maker.GetTrimFrame();
     }
-
     /// <summary>
     /// スクリプト作成
     /// </summary>
@@ -60,7 +57,6 @@ namespace LGLauncher
     }
   }
 
-
   /// <summary>
   /// Avs, Vpyの抽象化
   /// </summary>
@@ -69,7 +65,6 @@ namespace LGLauncher
     public abstract int[] GetTrimFrame();
     public abstract string MakeScript(int[] trimFrame);
   }
-
 
 
   /// <summary>
@@ -148,8 +143,8 @@ namespace LGLauncher
     /// <returns>開始、終了フレーム数</returns>
     private static int[] GetTrimFrame_fromName(string nameKey)
     {
-      if (PathList.LWorkDir == null) return null;
-
+      if (PathList.LWorkDir == null)
+        return null;
       var files = Directory.GetFiles(PathList.LWorkDir, nameKey);
       if (files.Count() != 1)
       {

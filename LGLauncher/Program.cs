@@ -166,7 +166,7 @@ namespace LGLauncher
          *  length = 45min なら、 30m, 15m       に分割
          *  length = 95min なら、 30m, 30m, 35m  に分割
          */
-        //開始フレーム　　（　直前の終了フレーム　＋　１　）
+        //開始フレーム　　（　直前の終了フレーム＋１　）
         int beginFrame;
         {
           //  trimFrame_prv[0] : previous begin frame
@@ -176,7 +176,6 @@ namespace LGLauncher
                                     : null;
           beginFrame = (trimFrame_prv != null) ? trimFrame_prv[1] + 1 : 0;
         }
-
         int[] splitTrim;
         {
           const int len_30min = (int)(30.0 * 60.0 * 29.970);
@@ -193,7 +192,6 @@ namespace LGLauncher
             isLastSplit = true;
           }
         }
-
         //Log
         double len_min = 1.0 * (splitTrim[1] - splitTrim[0]) / 29.970 / 60;
         var text = new StringBuilder();
@@ -225,7 +223,7 @@ namespace LGLauncher
         {
           int beginFrame = trimFrame[0];
           double shiftSec = 1.0 * beginFrame / 29.970;
-          srtPath = SrtFile.Format(shiftSec);
+          srtPath = new SrtFile().Format(shiftSec);
         }
         //bat
         string batPath = "";
@@ -287,17 +285,13 @@ namespace LGLauncher
           finally
           {
             LwiFileMover.Back();
-            //Semaphore解放
             if (waitForReady != null)
               waitForReady.Release();
           }
         }
       }
-
-
     } //class Program_Core 
     #endregion
-
 
   }//class Program
 }//namespace

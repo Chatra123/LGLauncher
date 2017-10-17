@@ -94,10 +94,13 @@ namespace LGLauncher
 
   #region LwiFile
 
+
   /*
-   *   lwi  -->  最後のindex= 以降を削除 
+   * lwi
+   *  - 作成途中のlwiを読み込む。 
+   *  - 最後のindex= 以降を削除してlwiとして使用できる形にする。 
    */
-  static class LwiFile
+  class LwiFile
   {
     //lwiの３，４行目
     //
@@ -118,7 +121,7 @@ namespace LGLauncher
     /// <summary>
     /// フォーマットを整える
     /// </summary>
-    public static void Format()
+    public void Format()
     {
       //IsAll
       if (PathList.IsAll)
@@ -142,31 +145,29 @@ namespace LGLauncher
         var readBuff = new List<string>();
         var writeBuff = new List<string>();
         readBuff = reader.ReadNLines(100);
-        //簡易チェック
+        if (readBuff.Count < 100)
+          throw new LGLException("lwi text is less than 100 lines");
+        //簡易ファイルチェック
         {
-          if (readBuff.Count < 100)
-            throw new LGLException("lwi text is less than 100 lines");
           bool isLwi = true;
-          isLwi &= Regex.IsMatch(readBuff[0], @"<LibavReaderIndexFile=\d+>");
-          isLwi &= Regex.IsMatch(readBuff[1], @"<InputFilePath>.*</InputFilePath>");
-          isLwi &= Regex.IsMatch(readBuff[2], @"<LibavReaderIndex=.*>");
+          isLwi &= Regex.IsMatch(readBuff[0], @"<LSMASHWorksIndexVersion=.*>");
+          isLwi &= Regex.IsMatch(readBuff[1], @"<LibavReaderIndexFile=\d+>");
+          isLwi &= Regex.IsMatch(readBuff[2], @"<InputFilePath>.*</InputFilePath>");
+          isLwi &= Regex.IsMatch(readBuff[3], @"<LibavReaderIndex=.*>");
           if (isLwi == false)
             throw new LGLException("lwi format error");
         }
-
-
         /*
          * バックグラウンドで複数動かすため適度に速度を抑える。
          * サイズは100MB程と小さいがThread.Sleep();の１行加えるだけなので入れておく。
-         *   10 MB/sec * 1.00 sec  =  10.0 MB    130,000 line
-         *   10        * 0.10      =   1.0        13,000 
-         *   10        * 0.01      =   0.1         1,300 
-         *   10        * 0.06      =   0.6         8,000
-         * 
+         * 10 MB/sec * 1.00 sec  =  10.0 MB    130,000 line
+         * 10        * 0.10      =   1.0        13,000 
+         * 10        * 0.01      =   0.1         1,300 
+         * 10        * 0.06      =   0.6         8,000
          * Thread.Sleep(60);
          * readBuff = reader.ReadNLines(8 * 1000);
          * で実測 6.0 - 8.0 MB/secほど。
-         */
+         * */
         //読
         writeBuff = readBuff;
         while (true)
@@ -181,7 +182,7 @@ namespace LGLauncher
           }
           else
           {
-            //reach EOF
+            //EOF
             reader.Close();
             break;
           }
@@ -190,8 +191,6 @@ namespace LGLauncher
         //lwi末尾
         //　writeBuff + readBuffで１００行以上は確実にある。
         writeBuff.AddRange(readBuff);
-
-
         //最後の"index=..."行以降を削除
         const string Ptn = @"Index=\d+,Type=\d+,Codec=\d+,";
         string matchLine = writeBuff.LastOrDefault(line => Regex.Match(line, Ptn).Success);
@@ -215,15 +214,13 @@ namespace LGLauncher
         }
         else
         {
-          //読込失敗、footer作成
           string footer_new = Create_footer(writeBuff);
           writer.WriteLine(writeBuff);
           writer.WriteLine(footer_new);
           writer.Close();
         }
-
 #pragma warning disable 0162           //警告0162：到達できないコード
-        //デバッグ用のコピー  TsShortName.lwi  -->  TsShortName.p2.lwi
+        //copy  TsShortName.lwi --> TsShortName.p2.lwi
         if (Debug.CopyIndex)
         {
           string outPath_part = PathList.WorkPath + ".lwi";
@@ -251,7 +248,7 @@ namespace LGLauncher
     ///   lwiファイルの<ExtraDataList>だけはバイナリーで書かれているので
     ///   バイナリーモードで読み込む。
     /// </remarks>
-    private static byte[] ReadFile_footer()
+    private byte[] ReadFile_footer()
     {
       const string Tag = "</LibavReaderIndexFile>\n";
       byte[] footer = null;
@@ -260,28 +257,27 @@ namespace LGLauncher
       //</LibavReaderIndexFile>を確認するまで繰り返す。
       for (int i = 0; i < 3; i++)
       {
-        if (File.Exists(PathList.LwiFooterPath) == false) return null;
-
+        if (File.Exists(PathList.LwiFooterPath) == false)
+          return null;
         footer = TextR.ReadBytes(PathList.LwiFooterPath);
         if (footer != null)
         {
           var footer_ascii = System.Text.Encoding.ASCII.GetString(footer);
           bool hasTag = footer_ascii.IndexOf(Tag) == (footer_ascii.Length - Tag.Length);
           if (hasTag)
-            break;                     //チェックＯＫ
+            break;       //チェックＯＫ
           else
             footer = null;
         }
         Thread.Sleep(1000);
       }
-
       return footer;
     }
 
     /// <summary>
     /// footer作成　footerファイルが無いときに使用。
     /// </summary>
-    private static string Create_footer(List<string> lwiText)
+    private string Create_footer(List<string> lwiText)
     {
       /*
         lwiText line sample
@@ -294,7 +290,7 @@ namespace LGLauncher
       if (matchLine != null)
       {
         var m = Regex.Match(matchLine, Ptn);
-        if (m.Groups.Count == 4)                       //found match
+        if (m.Groups.Count == 4)            //found match
         {
           w = m.Groups[1].ToString();
           h = m.Groups[2].ToString();
@@ -322,7 +318,7 @@ namespace LGLauncher
                     </ExtraDataList>
                     </LibavReaderIndexFile>";
       string footer = template;
-      footer = Regex.Replace(footer, @"[ \t　]", "");         //VisualStudio上での表示用スペース削除
+      footer = Regex.Replace(footer, @"[ \t　]", "");  //VisualStudio上での表示用スペース削除
       footer = Regex.Replace(footer, @"#Width#", w);
       footer = Regex.Replace(footer, @"#Height#", h);
       footer = Regex.Replace(footer, @"#Format#", f);
