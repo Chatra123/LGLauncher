@@ -67,20 +67,17 @@ namespace LGLauncher.Bat
         if (hasExisted == false) prc.Kill();
         prc.Close();
       }
-
       //正常終了
       if (exitCode == 0)
       {
         return;
       }
-
       //タイムアウト
       if (hasExisted == false)
       {
         Log.WriteLine("bat timeout");
         return;
       }
-
       //異常終了
       if (PathList.IsJLS)
       {

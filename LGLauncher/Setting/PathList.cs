@@ -299,26 +299,23 @@ namespace LGLauncher
       }
 
       //Plugin  Detector  AvsVpy
-      {
-        string plugin = setting.InputPlugin.Trim().ToLower();
-        string detector = setting.Detector.Trim().ToLower();
-        bool isD2v = plugin == "d2v".ToLower();
-        bool isLwi = plugin == "lwi".ToLower();
-        bool isLG = detector == "LG".ToLower();
-        bool isJLS = detector == "JLS".ToLower();
-
-        InputPlugin = isD2v ? Plugin.D2v
-                    : isLwi ? Plugin.Lwi
-                    : Plugin.None;
-        Detector = isJLS ? Detector.Join_Logo_Scp
-                  : isLG ? Detector.LogoGuillo
-                  : Detector.None;
-        //Avs固定 
-        const AvsVpy avs = AvsVpy.Avs;
-        AvsVpy = avs;
-        if (AvsVpy == AvsVpy.Vpy)
-          throw new NotImplementedException();
-      }
+      string plugin = setting.InputPlugin.Trim().ToLower();
+      string detector = setting.Detector.Trim().ToLower();
+      bool isD2v = plugin == "d2v".ToLower();
+      bool isLwi = plugin == "lwi".ToLower();
+      bool isLG = detector == "LG".ToLower();
+      bool isJLS = detector == "JLS".ToLower();
+      InputPlugin = isD2v ? Plugin.D2v
+                  : isLwi ? Plugin.Lwi
+                  : Plugin.None;
+      Detector = isJLS ? Detector.Join_Logo_Scp
+                : isLG ? Detector.LogoGuillo
+                : Detector.None;
+      //Avs固定 
+      const AvsVpy avs = AvsVpy.Avs;
+      AvsVpy = avs;
+      if (AvsVpy == AvsVpy.Vpy)
+        throw new NotImplementedException();
     }
 
 
@@ -350,7 +347,6 @@ namespace LGLauncher
         dirName = time + "_" + TsShortName + "_" + MD5;
       }
       LWorkDir = Path.Combine(LTopWorkDir, dirName);
-
       if (Directory.Exists(LWorkDir) == false)
         Directory.CreateDirectory(LWorkDir);
     }
@@ -487,6 +483,7 @@ namespace LGLauncher
         }
         else if (IsLwi)
           LSMASHSource = sercher.Get("LSMASHSource.dll");
+
       }
       else if (IsVpy)
       {

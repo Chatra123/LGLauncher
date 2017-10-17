@@ -23,7 +23,7 @@ namespace LGLauncher.Bat
         throw new LGLException("LogoSelector return null");
       if (result.Count < 2)
         throw new LGLException("LogoSelector return value is -lt 2 lines");
-      //                      { logo path, param path }
+      /*                      { logo path, param path } */
       return new List<string> { result[0], result[1] };
     }
 
@@ -38,7 +38,7 @@ namespace LGLauncher.Bat
         throw new LGLException("LogoSelector return null");
       if (result.Count < 1)
         throw new LGLException("LogoSelector return value is -lt 1 line");
-      //                      { logo path }
+      /*                      { logo path } */
       return new List<string> { result[0] };
     }
 
@@ -87,7 +87,6 @@ namespace LGLauncher.Bat
       prc.StartInfo.UseShellExecute = false;
       //入出力のリダイレクト
       prc.StartInfo.RedirectStandardOutput = true;
-
       try
       {
         prc.Start();
