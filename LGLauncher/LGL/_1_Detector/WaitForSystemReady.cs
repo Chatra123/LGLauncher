@@ -37,7 +37,7 @@ namespace LGLauncher
     {
       if (multiRun <= 0) return false;
 
-      //targetNamesから.exe除去
+      //.exe除去
       targetNames = targetNames.Select(
                       (prcname) =>
                       {
@@ -49,7 +49,7 @@ namespace LGLauncher
                      .ToList();
 
       /// <summary>
-      /// targetのプロセス数が少ないか？
+      /// プロセス数が少ないか？
       ///   target単体、外部ランチャーとの衝突回避
       /// </summary>
       var TargetHasExited = new Func<int, bool>((max_prc) =>
@@ -89,7 +89,7 @@ namespace LGLauncher
 
       //Semaphore取得
       //  LGLauncher同士での衝突回避
-      //  取得できないときは待機時間を追加
+      //  取得できなければ待機時間を追加
       bool additionalWait;
       {
         const int timeout_min = 120;
@@ -110,16 +110,15 @@ namespace LGLauncher
             additionalWait = true;
           }
         }
-        catch (SemaphoreFullException)//指定されたカウントをセマフォに追加すると、カウントの最大値を超えます。
+        catch (SemaphoreFullException)
         {
+          //SemaphoreFullException 指定されたカウントをセマフォに追加すると、カウントの最大値を超えます。
           additionalWait = true;
         }
       }
 
 
-      //
       //システムチェック
-      //
       var rand = new Random(DateTime.Now.Millisecond + Process.GetCurrentProcess().Id);
       while (true)
       {
@@ -128,24 +127,19 @@ namespace LGLauncher
         {
           Thread.Sleep(1 * 60 * 1000);                               // 1 min
         }
-
         //ＣＰＵ使用率
         if (check_SysIdle && SystemIsIdle() == false)
         {
           Thread.Sleep(rand.Next(3 * 60 * 1000, 5 * 60 * 1000));     // 3 - 5 min
           continue;
         }
-
-        //Semaphore
         if (additionalWait)
         {
           Thread.Sleep(rand.Next(0 * 1000, 3 * 60 * 1000));          // 0 - 3 min
         }
-
         //プロセス数  再チェック
         if (TargetHasExited(multiRun) == false)
           continue;
-
         //チェックＯＫ
         return true;
       }

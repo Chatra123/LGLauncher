@@ -36,7 +36,6 @@ namespace LGLauncher
           LwiFileMover.Back();
         }
       }
-
       //総フレーム数取得
       int totalframe;
       {
@@ -44,8 +43,7 @@ namespace LGLauncher
         var info = AvsVpyCommon.GetInfo_fromText(path);
         totalframe = (int)info[0];
       }
-
-      //開始フレーム　　（　直前の終了フレーム　＋　１　）
+      //開始フレーム　　（　直前の終了フレーム＋１　）
       int beginFrame;
       {
         //  trimFrame_prv[0] : previous begin frame
@@ -55,7 +53,6 @@ namespace LGLauncher
                                   : null;
         beginFrame = (trimFrame_prv != null) ? trimFrame_prv[1] + 1 : 0;
       }
-
       int[] trimFrame = new int[] { beginFrame, totalframe - 1 };
       return trimFrame;
     }
@@ -132,20 +129,21 @@ namespace LGLauncher
       prc.StartInfo.Arguments = " \"" + vpyPath + "\"";
       prc.StartInfo.CreateNoWindow = true;
       prc.StartInfo.UseShellExecute = false;
-
       try
       {
         prc.Start();
         prc.WaitForExit(30 * 1000);  //数秒かかるので短すぎるのはダメ
         if (prc.HasExited && prc.ExitCode == 0)
           return;
+        else
+          throw new LGLException("  RunInfo() timeout");
+
       }
       catch
       {
         //not found python 
-        throw new LGLException("  RunInfo() runtime error");
+        throw new LGLException("  RunInfo() runtime error [python]");
       }
-      throw new LGLException("  RunInfo() timeout");
     }
 
 
