@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LGLauncher", "LGLauncher\LG
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LGLFrameChecker", "LGLFrameChecker\LGLFrameChecker.csproj", "{C9C2C508-4E11-48B8-9FD4-C0F29D028BD7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TweakFrame", "TweakFrame\TweakFrame.csproj", "{D521F134-37A3-41A6-B299-311A1F3CDD52}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{C9C2C508-4E11-48B8-9FD4-C0F29D028BD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C9C2C508-4E11-48B8-9FD4-C0F29D028BD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C9C2C508-4E11-48B8-9FD4-C0F29D028BD7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D521F134-37A3-41A6-B299-311A1F3CDD52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D521F134-37A3-41A6-B299-311A1F3CDD52}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D521F134-37A3-41A6-B299-311A1F3CDD52}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D521F134-37A3-41A6-B299-311A1F3CDD52}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
