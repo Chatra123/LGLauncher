@@ -325,7 +325,7 @@ namespace LGLauncher
       return footer;
     }
   }
-  #endregion LwiFormatter
+  #endregion
 
 
 

@@ -8,8 +8,6 @@ using System.IO;
 #endregion
 
 
-
-
 namespace LGLauncher
 {
   internal class Program
@@ -18,6 +16,7 @@ namespace LGLauncher
 
     private static void Main(string[] args)
     {
+
       ///*テスト用*/
       //var testArgs = new List<string>() { 
       //                                    "-part", 
@@ -35,7 +34,6 @@ namespace LGLauncher
       int[] trimFrame = null;        //avsの有効フレーム範囲
       try
       {
-        //初期設定
         bool initialized = core.Initialize(args);
         if (initialized == false) return;
 
@@ -109,7 +107,7 @@ namespace LGLauncher
           Log.WriteLine();
           Log.WriteLine(e.ToString());
         }
-        
+
         if (PathList.IsLastSplit || PathList.IsAll || HasError)
           break;
         else

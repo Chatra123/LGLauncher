@@ -70,10 +70,9 @@ namespace LGLauncher
       //タイムコードの開始を０秒からに振りなおす
       var shiftText = formatText;
       if (2 <= PathList.PartNo)
-      {
         shiftText = Shift_SrtText(shiftText, shiftSec);
-      }
-      if (shiftText.Count == 0) return "";
+      if (shiftText.Count == 0)
+        return "";
 
       //書
       string dstPath = PathList.WorkPath + ".srt";

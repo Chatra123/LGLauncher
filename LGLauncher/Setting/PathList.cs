@@ -101,8 +101,8 @@ namespace LGLauncher
     //  [  Work value  ]
     //    LSystemDir
     public static string LSystemDir { get; private set; }
-    public static string LTopWorkDir { get; private set; }
-    public static string LWorkDir { get; private set; }
+    public static string LTopWorkDir { get; private set; } // C:\EDCB\Write\Write_PF\LGLauncher\LWork
+    public static string LWorkDir { get; private set; }    // C:\EDCB\Write\Write_PF\LGLauncher\LWork\010101_ショップジ_0a1b308c1
 
 
     //  WorkPath                example

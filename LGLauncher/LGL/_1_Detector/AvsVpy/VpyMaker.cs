@@ -64,7 +64,7 @@ namespace LGLauncher
     public override string MakeScript(int[] trimFrame)
     {
       var text = scripter.CreateText(trimFrame);
-      string path = AvsVpyCommon.OutScript(trimFrame, text, ".vpy", TextEnc.UTF8_nobom);
+      string path = AvsVpyCommon.OutScript(trimFrame, text, PathList.AvsVpyExt, TextEnc.UTF8_nobom);
       return path;
     }
 
@@ -113,7 +113,6 @@ namespace LGLauncher
       //書
       string infoPath = PathList.WorkPath + ".info.vpy";
       File.WriteAllLines(infoPath, text, TextEnc.UTF8_bom);
-
       return infoPath;
     }
 
@@ -136,16 +135,14 @@ namespace LGLauncher
         if (prc.HasExited && prc.ExitCode == 0)
           return;
         else
-          throw new LGLException("  RunInfo() timeout");
-
+          throw new LGLException("RunInfo() vpy timeout");
       }
       catch
       {
         //not found python 
-        throw new LGLException("  RunInfo() runtime error [python]");
+        throw new LGLException("RunInfo() vpy runtime error [python]");
       }
     }
-
 
 
     /// <summary>

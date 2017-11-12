@@ -64,7 +64,7 @@ namespace LGLauncher
     public override string MakeScript(int[] trimFrame)
     {
       var text = scripter.CreateText(trimFrame);
-      string path = AvsVpyCommon.OutScript(trimFrame, text, ".avs", TextEnc.Shift_JIS);
+      string path = AvsVpyCommon.OutScript(trimFrame, text, PathList.AvsVpyExt, TextEnc.Shift_JIS);
       return path;
     }
 
@@ -127,7 +127,6 @@ namespace LGLauncher
       //書
       string infoPath = PathList.WorkPath + ".info.avs";
       File.WriteAllLines(infoPath, text, TextEnc.Shift_JIS);
-
       return infoPath;
     }
 
@@ -150,11 +149,11 @@ namespace LGLauncher
         if (prc.HasExited && prc.ExitCode == 0)
           return;
         else
-          throw new LGLException("  RunInfo_avs() timeout");
+          throw new LGLException("RunInfo() avs timeout");
       }
       catch
       {
-        throw new LGLException("  RunInfo_avs() runtime error");
+        throw new LGLException("RunInfo() avs runtime error");
       }
     }
 
