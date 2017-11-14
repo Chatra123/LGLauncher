@@ -93,20 +93,19 @@ namespace LGLauncher
     public static string SrtName { get { return Path.GetFileName(SrtPath); } }
 
     //App
-    public static string AppPath { get; private set; }
+    public static string AppPath { get { return System.Reflection.Assembly.GetExecutingAssembly().Location; } }
     public static string AppDir { get { return Path.GetDirectoryName(AppPath); } }
     public static string AppName { get { return Path.GetFileName(AppPath); } }
 
-
     //  [  Work value  ]
     //    LSystemDir
-    public static string LSystemDir { get; private set; }
+    public static string LSystemDir { get; private set; }  // C:\EDCB\Write\Write_PF\LGLauncher\LSystem
     public static string LTopWorkDir { get; private set; } // C:\EDCB\Write\Write_PF\LGLauncher\LWork
     public static string LWorkDir { get; private set; }    // C:\EDCB\Write\Write_PF\LGLauncher\LWork\010101_ショップジ_0a1b308c1
 
 
-    //  WorkPath                example
-    //    current  work path      C:\EDCB\Write\Write_PF\LGLauncher\LWork\010101_ショップジ_0a1b308c1\ショップジ.p3
+    //  WorkPath                  example
+    //             work path      C:\EDCB\Write\Write_PF\LGLauncher\LWork\010101_ショップジ_0a1b308c1\ショップジ.p3
     //                  name      ショップジ.p3
     //    previous work path      C:\EDCB\Write\Write_PF\LGLauncher\LWork\010101_ショップジ_0a1b308c1\ショップジ.p2
     //                  name      ショップジ.p2
@@ -117,9 +116,9 @@ namespace LGLauncher
 
 
     //  [  PartNo  ]
-    //  avsの分割数を管理
+    //  分割されたavsの連番
     //     1 <= No  IsPart
-    //    No  =  0  uninitialized value and detect No 
+    //    No  =  0  uninitialized value and detect PartNo from file 
     //    No  = -1  IsAll
     public static int PartNo { get; private set; }
     public static bool Is1stPart { get { return PartNo == 1; } }
@@ -130,17 +129,14 @@ namespace LGLauncher
     private static bool IsLast_cmdline;
     //最後のLGLauncherプロセスか？
     public static bool IsLastProcess { get { return IsAll || IsLast_cmdline; } }
-
     //最後の SplitTrimか？
-    //  SplitTrim : avsからフレーム数を取得した後に、さらに分割したTrim()
+    //  SplitTrim : フレーム数を取得してTrim()したavsをさらに分割したTrim()
     public static bool IsLastSplit { get; private set; }
-
     //IsLastSplit更新
     public static void Update_IsLastSplit(bool islast)
     {
       IsLastSplit = islast;
     }
-
     //最後の PartNoか？
     public static bool IsLastPart
     {
@@ -152,7 +148,6 @@ namespace LGLauncher
           return true;//IsAll
       }
     }
-
     //PartNo++
     public static void IncrementPartNo()
     {
@@ -285,11 +280,13 @@ namespace LGLauncher
       TsShortName = new Regex("[ $|()^　]").Replace(TsName, "_");      //batの特殊文字
       TsShortName = (5 < TsShortName.Length) ? TsShortName.Substring(0, 5) : TsShortName;
 
+      //作成中の *.ts.lwi？
       D2vPath = D2vPath ?? TsPath + ".pp.d2v";
       LwiPath = LwiPath ?? TsPath + ".pp.lwi";
       LwiFooterPath = LwiPath + "footer";
       SrtPath = SrtPath ?? Path.Combine(TsDir, TsNameWithoutExt + ".srt");
-
+ 
+      //作成済みの *.ts.lwi？
       if (IsAll)
       {
         if (File.Exists(D2vPath) == false && File.Exists(TsPath + ".d2v"))
@@ -325,9 +322,6 @@ namespace LGLauncher
     /// </summary>
     private static void Make_WorkDir()
     {
-      //App path
-      AppPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-
       //Dir作成
       LTopWorkDir = Path.Combine(AppDir, @"LWork");
       LSystemDir = Path.Combine(AppDir, @"LSystem");
@@ -375,7 +369,7 @@ namespace LGLauncher
     /// </summary>
     private static void Detect_PartNo()
     {
-      //LWorkDir, TsShortNameの設定前だと処理できない。
+      //LWorkDir,TsShortName設定前だと処理できない。
       if (LWorkDir == null) throw new Exception();
       if (TsShortName == null) throw new Exception();
 
@@ -406,7 +400,6 @@ namespace LGLauncher
         string no = name.Substring(len_title, len_no);
         return no;
       });
-
       // string  -->  int
       var intNums = strNums.Select(num =>
       {
@@ -477,13 +470,11 @@ namespace LGLauncher
             InputPlugin |= Plugin.D2v_MPEG2DecPlus;  //MPEG2DecPlus.dll優先 
           else if (DGDecode != null)
             InputPlugin |= Plugin.D2v_DGDecode;
-
           if (MPEG2DecPlus == null && DGDecode == null)
             throw new LGLException("not found d2v plugin");
         }
         else if (IsLwi)
           LSMASHSource = sercher.Get("LSMASHSource.dll");
-
       }
       else if (IsVpy)
       {

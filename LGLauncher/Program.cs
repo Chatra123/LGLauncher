@@ -7,7 +7,6 @@ using System.IO;
 #region region_title
 #endregion
 
-
 namespace LGLauncher
 {
   internal class Program
@@ -16,7 +15,6 @@ namespace LGLauncher
 
     private static void Main(string[] args)
     {
-
       ///*テスト用*/
       //var testArgs = new List<string>() { 
       //                                    "-part", 
