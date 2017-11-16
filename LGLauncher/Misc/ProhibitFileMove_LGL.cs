@@ -62,7 +62,7 @@ namespace LGLauncher
         if (File.Exists(PathList.SrtPath))
         {
           var size = new FileInfo(PathList.SrtPath).Length;
-          if (3 < size)  // -gt 3byte bom
+          if (3 < size)  // -gt 3byte UTF8_bom
           {
             var srt = new FileStream(PathList.SrtPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             LockItems.Add(srt);
@@ -78,8 +78,8 @@ namespace LGLauncher
     /// </summary>
     public static void Unlock()
     {
-      foreach (var fstream in LockItems)
-        fstream.Close();
+      foreach (var fs in LockItems)
+        fs.Close();
       LockItems = new List<FileStream>();
     }
 

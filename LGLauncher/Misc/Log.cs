@@ -18,7 +18,7 @@ namespace LGLauncher
     {
       string LogPath = null;
       {
-        //LogDirの想定
+        //LogDir is
         //　LWorkDir    通常
         //　AppDir      LWorkDir作成前に発生した LGLException用
         var AppPath = Assembly.GetExecutingAssembly().Location;
@@ -69,8 +69,10 @@ namespace LGLauncher
     /// </summary>
     public static void WriteLine(string line = "")
     {
-      if (writer == null) writer = CreateWriter();
-      if (writer != null) writer.WriteLine(line);
+      if (writer == null)
+        writer = CreateWriter();
+      if (writer != null)
+        writer.WriteLine(line);
     }
 
 

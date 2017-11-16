@@ -130,7 +130,7 @@ namespace LGLauncher
     //最後のLGLauncherプロセスか？
     public static bool IsLastProcess { get { return IsAll || IsLast_cmdline; } }
     //最後の SplitTrimか？
-    //  SplitTrim : フレーム数を取得してTrim()したavsをさらに分割したTrim()
+    //  SplitTrim : フレーム数を取得してTrim()したavsをさらに分割したavs
     public static bool IsLastSplit { get; private set; }
     //IsLastSplit更新
     public static void Update_IsLastSplit(bool islast)
@@ -280,7 +280,7 @@ namespace LGLauncher
       TsShortName = new Regex("[ $|()^　]").Replace(TsName, "_");      //batの特殊文字
       TsShortName = (5 < TsShortName.Length) ? TsShortName.Substring(0, 5) : TsShortName;
 
-      //作成中の *.ts.lwi？
+      //作成中の *.ts.pp.lwi？
       D2vPath = D2vPath ?? TsPath + ".pp.d2v";
       LwiPath = LwiPath ?? TsPath + ".pp.lwi";
       LwiFooterPath = LwiPath + "footer";

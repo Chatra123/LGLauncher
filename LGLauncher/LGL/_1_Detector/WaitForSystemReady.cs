@@ -80,7 +80,7 @@ namespace LGLauncher
       //  取得できなければ待機時間を追加
       hasSemaphore = false;
       {
-        const int timeout_min = 10;
+        const int timeout_min = 120;
         const string name = "LGL-41CDEAC6-6717";      //LGL
         //const string name = "V2P-33A2FE1F-0891";      //V2P
         semaphore = new Semaphore(multiRun, multiRun, name);

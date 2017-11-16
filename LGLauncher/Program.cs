@@ -54,9 +54,9 @@ namespace LGLauncher
         int[] splitTrim;
         if (PathList.IsPart)
         {
-          int EndFrame_Max = trimFrame[1];
+          int endFrame_Max = trimFrame[1];
           bool isLastSplit;
-          splitTrim = core.MakeSplitTrim(EndFrame_Max, out isLastSplit);
+          splitTrim = core.MakeSplitTrim(endFrame_Max, out isLastSplit);
           PathList.Update_IsLastSplit(isLastSplit);
         }
         else//IsAll

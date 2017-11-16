@@ -51,7 +51,7 @@ namespace LGLauncher
           cleaner.OldFile(0.0, PathList.LWorkDir, "*" + PathList.TsShortName + "*");
         }
 
-      // Mode = 1    古いファイル削除
+      // Mode = 2,1    古いファイル削除
       if (1 <= PathList.Mode_CleanWorkItem)
         if (PathList.IsLastPart)
         {
@@ -65,7 +65,7 @@ namespace LGLauncher
           cleaner.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.d2v");
           cleaner.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.lwi");
           cleaner.EmptyDir(PathList.LTopWorkDir);
-          //Windows Temp
+          //Windows Temp    DGIndex
           cleaner.OldFile(nDaysBefore, Path.GetTempPath(), "DGI_temp_*_*");
         }
     }
