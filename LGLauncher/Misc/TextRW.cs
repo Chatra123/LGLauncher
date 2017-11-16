@@ -1,23 +1,16 @@
-﻿/*
- * 最終更新日
- *   17/06/19
- *  
- * 概要
- *   - テキストファイルの読み書きにファイル共有設定をつける。
- *     System.IO.File.ReadAllLines();は別のプロセスが使用中のファイルを読み込めなかった。
- *     
- *   - アセンブリリソースの読込み 
- *  
- *  
- */
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace OctNov.IO
+/*
+ *   - テキストファイルの読み書きにファイル共有設定をつける。
+ *     System.IO.File.ReadAllLines();は別のプロセスが使用中のファイルを読み込めなかった。
+ *   - アセンブリリソースの読込み 
+ */
+namespace LGLauncher
 {
   /// <summary>
   /// 文字エンコード
@@ -29,7 +22,7 @@ namespace OctNov.IO
   ///  vpy                     UTF8_nobom
   ///  srt                     UTF8_bom
   /// </remarks>
-  internal class TextEnc
+  class TextEnc
   {
     public static readonly
       Encoding Ascii = Encoding.ASCII,
@@ -44,9 +37,9 @@ namespace OctNov.IO
   #region TextR
 
   /// <summary>
-  /// 共有設定を付けて読み込む
+  /// 共有設定を付けてテキストを読み込む
   /// </summary>
-  internal class TextR
+  class TextR
   {
     /// <summary>
     /// 共有設定を付けてテキストを読込む
@@ -56,11 +49,11 @@ namespace OctNov.IO
       enc = enc ?? TextEnc.Shift_JIS;
       try
       {
-        using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+        using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
         {
-          if (100 * 1024 * 1024 < stream.Length)// greater than 100 MB
+          if (100 * 1024 * 1024 < fs.Length)
             throw new Exception("read large file");
-          using (var reader = new StreamReader(stream, enc))
+          using (var reader = new StreamReader(fs, enc))
           {
             var text = new List<string>();
             while (!reader.EndOfStream)
@@ -82,11 +75,11 @@ namespace OctNov.IO
     {
       try
       {
-        using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+        using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
         {
-          if (100 * 1024 * 1024 < stream.Length)// greater than 100 MB
+          if (100 * 1024 * 1024 < fs.Length)
             throw new Exception("read large file");
-          using (var reader = new BinaryReader(stream))
+          using (var reader = new BinaryReader(fs))
           {
             var data = new List<byte>();
             while (true)
@@ -130,10 +123,17 @@ namespace OctNov.IO
       return text;
     }
 
+  }
+  #endregion
 
-    //=====================================
-    // lwi読込み用
-    //=====================================
+
+
+  #region LTextR
+  /// <summary>
+  /// lwi読込み用
+  /// </summary>
+  class LTextR
+  {
     public bool IsOpen { get { return reader != null; } }
     private FileStream fstream;
     private StreamReader reader;
@@ -141,17 +141,16 @@ namespace OctNov.IO
     /// <summary>
     /// Constructor
     /// </summary>
-    public TextR(string path, Encoding enc = null)
+    public LTextR(string path)
     {
-      enc = enc ?? TextEnc.Shift_JIS;
       try
       {
         fstream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-        reader = new StreamReader(fstream, enc);
+        reader = new StreamReader(fstream, TextEnc.Shift_JIS);
       }
       catch { /* do nothing */ }
     }
-    ~TextR()
+    ~LTextR()
     {
       Close();
     }
@@ -161,20 +160,19 @@ namespace OctNov.IO
     /// </summary>
     public void Close()
     {
-      if (reader == null)
-        return;
-      reader.Close();
+      if (reader != null)
+        reader.Close();
     }
 
     /// <summary>
     /// Ｎ行読込む
     /// </summary>
-    /// <param name="NLines">読み込む最大行数</param>
+    /// <param name="NLines">読込行数</param>
     /// <returns>
-    /// 読み込んだテキスト、０～Ｎ行
-    /// EOFに到達すると NLinesに満たない行数を返す。
+    /// ０～Ｎ行
+    /// EOFに到達するとNLinesに満たない。
     /// </returns>
-    public List<string> ReadNLines(int NLines)
+    public List<string> ReadLines(int NLines)
     {
       var text = new List<string>();
       for (int i = 0; i < NLines; i++)
@@ -193,32 +191,12 @@ namespace OctNov.IO
 
 
 
-  #region TextW
-
+  #region LTextW
   /// <summary>
-  /// テキスト書込み
+  /// lwi書込み用
   /// </summary>
-  internal class TextW
+  class LTextW
   {
-    /// <summary>
-    /// バイナリ追記
-    /// </summary>
-    public static bool AppendBytes(string path, IEnumerable<byte> data)
-    {
-      try
-      {
-        var stream = new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.Read);
-        stream.Write(data.ToArray(), 0, data.Count());
-        stream.Close();
-        return true;
-      }
-      catch { return false; }
-    }
-
-
-    //=====================================
-    // lwi書込み用
-    //=====================================
     public bool IsOpen { get { return writer != null; } }
     private FileStream fstream;
     private StreamWriter writer;
@@ -226,17 +204,16 @@ namespace OctNov.IO
     /// <summary>
     /// Constructor
     /// </summary>
-    public TextW(string path, Encoding enc = null)
+    public LTextW(string path)
     {
-      enc = enc ?? TextEnc.Shift_JIS;
       try
       {
         fstream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.Read);
-        writer = new StreamWriter(fstream, enc);
+        writer = new StreamWriter(fstream, TextEnc.Shift_JIS);
       }
       catch { /* do nothing */ }
     }
-    ~TextW()
+    ~LTextW()
     {
       Close();
     }
@@ -246,9 +223,8 @@ namespace OctNov.IO
     /// </summary>
     public void Close()
     {
-      if (writer == null)
-        return;
-      writer.Close();
+      if (writer != null)
+        writer.Close();
     }
 
     /// <summary>
@@ -277,7 +253,7 @@ namespace OctNov.IO
     }
 
     /// <summary>
-    /// バイト列の書込み
+    /// バイナリ書込み
     /// </summary>
     public void WriteByte(IEnumerable<byte> data)
     {

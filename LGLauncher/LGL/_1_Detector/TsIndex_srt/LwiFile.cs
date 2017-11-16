@@ -133,9 +133,9 @@ namespace LGLauncher
 
       //IsPart
       //  作成済みのlwiかどうかはチェックしていないので、
-      //  作成済みのlwiでも最後の"index=..."行以降を必ず切り捨ててている。
-      var reader = new TextR(PathList.LwiPath);
-      var writer = new TextW(PathList.LwiPathInLWork);
+      //  -lastのlwiでも最後の"index=..."行以降を必ず切り捨てる。
+      var reader = new LTextR(PathList.LwiPath);
+      var writer = new LTextW(PathList.LwiPathInLWork);
       if (reader.IsOpen == false || writer.IsOpen == false)
         throw new LGLException("lwi reader,writer open error");
       writer.SetNewline_n();
@@ -144,7 +144,7 @@ namespace LGLauncher
       {
         var readBuff = new List<string>();
         var writeBuff = new List<string>();
-        readBuff = reader.ReadNLines(100);
+        readBuff = reader.ReadLines(100);
         if (readBuff.Count < 100)
           throw new LGLException("lwi text is less than 100 lines");
         //簡易ファイルチェック
@@ -165,7 +165,7 @@ namespace LGLauncher
          * 10        * 0.01      =   0.1         1,300 
          * 10        * 0.06      =   0.6         8,000
          * Thread.Sleep(60);
-         * readBuff = reader.ReadNLines(8 * 1000);
+         * readBuff = reader.ReadLines(8 * 1000);
          * で実測 6.0 - 8.0 MB/secほど。
          * */
         //読
@@ -173,7 +173,7 @@ namespace LGLauncher
         while (true)
         {
           Thread.Sleep(60);
-          readBuff = reader.ReadNLines(8 * 1000);
+          readBuff = reader.ReadLines(8 * 1000);
           if (readBuff.Count() == 8 * 1000)
           {
             writer.WriteLine(writeBuff);           //write file
@@ -253,7 +253,7 @@ namespace LGLauncher
       const string Tag = "</LibavReaderIndexFile>\n";
       byte[] footer = null;
 
-      //数秒間隔でfooterファイル全体が更新されるので、
+      //footerファイルは数秒間隔でファイル全体が更新されるので、
       //</LibavReaderIndexFile>を確認するまで繰り返す。
       for (int i = 0; i < 3; i++)
       {
