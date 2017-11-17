@@ -19,8 +19,6 @@ namespace LGLauncher.Bat
     public static List<string> GetLogo_and_Param()
     {
       var result = Run();
-      if (result == null)
-        throw new LGLException("LogoSelector return null");
       if (result.Count < 2)
         throw new LGLException("LogoSelector return value is -lt 2 lines");
       /*                      { logo path, param path } */
@@ -34,8 +32,6 @@ namespace LGLauncher.Bat
     public static List<string> GetLogo()
     {
       var result = Run();
-      if (result == null)
-        throw new LGLException("LogoSelector return null");
       if (result.Count < 1)
         throw new LGLException("LogoSelector return value is -lt 1 line");
       /*                      { logo path } */
@@ -62,13 +58,13 @@ namespace LGLauncher.Bat
 
       if (PathList.Is1stPart || PathList.IsAll)
       {
-        var log = new StringBuilder();
-        log.AppendLine("  [ LogoSelector ]");
-        log.AppendLine("    path   :  " + path);
-        log.AppendLine("    args   :  " + args);
-        log.AppendLine("    return :");
-        log.Append(result);
-        Log.WriteLine(log.ToString());
+        var text = new StringBuilder();
+        text.AppendLine("  [ LogoSelector ]");
+        text.AppendLine("    path   :  " + path);
+        text.AppendLine("    args   :  " + args);
+        text.AppendLine("    return :");
+        text.Append(result);
+        Log.WriteLine(text.ToString());
       }
       return split;
     }

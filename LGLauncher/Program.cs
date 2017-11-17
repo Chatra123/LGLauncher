@@ -25,6 +25,7 @@ namespace LGLauncher
       //args = testArgs.ToArray();
 
 
+
       //例外を捕捉する
       AppDomain.CurrentDomain.UnhandledException += OctNov.Excp.ExceptionInfo.OnUnhandledException;
 
