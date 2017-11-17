@@ -20,7 +20,7 @@
 1. LSystemフォルダに  
     - logoGuillo.exe  
     - avs2pipemod.exe  
-    - LSMASHSource.dll  
+    - LSMASHSource.dll (L-SMASH Works r921)  
    を入れる。
 
 2. LSystemフォルダの LogoSelector.exeを実行してiniを作成し、[LogoDir]を設定する。  
@@ -31,13 +31,13 @@
 	tsファイル名にチャンネル名が埋め込まれていれば -chは必要ありません。
 
 lwi作成中  
-    LGLauncher.exe  -part  -ts "C:\Video.ts"  -ch "abc"  
+    LGLauncher.exe  -part  -ts "C:\Video.ts"  -ch "AbcTV"  
 最後のみ  
-    LGLauncher.exe  -last  -ts "C:\Video.ts"  -ch "abc"  
+    LGLauncher.exe  -last  -ts "C:\Video.ts"  -ch "AbcTV"  
 
 	
 lwi作成済み  
-    LGLauncher.exe         -ts "C:\Video.ts"  -ch "abc"  
+    LGLauncher.exe  "C:\Video AbcTV.ts"  
 
 
 ------------------------------------------------------------------
@@ -45,12 +45,7 @@ lwi作成済み
 
     -ts "C:\video.ts"
 tsファイルのフルパス  
-tsのパスを元に各ファイルパスを作成します。  
-"C:\video.ts.pp.d2v"  
-"C:\video.ts.pp.lwi"  
-"C:\video.ts.pp.lwifooter"  
-"C:\video.srt"  
-tsと同じフォルダに d2v, lwi, srtをおいてください。  
+tsと同じフォルダに pp.d2v, pp.lwi, srtをおいてください。  
 
 
     -part  
@@ -125,14 +120,6 @@ Tvtplay用チャプターファイルを出力
 2 : 毎回出力する  
 
 
-    Output_Ogm  0  
-Ogm形式のチャプターファイルを出力  
-短い本編、ＣＭは除去されています。  
-0 : 出力しない  
-1 : -lastのみ出力する  
-2 : N/A
-
-
     Output_Frame  1  
 フレームファイルを出力  
 短い本編、ＣＭは除去されています。  
@@ -149,7 +136,7 @@ Ogm形式のチャプターファイルを出力
 2 : 毎回出力する  
 
 
-    Output_Scp  0  
+    Output_Jls  0  
 Chapter_exe、LogoFrameの結果を出力
 0 : 出力しない  
 1 : -lastのみ出力する  
@@ -162,7 +149,7 @@ Tvtplayチャプターの出力フォルダ
 
 
     ChapDir_Misc  C:\Frame_and_misc_Directory\  
-Ogm chapter、フレームファイルの出力フォルダ  
+フレームファイル、Chapter_exe、LogoFrameの出力フォルダ  
 フォルダが存在しない場合はＴＳと同じ場所に出力します。  
 
 
@@ -228,16 +215,8 @@ Ogm chapter、フレームファイルの出力フォルダ
  
 * 作業ファイルのパスが２５０文字を超えると正常に動きません。深いフォルダにおかないでください。
 
-
 * LSystemフォルダにSystemIdleMonitor.exeがあれば、ＣＰＵ使用率が６０％以下になるまで待機
 してからLogoGuilloを実行します。
-
-
-* lwi作成済のtsファイルを  
- LGLauncher.exe         -ts "C:\Video.ts"  -ch "abc"  
-で処理すると通常どおり処理します。  
- LGLauncher.exe  -last  -ts "C:\Video.ts"  -ch "abc"  
-だと30minごとに分割し、最初のチャプター作成が少し早くなります。  
 
   
 ------------------------------------------------------------------
