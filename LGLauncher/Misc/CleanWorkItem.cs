@@ -23,9 +23,9 @@ namespace LGLauncher
     public static void Clean_Beforehand()
     {
       //LWorkDir
-      if (PathList.Is1stPart || PathList.IsAll)
+      if (PathList.Is1stPart)
       {
-        if (PathList.Is1stPart)
+        if (PathList.IsPart)
           cleaner.OldFile(0.0, PathList.LWorkDir, "*.p?*.*");
         else if (PathList.IsAll)
           cleaner.OldFile(0.0, PathList.LWorkDir, "*.all.*");

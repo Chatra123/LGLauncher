@@ -25,7 +25,6 @@ namespace LGLauncher
       //args = testArgs.ToArray();
 
 
-
       //例外を捕捉する
       AppDomain.CurrentDomain.UnhandledException += OctNov.Excp.ExceptionInfo.OnUnhandledException;
 
@@ -35,7 +34,6 @@ namespace LGLauncher
       {
         bool initialized = core.Initialize(args);
         if (initialized == false) return;
-
         //有効フレーム範囲取得
         AvsVpyMaker.Init();
         trimFrame = AvsVpyMaker.GetTrimFrame();
@@ -53,20 +51,20 @@ namespace LGLauncher
         //分割トリム作成
         //有効フレーム範囲を適度に分割して初回のチャプター作成を早くする。
         int[] splitTrim;
-        if (PathList.IsPart)
+        if (PathList.DisableSplit)
+        {
+          splitTrim = trimFrame;
+          PathList.Update_IsLastSplit(true);
+        }
+        else
         {
           int endFrame_Max = trimFrame[1];
           bool isLastSplit;
           splitTrim = core.MakeSplitTrim(endFrame_Max, out isLastSplit);
           PathList.Update_IsLastSplit(isLastSplit);
         }
-        else//IsAll
-        {
-          splitTrim = trimFrame;
-          PathList.Update_IsLastSplit(true);
-        }
 
-        //LogoGuillo bat実行
+        /* LogoGuillo bat実行 */
         bool HasError = false;
         try
         {
@@ -94,7 +92,7 @@ namespace LGLauncher
           AvsVpyCommon.CreateDummy_OnError();
         }
 
-        //チャプター出力
+        /* チャプター出力 */
         try
         {
           var concat = Frame.EditFrame.Concat(splitTrim);
@@ -110,7 +108,7 @@ namespace LGLauncher
         if (PathList.IsLastSplit || PathList.IsAll || HasError)
           break;
         else
-          PathList.IncrementPartNo();  //PartNo++
+          PathList.IncrementPartNo();  /* PartNo++ */
       }
 
 
@@ -136,14 +134,14 @@ namespace LGLauncher
           return false;
         }
         if (setting.Enable <= 0) return false;
-        if (args.Count() == 0) return false;               //”引数０”なら設定ファイル作成後に終了
+        if (args.Count() == 0) return false;     /* ”引数０”なら設定ファイル作成後に終了 */
 
-        //パス作成
+        /* パス作成 */
         PathList.Init(cmdline, setting);
         ProhibitFileMove_LGL.Lock();
         CleanWorkItem.Clean_Beforehand();
 
-        if (PathList.Is1stPart || PathList.IsAll)
+        if (PathList.Is1stPart)
           Log.WriteLine(cmdline.Result());
         return true;
       }
@@ -227,16 +225,15 @@ namespace LGLauncher
         {
           if (PathList.IsJLS)
           {
-            var logo = Bat.LogoSelector.GetLogo();
+            var logo = Bat.LogoSelector.LogoPath;
             var jl_cmd = PathList.JL_Cmd_OnRec;
-            batPath = Bat.Bat_JLS.Make_OnRec(avsPath,
-                                             logo[0], jl_cmd);
+            batPath = Bat.Bat_JLS.Make_OnRec(avsPath, logo, jl_cmd);
           }
           else if (PathList.IsLG)
           {
-            var logo_param = Bat.LogoSelector.GetLogo_and_Param();
-            batPath = Bat.Bat_LG.Make(avsPath, srtPath,
-                                      logo_param[0], logo_param[1]);
+            var logo = Bat.LogoSelector.LogoPath;
+            var param = Bat.LogoSelector.ParamPath;
+            batPath = Bat.Bat_LG.Make(avsPath, srtPath, logo, param);
           }
         }
         return batPath;

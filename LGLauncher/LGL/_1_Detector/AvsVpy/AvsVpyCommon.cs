@@ -236,7 +236,7 @@ namespace LGLauncher
     {
       int[] trimFrame_prv;
       {
-        if (PathList.IsAll || PathList.Is1stPart)
+        if (PathList.Is1stPart)
         {
           trimFrame_prv = new int[] { 0, 0 };
         }

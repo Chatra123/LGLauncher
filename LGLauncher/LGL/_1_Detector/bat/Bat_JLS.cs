@@ -77,16 +77,16 @@ namespace LGLauncher.Bat
       string scpos_catPath = PathList.TsShortName + ".jls.scpos.cat.txt";
       string logoFrame_catPath = PathList.TsShortName + ".jls.logoframe.cat.txt";
       string join_logo_scpPath = PathList.Join_Logo_Scp;
-      string jls_resultPath = PathList.TsShortName + ".jls.last.result.txt";
+      string jls_resultPath = PathList.TsShortName + ".jls.last.txt";
 
       for (int i = 0; i < batText.Count; i++)
       {
         var line = batText[i];
-        line = Regex.Replace(line, "#SCPosPath#", scpos_catPath);
-        line = Regex.Replace(line, "#LogoFrameText#", logoFrame_catPath);
+        line = Regex.Replace(line, "#chapter_exe_Result#", scpos_catPath);
+        line = Regex.Replace(line, "#LogoFrame_Result#", logoFrame_catPath);
         line = Regex.Replace(line, "#join_logo_scp#", join_logo_scpPath);
         line = Regex.Replace(line, "#JL_CmdPath#", jl_CmdPath);
-        line = Regex.Replace(line, "#JLS_ResultPath#", jls_resultPath);
+        line = Regex.Replace(line, "#JLS_Result#", jls_resultPath);
         batText[i] = line;
       }
 

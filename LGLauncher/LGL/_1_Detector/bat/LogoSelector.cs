@@ -13,62 +13,35 @@ namespace LGLauncher.Bat
   /// </summary>
   static class LogoSelector
   {
-    /// <summary>
-    /// LogoGuillo用　Logo、Param取得
-    /// </summary>
-    public static List<string> GetLogo_and_Param()
-    {
-      var result = Run();
-      if (result.Count < 2)
-        throw new LGLException("LogoSelector return value is -lt 2 lines");
-      /*                      { logo path, param path } */
-      return new List<string> { result[0], result[1] };
-    }
-
-
-    /// <summary>
-    /// Join_logo_Scp用  Logo取得
-    /// </summary>
-    public static List<string> GetLogo()
-    {
-      var result = Run();
-      if (result.Count < 1)
-        throw new LGLException("LogoSelector return value is -lt 1 line");
-      /*                      { logo path } */
-      return new List<string> { result[0] };
-    }
-
+    public static string LogoPath { get; private set; }
+    public static string ParamPath { get; private set; }
+    public static bool HasLogo { get { return string.IsNullOrEmpty(LogoPath) == false; } }
+    public static bool HasParam { get { return string.IsNullOrEmpty(ParamPath) == false; } }
+    public static bool HasLogo_Param { get { return HasLogo && HasParam; } }
+    public static string ResultLog { get; private set; }
 
     /// <summary>
     /// LogoSelector実行
     /// </summary>
-    private static List<string> Run()
+    public static void Run(string exe, string ch, string program, string tsPath)
     {
-      if (File.Exists(PathList.LogoSelector) == false)
-        throw new LGLException("LogoSelector does not exist");
+      string args = string.Format("  \"{0}\"   \"{1}\"   \"{2}\"  ",
+                              ch, program, tsPath);
+      string stdout = Start_GetStdout(exe, args);
+      var split = stdout.Split(new string[] { Environment.NewLine }, StringSplitOptions.None).ToList();
+      if (1 <= split.Count) LogoPath = split[0];
+      if (2 <= split.Count) ParamPath = split[1];
 
-      string path, args;
-      {
-        path = PathList.LogoSelector;
-        args = string.Format("  \"{0}\"   \"{1}\"   \"{2}\"  ",
-                              PathList.Channel, PathList.Program, PathList.TsPath);
-      }
-      string result = Start_GetStdout(path, args);
-      var split = result.Split(new string[] { Environment.NewLine }, StringSplitOptions.None).ToList();
-
-      if (PathList.Is1stPart || PathList.IsAll)
-      {
-        var text = new StringBuilder();
-        text.AppendLine("  [ LogoSelector ]");
-        text.AppendLine("    path   :  " + path);
-        text.AppendLine("    args   :  " + args);
-        text.AppendLine("    return :");
-        text.Append(result);
-        Log.WriteLine(text.ToString());
-      }
-      return split;
+      var text = new StringBuilder();
+      text.AppendLine("  [ LogoSelector ]");
+      text.AppendLine("    path      :  " + exe);
+      text.AppendLine("    args      :  " + args);
+      text.AppendLine("    return    :");
+      text.Append(stdout);
+      text.AppendLine("    LogoPath  :  " + LogoPath);
+      text.AppendLine("    ParamPath :  " + ParamPath);
+      ResultLog = text.ToString();
     }
-
 
 
     /// <summary>
@@ -86,10 +59,10 @@ namespace LGLauncher.Bat
       try
       {
         prc.Start();
-        string result = prc.StandardOutput.ReadToEnd();
+        string stdout = prc.StandardOutput.ReadToEnd();
         prc.WaitForExit();
         prc.Close();
-        return result;
+        return stdout;
       }
       catch (Exception e)
       {

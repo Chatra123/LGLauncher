@@ -32,12 +32,27 @@ namespace LGLauncher.Frame
         //     *.p1.jls.result.txt  -->  *.p1.frame.txt
         JLS.JLS.Result_to_Frame(false);
 
-        //Chapter_exe, LogoFrame
-        //  make *.cat 
+        //make *.cat 
+        //  Chapter_exe, LogoFrame
         if (PathList.IsPart)
         {
+          //concat
+          //  *.p1.jls.scpos.txt  -->  *.scpos.cat.txt
           JLS.Chapter_exe.Concat(trimFrame);
           JLS.LogoFrame.Concat(trimFrame);
+        }
+        else if (PathList.IsAll)
+        {
+          //copy
+          //  *.all.jls.scpos.txt  -->  *.scpos.cat.txt
+          string src = PathList.WorkPath;
+          string dst = Path.Combine(PathList.LWorkDir, PathList.TsShortName);
+          try
+          {
+            File.Copy(src + ".jls.scpos.txt", dst + ".jls.scpos.cat.txt", true);
+            File.Copy(src + ".jls.logoframe.txt", dst + ".jls.logoframe.cat.txt", true);
+          }
+          catch { Log.WriteLine("fail to copy cat file in LWorkDir"); }
         }
 
         //Re-execute JLS with *.cat
@@ -49,6 +64,7 @@ namespace LGLauncher.Frame
           List<int> jls_last_frame = JLS.JLS.Result_to_Frame(true);
           return jls_last_frame;
         }
+
       }
 
       //Join_Logo_Scp  &  LogoGuillo
@@ -137,21 +153,20 @@ namespace LGLauncher.Frame
           File.WriteAllText(path, text, TextEnc.UTF8_bom);
       }
 
-
       //SCPos & logoframe
       if (PathList.IsJLS)
         if (PathList.IsLastPart && 1 <= PathList.Output_Jls)
         {
+          //  *.scpos.cat.txt
           string src = Path.Combine(PathList.LWorkDir, PathList.TsShortName);
           string dst = Path.Combine(PathList.ChapDir_Misc, PathList.TsNameWithoutExt);
           try
           {
-            File.Copy(src + ".jls.scpos.cat.txt", dst + ".scpos.txt");
-            File.Copy(src + ".jls.logoframe.cat.txt", dst + ".logoframe.txt");
+            File.Copy(src + ".jls.scpos.cat.txt", dst + ".scpos.txt", true);
+            File.Copy(src + ".jls.logoframe.cat.txt", dst + ".logoframe.txt", true);
           }
-          catch { }
+          catch { Log.WriteLine("fail to copy cat file to ChapDir"); }
         }
-
 
     }
   }//class
