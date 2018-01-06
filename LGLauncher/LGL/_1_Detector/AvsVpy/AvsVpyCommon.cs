@@ -9,7 +9,6 @@ using System.Threading;
 
 namespace LGLauncher
 {
-  using OctNov.IO;
 
   /// <summary>
   /// Avs or Vpy作成

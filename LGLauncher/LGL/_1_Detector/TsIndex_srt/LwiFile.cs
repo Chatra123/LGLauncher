@@ -9,7 +9,6 @@ using System.Threading;
 
 namespace LGLauncher
 {
-  using OctNov.IO;
 
   #region LwiFileMover
   /// <summary>
@@ -36,14 +35,10 @@ namespace LGLauncher
       {
         if (File.Exists(dstPath))
           File.Delete(dstPath);
-        Thread.Sleep(500);
-
         if (isSameRoot)
           File.Move(srcPath, dstPath);
         else
           File.Copy(srcPath, dstPath);
-
-        Thread.Sleep(500);
         lock_lwi = new FileStream(dstPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
       }
       catch
@@ -73,12 +68,10 @@ namespace LGLauncher
           lock_lwi.Close();
           lock_lwi = null;
         }
-
         if (isSameRoot)
           File.Move(srcPath, dstPath);
         else
           File.Delete(srcPath);
-        Thread.Sleep(500);
       }
       catch
       {
@@ -123,7 +116,6 @@ namespace LGLauncher
     /// </summary>
     public void Format()
     {
-      //IsAll
       if (PathList.IsAll)
       {
         //コピーして終了

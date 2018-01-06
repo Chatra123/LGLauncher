@@ -7,7 +7,6 @@ using System.Linq;
 
 namespace LGLauncher.Frame
 {
-  using OctNov.IO;
 
   static class EditFrame
   {
