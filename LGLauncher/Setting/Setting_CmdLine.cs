@@ -22,7 +22,7 @@ namespace LGLauncher
     public string SrtPath { get; private set; }
     public string Channel { get; private set; }
     public string Program { get; private set; }
-
+    public bool DisableSplit { get; private set; }
 
     /// <summary>
     /// constructor
@@ -56,9 +56,10 @@ namespace LGLauncher
         .Add("d2v=", "d2v path", (v) => this.D2vPath = v)
         .Add("lwi=", "lwi path", (v) => this.LwiPath = v)
         .Add("srt=", "srt path", (v) => this.SrtPath = v)
-        .Add("ch=", "channel name", (v) => this.Channel = v)
-        .Add("channel=", "channel name", (v) => this.Channel = v)
-        .Add("program=", "program name", (v) => this.Program = v)
+        .Add("ch=", "channel", (v) => this.Channel = v)
+        .Add("channel=", "channel", (v) => this.Channel = v)
+        .Add("program=", "program", (v) => this.Program = v)
+        .Add("disablesplit", "", (v) => this.DisableSplit = v != null)
         .Add("and_more", "help message", (v) => { /*action*/ });
 
       try
@@ -81,17 +82,17 @@ namespace LGLauncher
     /// </summary>
     public string Result()
     {
-      var sb = new StringBuilder();
-      sb.AppendLine("  [ App Command Line ]");
-      sb.AppendLine("    IsPart    =  " + IsPart);
-      sb.AppendLine("    IsLast    =  " + IsLast);
-      sb.AppendLine("    TsPath    =  " + TsPath);
-      sb.AppendLine("    D2vPath   =  " + D2vPath);
-      sb.AppendLine("    LwiPath   =  " + LwiPath);
-      sb.AppendLine("    SrtPath   =  " + SrtPath);
-      sb.AppendLine("    Channel   =  " + Channel);
-      sb.AppendLine("    Program   =  " + Program);
-      return sb.ToString();
+      var text = new StringBuilder();
+      text.AppendLine("  [ App CommandLine ]");
+      text.AppendLine("    IsPart    =  " + IsPart);
+      text.AppendLine("    IsLast    =  " + IsLast);
+      text.AppendLine("    TsPath    =  " + TsPath);
+      text.AppendLine("    D2vPath   =  " + D2vPath);
+      text.AppendLine("    LwiPath   =  " + LwiPath);
+      text.AppendLine("    SrtPath   =  " + SrtPath);
+      text.AppendLine("    Channel   =  " + Channel);
+      text.AppendLine("    Program   =  " + Program);
+      return text.ToString();
     }
 
 

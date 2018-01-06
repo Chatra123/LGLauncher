@@ -16,12 +16,13 @@ namespace LGLauncher
   [Serializable]
   public class Setting_File
   {
-    const double CurrentRev = 16.3;
+    const double CurrentRev = 19.0;
 
     public double Rev = 0.0;
-    public string memo31 = "  Set InputPlugin     d2v  or  lwi  ";
-    public string memo32 = "  Set Detector        JLS  or  LG   ";
-    public string memo33 = "      cannot set d2v with JLS       ";
+    public string memo31 = "  InputPlugin is  d2v or lwi          ";
+    public string memo32 = "  Detector    is  JLS or LG  or Both  ";
+    public string memo33 = "      cannot set d2v with JLS        ";
+    public string memo34 = "      cannot set d2v with Both       ";
     public int Enable = 1;
     public string InputPlugin = "  lwi  ";
     public string Detector = "  LG  ";
@@ -41,14 +42,14 @@ namespace LGLauncher
     public string space_3 = "";
 
     //chapter directory
-    public string ChapDir_Tvtp = @"  C:\Tvtp_Directory\           ";
+    public string ChapDir_Tvtp = @"  C:\Tvtp_Directory\            ";
     public string ChapDir_Misc = @"  C:\Frame_and_misc_Directory\  ";
     public string space_4 = "";
-
+    //work item
     public int CleanWorkItem = 2;
 
 
-    //設定ファイル名
+    //XMLファイル名
     private static readonly string
             AppPath = System.Reflection.Assembly.GetExecutingAssembly().Location,
             AppDir = Path.GetDirectoryName(AppPath),
