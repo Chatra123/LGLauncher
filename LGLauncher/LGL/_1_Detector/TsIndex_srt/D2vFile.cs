@@ -13,7 +13,6 @@ using System.Threading;
  */
 namespace LGLauncher
 {
-  using OctNov.IO;
   class D2vFile
   {
     /// <summary>

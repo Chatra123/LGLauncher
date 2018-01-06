@@ -9,8 +9,6 @@ using System.Diagnostics;
 
 namespace LGLauncher
 {
-  using OctNov.IO;
-
   /// <summary>
   /// avsの作成、総フレーム数の取得
   /// </summary>

@@ -7,7 +7,6 @@ using System.Linq;
 
 namespace LGLauncher.Frame
 {
-  using OctNov.IO;
 
   class LogoGuillo
   {

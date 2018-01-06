@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
      */
 namespace LGLauncher
 {
-  using OctNov.IO;
+
   class SrtFile
   {
     /// <summary>

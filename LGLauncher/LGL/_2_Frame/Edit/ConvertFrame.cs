@@ -10,8 +10,6 @@ using System.Text.RegularExpressions;
 
 namespace LGLauncher.Frame
 {
-  using OctNov.IO;
-
   /// <summary>
   /// フレームリストの編集、各形式への変換
   /// </summary>
@@ -111,8 +109,7 @@ namespace LGLauncher.Frame
       //
       // CM Lengthが長ければ newListに本編｛frameList[i], frameList[i+1]｝を加える。
       //　　　　　　短ければ newList[last]を次の本編終端 frameList[i + 1]に置き換え短いＣＭをつぶす。
-      //ただし、開始直後のＣＭはそのまま、
-      //開始直後に短いＣＭがあっても本編には加えない。
+      //ただし、開始直後のＣＭはそのまま、開始直後に短いＣＭがあっても本編には加えない。
       var newList = new List<int>();
       int mini_cm = (int)(mini_cm_sec * 29.970);// sec --> frame
 

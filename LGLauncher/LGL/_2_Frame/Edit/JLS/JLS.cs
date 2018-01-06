@@ -10,7 +10,6 @@ using System.Text.RegularExpressions;
 
 namespace LGLauncher.Frame.JLS
 {
-  using OctNov.IO;
 
   public static class JLS
   {

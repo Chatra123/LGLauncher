@@ -8,8 +8,6 @@ using System.Text.RegularExpressions;
 
 namespace LGLauncher.Bat
 {
-  using OctNov.IO;
-
   static class Bat_LG
   {
     /// <summary>
