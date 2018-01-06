@@ -19,10 +19,10 @@ namespace LGLauncher
     const double CurrentRev = 19.0;
 
     public double Rev = 0.0;
-    public string memo31 = "  InputPlugin is  d2v or lwi          ";
-    public string memo32 = "  Detector    is  JLS or LG  or Both  ";
+    public string memo31 = "  InputPlugin is  d2v or lwi         ";
+    public string memo32 = "  Detector    is  JLS or LG or Auto  ";
     public string memo33 = "      cannot set d2v with JLS        ";
-    public string memo34 = "      cannot set d2v with Both       ";
+    public string memo34 = "      cannot set d2v with Auto       ";
     public int Enable = 1;
     public string InputPlugin = "  lwi  ";
     public string Detector = "  LG  ";

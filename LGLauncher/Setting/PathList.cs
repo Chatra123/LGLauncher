@@ -187,7 +187,7 @@ namespace LGLauncher
     private static Detector Detector;
     public static bool IsJLS { get { return Detector.HasFlag(Detector.Join_Logo_Scp); } }
     public static bool IsLG { get { return Detector.HasFlag(Detector.LogoGuillo); } }
-    private static bool Detector_AutoSelect { get { return Detector.HasFlag(Detector.AutoSelect); } }
+    private static bool DetectorIsAutoSelect { get { return Detector.HasFlag(Detector.AutoSelect); } }
     public static int Detector_MultipleRun { get; private set; }
     public static readonly string[] DetectorName =
       new string[] { "Chapter_exe", "LogoFrame", "LogoGuillo" };
@@ -305,7 +305,7 @@ namespace LGLauncher
       bool isLwi = plugin == "lwi".ToLower();
       bool isJLS = detector == "JLS".ToLower();
       bool isLG = detector == "LG".ToLower();
-      bool autoSelect = detector == "Both".ToLower();
+      bool autoSelect = detector == "Auto".ToLower();
       InputPlugin = isD2v ? Plugin.D2v
                   : isLwi ? Plugin.Lwi
                   : Plugin.None;
@@ -490,7 +490,7 @@ namespace LGLauncher
       }
 
       //Detector
-      if (IsJLS || Detector_AutoSelect)
+      if (IsJLS || DetectorIsAutoSelect)
       {
         avsinp_aui = searcher.Get("avsinp.aui");
         Chapter_exe = searcher.Get("Chapter_exe.exe");
@@ -499,14 +499,14 @@ namespace LGLauncher
         JL_Cmd_OnRec = searcher.Get("JL_標準_Rec.txt");
         JL_Cmd_Standard = searcher.Get("JL_標準.txt");
       }
-      if (IsLG || Detector_AutoSelect)
+      if (IsLG || DetectorIsAutoSelect)
       {
         LogoGuillo = searcher.Get("LogoGuillo.exe");
       }
 
       //
       Bat.LogoSelector.Run(LogoSelector, Channel, Program, TsPath);
-      if (Detector_AutoSelect)
+      if (DetectorIsAutoSelect)
       {
         if (Bat.LogoSelector.HasLogo_Param)
           Detector |= Detector.LogoGuillo;
@@ -571,8 +571,8 @@ namespace LGLauncher
         Log.WriteLine("        " + TsPath);
         Log.WriteLine("    InputPlugin  :  " + InputPlugin.ToString());
         Log.WriteLine("    Detector     :  " + Detector.ToString());
-        if (Detector_AutoSelect)
-          Log.WriteLine("                  ( DetectorAutoSelect = true )");
+        if (DetectorIsAutoSelect)
+          Log.WriteLine("                  ( DetectorIsAutoSelect = true )");
       }
       if (IsLastProcess)
         Log.WriteLine("    IsLast       :  " + IsLastProcess);
@@ -592,7 +592,7 @@ namespace LGLauncher
         throw new LGLException("None Detector");
       if (AvsVpy == AvsVpy.None)
         throw new LGLException("None AvsVpy");
-      if (IsD2v && Detector_AutoSelect)
+      if (IsD2v && DetectorIsAutoSelect)
         throw new LGLException("Cannot select d2v with Both");
       if (IsD2v && IsJLS)
         throw new LGLException("Cannot select d2v with JLS");
