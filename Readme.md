@@ -47,20 +47,16 @@ lwi作成済み
 tsファイルのフルパス  
 tsと同じフォルダに pp.d2v, pp.lwi, srtをおいてください。  
 
-
     -part  
 lwi作成中のＴＳファイルの処理  
-
 
     -last  
 最後の処理であることを明示する。  
 チャプター出力や、JL_標準.txtを用いてjoin_logo_scpの再実行などが行われます。  
 
-
     -ch      "abc"
     -channel "abc"
 LogoSelecterに渡すチャンネル名  
-
 
     
 ------------------------------------------------------------------
@@ -80,8 +76,11 @@ lwiパスの個別指定
 
     -srt "D:\rec\video.srt"
 srtパスの個別指定
+
     
-    
+    -DisableSplit
+Trimが必要ないところでは使用しない  
+
 
 ------------------------------------------------------------------
 ### 設定
@@ -98,8 +97,11 @@ lwi :  lwiで処理
     Detector  LG  
 JLS :  Join_Logo_Scpで処理  
 LG  :  LogoGuilloで処理  
+Auto:  LogoSelectorの戻り値に  
+       ParamがあればLogoGuillo  
+       LogoだけならJoin_Logo_Scp  
 
-
+	   
     Detector_MultipleRun  1  
 Windows内での chapter_exe, LogoGuillo, logoframe同時実行数
 
@@ -110,7 +112,6 @@ Windows内での chapter_exe, LogoGuillo, logoframe同時実行数
 
     Regard_NsecCM_AsMain  14.0  
 １４．０秒以下のＣＭ部を除去  
-
 
     Output_Tvtp  2  
 Tvtplay用チャプターファイルを出力  
@@ -174,23 +175,23 @@ Tvtplayチャプターの出力フォルダ
 	MPEG2DecPlus.dll  
     LSMASHSource.dll  
 
-##### ファイルがあれば使用
-    SystemIdleMonitor.exe  
-
 ##### LogoGuillo
     logoGuillo.exe  
 
-##### join_logo_scp
+##### Join_Logo_Scp
     avsinp.aui  
     chapter_exe.exe  
     logoframe.exe  
     join_logo_scp.exe  
     JL__標準.txt  
     JL_標準_Rec.txt  
+	
+##### ファイルがあれば使用
+    SystemIdleMonitor.exe  	
         
     
 ------------------------------------------------------------------
-### join_logo_scp
+### Join_Logo_Scp
 
 - 設定ファイルで  
  ``` <InputPlugin>    lwi    </InputPlugin> ```  
@@ -203,11 +204,6 @@ Tvtplayチャプターの出力フォルダ
    * join_logo_scp.exe  
    * logoframe.exe  
    を入れる。   
- 
-
-- JL_標準_Rec.txtは JL_標準.txtから必要なさそうな項目をコメントアウトしただけで、  
-  それ以外は同じです。
- 
 
  
 ------------------------------------------------------------------
