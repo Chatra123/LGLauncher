@@ -97,9 +97,8 @@ lwi :  lwiで処理
     Detector  LG  
 JLS :  Join_Logo_Scpで処理  
 LG  :  LogoGuilloで処理  
-Auto:  LogoSelectorの戻り値に  
-       ParamがあればLogoGuillo  
-       LogoだけならJoin_Logo_Scp  
+Auto:  ParamファイルがあればLogoGuillo  
+       LogoファイルだけならJoin_Logo_Scp  
 
 	   
     Detector_MultipleRun  1  
