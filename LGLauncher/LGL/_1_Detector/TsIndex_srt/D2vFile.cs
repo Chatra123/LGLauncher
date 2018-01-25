@@ -8,8 +8,7 @@ using System.Threading;
 /*
  * d2v
  *  - 作成途中のd2vを読み込む。 
- *  - 最終行を削除してd2vとして使用できる形にする。 
- *
+ *  - 最終行を削除してd2vとして利用できる形にする。 
  */
 namespace LGLauncher
 {
@@ -29,12 +28,12 @@ namespace LGLauncher
 
       //簡易ファイルチェック
       {
-        bool isD2v = true;
+        bool isValid = true;
         for (int i = 18; i < 30; i++)
         {
-          isD2v &= Regex.IsMatch(readText[i], @"\d+ \d+ \d+ \d+ \d+ \d+ \d+ .*");
+          isValid &= Regex.IsMatch(readText[i], @"\d+ \d+ \d+ \d+ \d+ \d+ \d+ .*");
         }
-        if (isD2v == false)
+        if (isValid == false)
           throw new LGLException("d2v format error");
       }
 

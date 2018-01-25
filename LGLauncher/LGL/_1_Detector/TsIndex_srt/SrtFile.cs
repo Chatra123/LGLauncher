@@ -24,22 +24,6 @@ namespace LGLauncher
       //srtはすでに削除されている可能性もある。
       if (File.Exists(PathList.SrtPath) == false) return "";
 
-      if (PathList.IsAll)
-      {
-        //コピーして終了
-        string copyDstPath = Path.Combine(PathList.LWorkDir, PathList.SrtName);
-        try
-        {
-          File.Copy(PathList.SrtPath, copyDstPath);
-          return copyDstPath;
-        }
-        catch
-        {
-          Log.WriteLine("srt file copy error");
-          return "";
-        }
-      }
-
       //読
       var srtText = TextR.ReadAllLines(PathList.SrtPath, TextEnc.UTF8_bom);
       if (srtText == null)

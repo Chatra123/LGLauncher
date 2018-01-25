@@ -8,6 +8,18 @@ using System.Threading;
 using System.Threading.Tasks;
 
 
+/*
+ * 
+ *   LGLauncher r20での作業ファイル名の変更に対応していないので動作しない
+ *   中身に変更はないのでall, DisableSplitのときにリネーム、コピーすればいい。
+ *   LGLFrameChecker自体ほとんど使用していないので手動コピーで対応する。
+ *       
+ *   r19                         r20
+ *      *.all.frame.txt     -->     *.p1.frame.txt                   
+ *      *.all.0__57000.avs  -->     *.p1.0__57000.avs
+ * 
+ */
+
 
 namespace LGLFrameChecker
 {
@@ -242,7 +254,7 @@ namespace LGLFrameChecker
       }
 
       //beginEnd取得
-      frameset.beginEnd = GetTrimFrame_fromName(dir, avsName);
+      frameset.beginEnd = GetTrimRange_fromName(dir, avsName);
       if (frameset.beginEnd == null)
       {
         frameset.ErrMessage = "  Error:  fail to get beginEnd frame from avsName  " + avsName;
@@ -283,7 +295,7 @@ namespace LGLFrameChecker
     /// </summary>
     /// <param name="nameKey">対象のファイル名。ワイルドカード指定可</param>
     /// <returns>開始、終了フレーム数</returns>
-    private static int[] GetTrimFrame_fromName(string directory, string nameKey)
+    private static int[] GetTrimRange_fromName(string directory, string nameKey)
     {
       //ファイル検索
       var files = Directory.GetFiles(directory, nameKey);

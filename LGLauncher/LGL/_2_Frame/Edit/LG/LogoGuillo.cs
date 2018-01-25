@@ -13,7 +13,7 @@ namespace LGLauncher.Frame
     /// <summary>
     /// 前回までのフレームファイルと、今回　生成したフレームをつなげる。
     /// </summary>
-    public static List<int> Concat(int[] trimFrame)
+    public static List<int> Concat(int[] trimRange)
     {
       //logoGuilloによって作成されるファイル                    *.p3.frame.txt
       string addList_Path = PathList.WorkPath + ".frame.txt";
@@ -34,9 +34,9 @@ namespace LGLauncher.Frame
         {
           old_CatList = ConvertFrame.Read_FrameFile(catList_Path);    // from  *.frame.cat.txt
           if (old_CatList == null && add_List == null)
-            throw new LGLException("not found frame file  or  is invalid");
+            throw new LGLException("frame file is not found or invalid");
         }
-        //ファイルが見つからないなら new()
+        //ファイルが見つからないので new()
         old_CatList = old_CatList ?? new List<int>();
         add_List = add_List ?? new List<int>();
       }
@@ -46,10 +46,9 @@ namespace LGLauncher.Frame
       List<int> new_CatList;
       {
         new_CatList = new List<int>(old_CatList);
-
-        if (PathList.IsPart && trimFrame != null)
+        if (trimRange != null)
         {
-          int beginFrame = trimFrame[0];
+          int beginFrame = trimRange[0];
           add_List = add_List.Select((f) => f + beginFrame).ToList();
         }
         new_CatList.AddRange(add_List);
@@ -63,15 +62,13 @@ namespace LGLauncher.Frame
       //書
       //次回の参照用に上書き                    *.frame.cat.txt
       File.WriteAllLines(catList_Path, new_CatText, TextEnc.Shift_JIS);
-      //catPath_partはDetect_PartNo()で使用されるので必ず作成すること。
+      //catPath_partはDetect_PartNo_fromFileName()で使用されるので必ず作成すること。
       //                                        *.p3.frame.cat.txt
       string catPath_part = PathList.WorkPath + ".frame.cat.txt";
       File.WriteAllLines(catPath_part, new_CatText, TextEnc.Shift_JIS);
 
       return new_CatList;
     }
-
-
 
   }
 

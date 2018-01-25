@@ -15,28 +15,23 @@ namespace LGLauncher
 
     private static void Main(string[] args)
     {
-      ///*テスト用*/
-      //var testArgs = new List<string>() { 
-      //                                    "-part", 
-      //                                    "-ts",
-      //                                    @".\cap8s.ts",
-      //                                    "-ch", "A", 
-      //                                  };
-      //args = testArgs.ToArray();
+      //args = new string[] {
+      //  @".\cap8s.ts",
+      //};
 
 
       //例外を捕捉する
       AppDomain.CurrentDomain.UnhandledException += OctNov.Excp.ExceptionInfo.OnUnhandledException;
 
 
-      int[] trimFrame = null;        //avsの有効フレーム範囲
+      int[] trimRange = null;        //avsの有効フレーム範囲
       try
       {
         bool initialized = core.Initialize(args);
         if (initialized == false) return;
         //有効フレーム範囲取得
         AvsVpyMaker.Init();
-        trimFrame = AvsVpyMaker.GetTrimFrame();
+        trimRange = AvsVpyMaker.GetTrimRange();
       }
       catch (LGLException e)
       {
@@ -45,7 +40,6 @@ namespace LGLauncher
         return;
       }
 
-
       while (true)
       {
         //分割トリム作成
@@ -53,12 +47,12 @@ namespace LGLauncher
         int[] splitTrim;
         if (PathList.DisableSplit)
         {
-          splitTrim = trimFrame;
+          splitTrim = trimRange;
           PathList.Update_IsLastSplit(true);
         }
         else
         {
-          int endFrame_Max = trimFrame[1];
+          int endFrame_Max = trimRange[1];
           bool isLastSplit;
           splitTrim = core.MakeSplitTrim(endFrame_Max, out isLastSplit);
           PathList.Update_IsLastSplit(isLastSplit);
@@ -75,7 +69,7 @@ namespace LGLauncher
         {
           /*
           * ◇エラー発生時の動作について
-          * 　・作成済みのavs  *.p3.2000__3000.avs  を削除
+          * 　・作成済みのavs  *.p3.2001__3000.avs  を削除
           * 　・ダミーavs      *.p3.2000__2000.avs  を作成
           * 　　次回のLGLauncherでダミーavsの 2000, 2000を読み込んでもらう。
           * 
@@ -105,13 +99,14 @@ namespace LGLauncher
           Log.WriteLine(e.ToString());
         }
 
-        if (PathList.IsLastSplit || PathList.IsAll || HasError)
+        if (PathList.IsLastSplit || HasError)
           break;
         else
           PathList.IncrementPartNo();  /* PartNo++ */
       }
 
 
+      Log.WriteLine("  exit");
       Log.Close();
       CleanWorkItem.Clean_Lastly();
     }
@@ -151,7 +146,7 @@ namespace LGLauncher
       /// 分割トリム作成
       /// </summary>
       /// <param name="endFrame_Max">作成可能な終了フレーム</param>
-      /// <param name="isLastSplit">分割トリムの最後か？</param>
+      /// <param name="isLastSplit">endFrame_Maxに到達したか？</param>
       public int[] MakeSplitTrim(int endFrame_Max, out bool isLastSplit)
       {
         /*
@@ -164,12 +159,12 @@ namespace LGLauncher
         //開始フレーム　　（　直前の終了フレーム＋１　）
         int beginFrame;
         {
-          //  trimFrame_prv[0] : previous begin frame
-          //  trimFrame_prv[1] : previous end   frame
-          int[] trimFrame_prv = (2 <= PathList.PartNo)
-                                    ? AvsVpyCommon.GetTrimFrame_previous()
+          //  trimRange_prv[0] : previous begin frame
+          //  trimRange_prv[1] : previous end   frame
+          int[] trimRange_prv = (2 <= PathList.PartNo)
+                                    ? AvsVpyCommon.GetTrimRange_previous()
                                     : null;
-          beginFrame = (trimFrame_prv != null) ? trimFrame_prv[1] + 1 : 0;
+          beginFrame = (trimRange_prv != null) ? trimRange_prv[1] + 1 : 0;
         }
         int[] splitTrim;
         {
@@ -206,17 +201,17 @@ namespace LGLauncher
       /// <summary>
       /// LogoGuillo実行用のbat作成
       /// </summary>
-      public string MakeDetectorBat(int[] trimFrame)
+      public string MakeDetectorBat(int[] trimRange)
       {
         //avs
         string avsPath;
         {
-          avsPath = AvsVpyMaker.MakeScript(trimFrame);
+          avsPath = AvsVpyMaker.MakeScript(trimRange);
         }
         //srt
         string srtPath;
         {
-          int beginFrame = trimFrame[0];
+          int beginFrame = trimRange[0];
           double shiftSec = 1.0 * beginFrame / 29.970;
           srtPath = new SrtFile().Format(shiftSec);
         }
@@ -243,7 +238,7 @@ namespace LGLauncher
       /// <summary>
       /// LogoGuillo実行
       /// </summary>
-      public void RunDetectorBat(int[] trimFrame, string batPath)
+      public void RunDetectorBat(int[] trimRange, string batPath)
       {
         //retry
         //  Windows sleep でタイムアウトしたらリトライする。
@@ -261,7 +256,7 @@ namespace LGLauncher
             {
               //logoframeが終了しないことがあったのでタイムアウトを設定
               //  ”avsの総時間”の３倍
-              int len_frame = trimFrame[1] - trimFrame[0] + 1;
+              int len_frame = trimRange[1] - trimRange[0] + 1;
               double len_sec = 1.0 * len_frame / 29.970;
               timeout_ms = (int)(len_sec * 3) * 1000;
               timeout_ms = timeout_ms <= 30 * 1000 ? 90 * 1000 : timeout_ms;

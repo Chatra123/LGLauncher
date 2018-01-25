@@ -17,9 +17,9 @@ namespace LGLauncher
     AvsScripter scripter = new AvsScripter();
 
     /// <summary>
-    /// トリムフレーム取得
+    /// トリム範囲取得
     /// </summary>
-    public override int[] GetTrimFrame()
+    public override int[] GetTrimRange()
     {
       //総フレーム数取得用スクリプトの作成、実行
       {
@@ -44,25 +44,25 @@ namespace LGLauncher
       //開始フレーム　　（　直前の終了フレーム＋１　）
       int beginFrame;
       {
-        //  trimFrame_prv[0] : previous begin frame
-        //  trimFrame_prv[1] : previous end   frame
-        int[] trimFrame_prv = (2 <= PathList.PartNo)
-                                  ? AvsVpyCommon.GetTrimFrame_previous()
+        //  trimRange_prv[0] : previous begin frame
+        //  trimRange_prv[1] : previous end   frame
+        int[] trimRange_prv = (2 <= PathList.PartNo)
+                                  ? AvsVpyCommon.GetTrimRange_previous()
                                   : null;
-        beginFrame = (trimFrame_prv != null) ? trimFrame_prv[1] + 1 : 0;
+        beginFrame = (trimRange_prv != null) ? trimRange_prv[1] + 1 : 0;
       }
-      int[] trimFrame = new int[] { beginFrame, totalframe - 1 };
-      return trimFrame;
+      int[] trimRange = new int[] { beginFrame, totalframe - 1 };
+      return trimRange;
     }
 
 
     /// <summary>
     /// Trim付きスクリプト作成
     /// </summary>
-    public override string MakeScript(int[] trimFrame)
+    public override string MakeScript(int[] trimRange)
     {
-      var text = scripter.CreateText(trimFrame);
-      string path = AvsVpyCommon.OutScript(trimFrame, text, PathList.AvsVpyExt, TextEnc.Shift_JIS);
+      var text = scripter.CreateText(trimRange);
+      string path = AvsVpyCommon.OutputScript(trimRange, text, PathList.AvsVpyExt, TextEnc.Shift_JIS);
       return path;
     }
 
@@ -159,7 +159,7 @@ namespace LGLauncher
     /// <summary>
     /// avsスクリプトの文字列を作成
     /// </summary>
-    public List<string> CreateText(int[] trimFrame)
+    public List<string> CreateText(int[] trimRange)
     {
       //読
       var text = TextR.ReadFromResource("LGLauncher.Resource.TrimAvs.avs");
@@ -190,22 +190,18 @@ namespace LGLauncher
           line = Regex.Replace(line, "#LSMASHSource#", PathList.LSMASHSource);
           line = Regex.Replace(line, "#TsPath#", PathList.TsPath);
         }
-
         //Detector
         if (PathList.IsJLS)
           line = Regex.Replace(line, "#JLS#", "");
         else if (PathList.IsLG)
           line = Regex.Replace(line, "#LG#", "");
-
         //Trim
-        if (PathList.IsPart)
-        {
-          int beginFrame = trimFrame[0];
-          int endFrame = trimFrame[1];
-          line = Regex.Replace(line, "#EnableTrim#", "");
-          line = Regex.Replace(line, "#BeginFrame#", "" + beginFrame);
-          line = Regex.Replace(line, "#EndFrame#", "" + endFrame);
-        }
+        int beginFrame = trimRange[0];
+        int endFrame = trimRange[1];
+        line = Regex.Replace(line, "#EnableTrim#", "");
+        line = Regex.Replace(line, "#BeginFrame#", "" + beginFrame);
+        line = Regex.Replace(line, "#EndFrame#", "" + endFrame);
+
         text[i] = line.Trim();
       }
 

@@ -112,48 +112,45 @@ namespace LGLauncher
     //    previous work path    C:\EDCB\Write\Write_PF\LGLauncher\LWork\010101_ショップジ_0a1b308c1\ショップジ.p2
     //                  name    ショップジ.p2
     public static string WorkPath { get { return Path.Combine(LWorkDir, WorkName); } }
-    public static string WorkName { get { return IsAll ? TsShortName + ".all" : TsShortName + ".p" + PartNo; } }
+    public static string WorkName { get { return TsShortName + ".p" + PartNo; } }
     public static string WorkPath_prv { get { return Path.Combine(LWorkDir, WorkName_prv); } }
     public static string WorkName_prv { get { return TsShortName + ".p" + (PartNo - 1); } }
 
-    //  [  PartNo  ]
-    //  分割されたavsの連番
-    //     1 <= No  IsPart
-    //    No  =  0  uninitialized value and detect PartNo from file 
-    //    No  = -1  IsAll
+    /*
+     * IsAll
+     *     - 録画後のＴＳ用
+     *     - １回のLGLauncherでＴＳ全体を処理する。
+     *     - avsは30分ごとにTrim()。avsごとにPartNo++
+     *     
+     * IsPart
+     *     - 録画中のＴＳ用
+     *     - コマンドラインに -part, -lastがある
+     *     - 数回のLGLauncherでＴＳ全体を処理する。
+     *     - avsは30分ごとにTrim()。avsごとにPartNo++
+     *     
+     * PartNo
+     *     - 分割されたavsの連番 
+     */
     public static int PartNo { get; private set; }
     public static bool Is1stPart { get { return PartNo == 1 || IsAll; } }
     public static bool IsPart { get; private set; }
     public static bool IsAll { get { return IsPart == false; } }
 
-    //コマンドラインに -IsLast があるか？
-    private static bool IsLast_on_cmdline;
-    //最後のLGLauncherプロセスか？
-    public static bool IsLastProcess { get { return IsAll || IsLast_on_cmdline; } }
-    //最後の SplitTrimか？
-    //  SplitTrim : フレーム数を取得してTrim()したavsをさらに分割したavs
+
+    /*
+     * IsLastSplit      最後の SplitTrimか？           (各プロセスごとにIsLastSplitがある)
+     * IsLastProcess    最後の LGLauncherプロセスか？  ( コマンドラインに -last          )
+     * IsLastPart       最後の PartNoか？              ( IsLastProcess & IsLastSplit     )
+     */
+    // SplitTrim : フレーム数を取得してTrim()したavsをさらに分割したavs
     public static bool DisableSplit { get; private set; }
     public static bool IsLastSplit { get; private set; }
-    public static void Update_IsLastSplit(bool islast)
-    {
-      IsLastSplit = islast;
-    }
-    //最後の PartNoか？
-    public static bool IsLastPart
-    {
-      get
-      {
-        if (IsPart)
-          return IsLastProcess && IsLastSplit;
-        else
-          return true;//IsAll
-      }
-    }
+    public static void Update_IsLastSplit(bool islast) { IsLastSplit = islast; }
+    private static bool IsLast_on_cmdline;
+    public static bool IsLastProcess { get { return IsAll || IsLast_on_cmdline; } }
+    public static bool IsLastPart { get { return IsLastProcess && IsLastSplit; } }
     //PartNo++
-    public static void IncrementPartNo()
-    {
-      PartNo++;
-    }
+    public static void IncrementPartNo() { PartNo++; }
 
 
     //  [  LSystem binary path  ]  
@@ -191,9 +188,9 @@ namespace LGLauncher
     public static int Detector_MultipleRun { get; private set; }
     public static readonly string[] DetectorName =
       new string[] { "Chapter_exe", "LogoFrame", "LogoGuillo" };
-    //LogoGuillo
+    //  LogoGuillo
     public static string LogoGuillo { get; private set; }
-    //Join_Logo_Scp
+    //  Join_Logo_Scp
     public static string avsinp_aui { get; private set; }
     public static string Chapter_exe { get; private set; }
     public static string LogoFrame { get; private set; }
@@ -203,15 +200,12 @@ namespace LGLauncher
     public static string JL_Cmd_Standard { get; private set; }
 
     //  [  Chapter  ]
-    //edit chapter
     public static double Regard_NsecCM_AsMain { get; private set; }
     public static double Regard_NsecMain_AsCM { get; private set; }
-    //chapter output mode
     public static int Output_RawFrame { get; private set; }
     public static int Output_Frame { get; private set; }
     public static int Output_Tvtp { get; private set; }
     public static int Output_Jls { get; private set; }
-    //chapter directory
     public static string ChapDir_Tvtp { get; private set; }
     public static string ChapDir_Misc { get; private set; }
 
@@ -327,7 +321,7 @@ namespace LGLauncher
     /// </summary>
     private static void Make_WorkDir()
     {
-      //Dir作成
+      //LSystem
       LTopWorkDir = Path.Combine(AppDir, @"LWork");
       LSystemDir = Path.Combine(AppDir, @"LSystem");
       if (Directory.Exists(LTopWorkDir) == false)
@@ -335,7 +329,7 @@ namespace LGLauncher
       if (Directory.Exists(LSystemDir) == false)
         Directory.CreateDirectory(LSystemDir);
 
-      //Dir path
+      //WorkDir
       //  衝突は考えない。
       string dirName;
       {
@@ -378,8 +372,8 @@ namespace LGLauncher
       if (LWorkDir == null) throw new Exception();
       if (TsShortName == null) throw new Exception();
 
-      PartNo = IsPart ? Detect_PartNo_fromFileName() : -1;
-      if (IsPart && PartNo <= 0)
+      PartNo = IsAll ? 1 : Detect_PartNo_fromFileName();
+      if (PartNo <= 0)
         throw new LGLException("Invalid PartNo.  PartNo = " + PartNo);
     }
     /// <summary>
@@ -388,8 +382,7 @@ namespace LGLauncher
     private static int Detect_PartNo_fromFileName()
     {
       //  search *.p2.frame.cat.txt
-      var files = Directory.GetFiles(LWorkDir,
-                                     TsShortName + ".p*.frame.cat.txt");
+      var files = Directory.GetFiles(LWorkDir, TsShortName + ".p*.frame.cat.txt");
       if (files.Count() == 0)
         return 1;//not found
 
@@ -504,7 +497,6 @@ namespace LGLauncher
         LogoGuillo = searcher.Get("LogoGuillo.exe");
       }
 
-      //
       Bat.LogoSelector.Run(LogoSelector, Channel, Program, TsPath);
       if (DetectorIsAutoSelect)
       {
@@ -571,8 +563,6 @@ namespace LGLauncher
         Log.WriteLine("        " + TsPath);
         Log.WriteLine("    InputPlugin  :  " + InputPlugin.ToString());
         Log.WriteLine("    Detector     :  " + Detector.ToString());
-        if (DetectorIsAutoSelect)
-          Log.WriteLine("                  ( DetectorIsAutoSelect = true )");
       }
       if (IsLastProcess)
         Log.WriteLine("    IsLast       :  " + IsLastProcess);
@@ -596,6 +586,9 @@ namespace LGLauncher
         throw new LGLException("Cannot select d2v with Both");
       if (IsD2v && IsJLS)
         throw new LGLException("Cannot select d2v with JLS");
+      if (DetectorIsAutoSelect)
+        if (IsLG == false && IsJLS == false)
+          throw new LGLException("Fail to select detector.   Check Logo and Param path");
     }
 
 

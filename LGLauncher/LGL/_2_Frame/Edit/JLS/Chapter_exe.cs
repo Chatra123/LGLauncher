@@ -16,7 +16,7 @@ namespace LGLauncher.Frame.JLS
     /// <summary>
     ///  chapter_exeのscposを連結
     /// </summary>
-    public static void Concat(int[] trimFrame)
+    public static void Concat(int[] trimRange)
     {
       //chapter_exeによって作成されるファイル                   *.p3.jls.scpos.txt
       string addText_Path = PathList.WorkPath + ".jls.scpos.txt";
@@ -35,13 +35,13 @@ namespace LGLauncher.Frame.JLS
         {
           old_CatText = TextR.ReadAllLines(catText_Path);          // from  *.jls.scpos.cat.txt
           if (old_CatText == null && addText == null)
-            throw new LGLException("not detect previous scpos file");
+            throw new LGLException("scpos file is not found");
         }
         //最終行の # SCPos:1000 2000 は除去
         addText = addText ?? new List<string>();
         addText = addText.Where(line => line.Trim().IndexOf("#") != 0)
-                                     .Where(line => string.IsNullOrWhiteSpace(line) == false)
-                                     .ToList();
+                         .Where(line => string.IsNullOrWhiteSpace(line) == false)
+                         .ToList();
         old_CatText = old_CatText ?? new List<string>();
         old_CatText = old_CatText.Where(line => line.Trim().IndexOf("#") != 0)
                                  .Where(line => string.IsNullOrWhiteSpace(line) == false)
@@ -53,17 +53,14 @@ namespace LGLauncher.Frame.JLS
       List<string> new_CatText;
       {
         new_CatText = new List<string>(old_CatText);
-        if (trimFrame == null)
-          throw new LGLException("trimFrame is null");
+        if (trimRange == null)
+          throw new LGLException("trimRange is null");
+        int beginFrame = trimRange[0];
+        int endFrame = trimRange[1];
+        //CHAPTER03  の 03 部分のオフセット数
+        int chapcnt_offset = old_CatText.Count / 2;
+        addText = AppendOffset_Scpos(addText, chapcnt_offset, beginFrame);
 
-        int beginFrame = trimFrame[0];
-        int endFrame = trimFrame[1];
-        if (PathList.IsPart)
-        {
-          //CHAPTER03  の 03 部分のオフセット数
-          int chapcnt_offset = old_CatText.Count / 2;
-          addText = AppendOffset_Scpos(addText, chapcnt_offset, beginFrame);
-        }
         new_CatText.AddRange(addText);
         new_CatText.Add("# SCPos:" + endFrame + " " + endFrame);
         //簡略化のため連結部の繋ぎ目はそのまま
@@ -110,8 +107,6 @@ namespace LGLauncher.Frame.JLS
        * CHAPTER02=00:01:08.602
        * CHAPTER02NAME=31フレーム ★★ SCPos:2081 2080
        */
-
-      //文字抽出
       Match match_timecode, match_name;
       {
         const string timecode_pattern = @"CHAPTER(?<ChapCnt>\d+)=(?<Hour>\d+):(?<Min>\d+):(?<Sec>\d+).(?<MSec>\d+)";
@@ -123,24 +118,20 @@ namespace LGLauncher.Frame.JLS
           throw new LGLException("scpos text regex match error");
       }
 
-      //文字列から抽出する値
+      //string --> int
       int chapCnt;
       TimeSpan timecode;
       string timetext;        //00:01:08.602
       string Mute_Mark;       //31フレーム ★★ 
       int SC_End, SC_Begin;
-
-      //文字　-->　数値
       try
       {
         chapCnt = int.Parse(match_timecode.Groups["ChapCnt"].Value);
-
         int hour = int.Parse(match_timecode.Groups["Hour"].Value);
         int min = int.Parse(match_timecode.Groups["Min"].Value);
         int sec = int.Parse(match_timecode.Groups["Sec"].Value);
         int msec = int.Parse(match_timecode.Groups["MSec"].Value);
         timecode = new TimeSpan(0, hour, min, sec, msec);
-
         Mute_Mark = match_name.Groups["Mute_Mark"].Value;
         SC_End = int.Parse(match_name.Groups["SC_End"].Value);
         SC_Begin = int.Parse(match_name.Groups["SC_Begin"].Value);
@@ -158,7 +149,7 @@ namespace LGLauncher.Frame.JLS
       SC_End += frame_offset;
       SC_Begin += frame_offset;
 
-      //update line
+      //new line
       string new_timecode_line = string.Format("Chapter{0:D2}={1}",
                                                chapCnt, timetext);
       string new_name_line = string.Format("Chapter{0:D2}Name={1}SCPos:{2} {3}",

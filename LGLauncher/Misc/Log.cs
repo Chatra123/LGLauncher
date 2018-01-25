@@ -20,7 +20,7 @@ namespace LGLauncher
       {
         //LogDir is
         //　LWorkDir    通常
-        //　AppDir      LWorkDir作成前に発生した LGLException用
+        //　AppDir      LWorkDir作成前に例外が発生したとき
         var AppPath = Assembly.GetExecutingAssembly().Location;
         var AppDir = Path.GetDirectoryName(AppPath);
         var AppName = Path.GetFileNameWithoutExtension(AppPath);
@@ -28,17 +28,17 @@ namespace LGLauncher
         LogDir = LogDir ?? PathList.LWorkDir;
         LogDir = LogDir ?? AppDir;
         string LogName = PathList.TsShortName ?? AppName;
-
         LogPath = Path.Combine(LogDir, "_" + LogName + ".sys.log");
       }
 
       try
       {
-        writer = new StreamWriter(LogPath, true, Encoding.UTF8);       //追記、UTF-8 bom
+        //追記、UTF-8 bom
+        writer = new StreamWriter(LogPath, true, Encoding.UTF8);
       }
       catch { /*失敗*/ }
 
-      //成功、ヘッダー書込み
+      //ヘッダー
       if (writer != null)
       {
         writer.AutoFlush = true;
@@ -57,7 +57,6 @@ namespace LGLauncher
     {
       if (writer != null)
       {
-        WriteLine("  exit");
         writer.Close();
         writer = null;
       }
@@ -73,6 +72,7 @@ namespace LGLauncher
         writer = CreateWriter();
       if (writer != null)
         writer.WriteLine(line);
+      Console.Error.WriteLine(line);
     }
 
 

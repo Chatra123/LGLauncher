@@ -23,13 +23,9 @@ namespace LGLauncher
     /// </summary>
     public static void Init()
     {
+      //作成途中のd2v, lwiファイルを利用できるようにフォーマットを整える。
       if (IndexHasFormatted == false)
       {
-        /*
-         * 作成途中のd2v, lwiファイルを利用できるようにフォーマットを整える。
-         *   d2v  -->  最終行を削除
-         *   lwi  -->  最後のindex= 以降を削除 
-         */
         IndexHasFormatted = true;
         if (PathList.IsD2v)
           new D2vFile().Format();
@@ -41,18 +37,18 @@ namespace LGLauncher
               null;
     }
     /// <summary>
-    /// トリムフレーム取得
+    /// トリム範囲取得
     /// </summary>
-    public static int[] GetTrimFrame()
+    public static int[] GetTrimRange()
     {
-      return maker.GetTrimFrame();
+      return maker.GetTrimRange();
     }
     /// <summary>
-    /// スクリプト作成
+    /// avs作成
     /// </summary>
-    public static string MakeScript(int[] trimFrame)
+    public static string MakeScript(int[] trimRange)
     {
-      return maker.MakeScript(trimFrame);
+      return maker.MakeScript(trimRange);
     }
   }
 
@@ -61,8 +57,8 @@ namespace LGLauncher
   /// </summary>
   abstract class AbstractAvsMaker
   {
-    public abstract int[] GetTrimFrame();
-    public abstract string MakeScript(int[] trimFrame);
+    public abstract int[] GetTrimRange();
+    public abstract string MakeScript(int[] trimRange);
   }
 
 
@@ -79,7 +75,7 @@ namespace LGLauncher
     /// </summary>
     public static double[] GetInfo_fromText(string infoPath)
     {
-      var infoText = new List<string>();
+      var info = new List<string>();
 
       for (int retry = 1; retry <= 3; retry++)
       {
@@ -89,9 +85,8 @@ namespace LGLauncher
           continue;
         };
 
-        infoText = TextR.ReadAllLines(infoPath);
-        //line count check
-        if (infoText == null || infoText.Count <= 1)
+        info = TextR.ReadAllLines(infoPath);
+        if (info == null || info.Count <= 1)
         {
           Thread.Sleep(500);
           continue;
@@ -99,17 +94,17 @@ namespace LGLauncher
         else
           break;   //取得成功
       }
-      if (infoText == null || infoText.Count <= 1)
+      if (info == null || info.Count <= 1)
         throw new LGLException("info file is invalid");
 
       try
       {
-        double frame = double.Parse(infoText[0]);
+        double frame = double.Parse(info[0]);
         return new double[] { frame };
       }
       catch
       {
-        throw new LGLException("info parse error");
+        throw new LGLException("frame count parse error");
       }
     }
 
@@ -117,51 +112,49 @@ namespace LGLauncher
 
 
 
-    #region GetTrimFrame
+    #region GetTrimRange
 
     /// <summary>
-    /// 今回のトリムフレーム数取得
+    /// 今回のトリム範囲取得
     /// </summary>
-    public static int[] GetTrimFrame()
+    public static int[] GetTrimRange()
     {
-      return GetTrimFrame_fromName(PathList.WorkName + ".*__*" + PathList.AvsVpyExt);
+      return GetTrimRange_fromName(PathList.WorkName + ".*__*" + PathList.AvsVpyExt);
     }
 
     /// <summary>
-    /// 前回のトリムフレーム数取得
+    /// 前回のトリム範囲取得
     /// </summary>
-    public static int[] GetTrimFrame_previous()
+    public static int[] GetTrimRange_previous()
     {
-      return GetTrimFrame_fromName(PathList.WorkName_prv + ".*__*" + PathList.AvsVpyExt);
+      return GetTrimRange_fromName(PathList.WorkName_prv + ".*__*" + PathList.AvsVpyExt);
     }
 
     /// <summary>
-    /// ファイル名からトリムフレーム数取得
+    /// ファイル名からトリム範囲取得
     /// </summary>
     /// <param name="nameKey">対象のファイル名。ワイルドカード指定可</param>
     /// <returns>開始、終了フレーム数</returns>
-    private static int[] GetTrimFrame_fromName(string nameKey)
+    private static int[] GetTrimRange_fromName(string nameKey)
     {
       if (PathList.LWorkDir == null)
         return null;
       var files = Directory.GetFiles(PathList.LWorkDir, nameKey);
       if (files.Count() != 1)
       {
-        Log.WriteLine("  Could'nt specify trim range." + "  file Count() = " + files.Count());
+        Log.WriteLine("  Could'nt specify trim range." + "  files.Count() = " + files.Count());
         Log.WriteLine("    nameKey = " + nameKey);
         return null;
       }
 
       //TsShortName.p1.0__1000.avs
-      //TsShortName.all.0__1000.avs
       //  <begin>      0
       //  <end>     1000
       var regex = new Regex(@".*\.(?<begin>\d+)__(?<end>\d+)\.[(avs)|(vpy)]", RegexOptions.IgnoreCase);
-
       Match match = regex.Match(files[0]);
       if (match.Success)
       {
-        //文字　→　数値
+        //string --> int
         string sbegin = match.Groups["begin"].Value;
         string send = match.Groups["end"].Value;
         try
@@ -172,36 +165,34 @@ namespace LGLauncher
         }
         catch
         {
-          // parse error
-          return null;
+          return null; // parse error
         }
       }
-      else  // match error
-        return null;
+      else
+        return null;  // match error
     }
 
-    #endregion GetTrimFrame
+    #endregion GetTrimRange
 
 
 
-    #region OutScript
+    #region OutputScript
 
     /// <summary>
     /// Scriptファイル作成
     /// </summary>
-    public static string OutScript(int[] trimFrame, List<string> scriptText,
-                                   string ext, Encoding enc)
+    public static string OutputScript(int[] trimRange, List<string> scriptText,
+                                      string ext, Encoding enc)
     {
       //長さチェック
-      //  30frame以下だと logoGuilloの avs2pipemodがエラーで落ちる。
+      //   30frame以下だと LogoGuilloの avs2pipemodがエラーで落ちる。
       //  120frame以下なら no frame errorと表示されて終了する。
-      //  150frame以上に設定する。
-      int beginFrame = trimFrame[0];
-      int endFrame = trimFrame[1];
+      //  150frame以上に設定。
+      int beginFrame = trimRange[0];
+      int endFrame = trimRange[1];
       int len = endFrame - beginFrame + 1;
       if (150 <= len)
       {
-        //書
         string outPath = string.Format("{0}.{1}__{2}{3}",
                                        PathList.WorkPath,
                                        beginFrame,
@@ -227,30 +218,30 @@ namespace LGLauncher
     /// </summary>
     /// <remarks>
     /// ・作成済みのavsファイルはあらかじめ削除しておくこと。
-    /// ・TrimFrame数を進めないために　trimFrame_prv[1], trimFrame_prv[1]　にする。
+    /// ・trimRange数を進めないために　trimRange_prv[1], trimRange_prv[1]　にする。
     /// 
-    /// 　TsShortName.p2.1000__2000.avs　を削除しておき
+    /// 　TsShortName.p2.1001__2000.avs　を削除しておき
     /// 　TsShortName.p2.1000__1000.avs　を作成 
     /// </remarks>
     public static void CreateDummy_OnError()
     {
-      int[] trimFrame_prv;
+      int[] trimRange_prv;
       {
         if (PathList.Is1stPart)
         {
-          trimFrame_prv = new int[] { 0, 0 };
+          trimRange_prv = new int[] { 0, 0 };
         }
         else
         {
-          trimFrame_prv = GetTrimFrame_previous();
-          if (trimFrame_prv == null) return;
+          trimRange_prv = GetTrimRange_previous();
+          if (trimRange_prv == null) return;
         }
       }
 
       string path = string.Format("{0}.{1}__{2}{3}",
                                   PathList.WorkPath,
-                                  trimFrame_prv[1],
-                                  trimFrame_prv[1],
+                                  trimRange_prv[1],
+                                  trimRange_prv[1],
                                   PathList.AvsVpyExt
                                   );
       File.Create(path).Close();

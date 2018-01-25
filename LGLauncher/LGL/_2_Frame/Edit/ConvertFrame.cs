@@ -49,7 +49,7 @@ namespace LGLauncher.Frame
       }
       catch
       {
-        frameList = null;  //変換失敗
+        frameList = null;  //失敗
       }
 
       //check
@@ -193,9 +193,9 @@ namespace LGLauncher.Frame
         if (i == 0 && time != 0)
           chapText += "0dix-" + time + "dox-";            //開始直後のＣＭスキップ用
         else if (i % 2 == 0)
-          chapText += "" + time + "dox-";                 //even    out cm
+          chapText += "" + time + "dox-";                 //out cm
         else
-          chapText += "" + time + "dix-";                 //odd     into cm
+          chapText += "" + time + "dix-";                 //into cm
       }
       chapText += "0eox-c";
       return chapText;
@@ -224,7 +224,7 @@ namespace LGLauncher.Frame
 
 
     /// <summary>
-    /// List<int>  -->  Ogmチャプター
+    /// List<int>  -->  Ogmチャプター   [obsolete]
     /// </summary>
     public static string To_OgmChap(List<int> frameList)
     {
@@ -249,7 +249,7 @@ namespace LGLauncher.Frame
 
 
     /// <summary>
-    /// フレーム  -->  タイムコード文字列  00:10:20.345         for Ogmチャプター
+    /// フレーム  -->  タイムコード文字列  00:10:20.345         for Ogmチャプター  [obsolete]
     /// </summary>
     private static List<string> Frame_to_TimeCode(List<int> frameList)
     {

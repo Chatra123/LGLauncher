@@ -86,20 +86,16 @@ namespace LGLauncher
 
 
   #region LwiFile
-
-
   /*
    * lwi
    *  - 作成途中のlwiを読み込む。 
-   *  - 最後のindex= 以降を削除してlwiとして使用できる形にする。 
+   *  - 最後のindex= 以降を削除してlwiとして利用できる形にする。 
    */
   class LwiFile
   {
     //lwiの３，４行目
-    //
     //<ActiveVideoStreamIndex>+0000000000</ActiveVideoStreamIndex>
     //<ActiveAudioStreamIndex>+0000000001</ActiveAudioStreamIndex>
-    //
     //はindex作成中のCreateLwiによって随時書き換えられる可能性が極わずかにあるが考慮しない。
     //書き換えの途中で読込み、不正なファイルになってもLSMASHSource.dllによって再作成されるだけ。
     //問題にはならない。
@@ -116,9 +112,9 @@ namespace LGLauncher
     /// </summary>
     public void Format()
     {
+      //コピーして終了
       if (PathList.IsAll)
       {
-        //コピーして終了
         File.Copy(PathList.LwiPath, PathList.LwiPathInLWork, true);
         return;
       }
@@ -141,12 +137,12 @@ namespace LGLauncher
           throw new LGLException("lwi text is less than 100 lines");
         //簡易ファイルチェック
         {
-          bool isLwi = true;
-          isLwi &= Regex.IsMatch(readBuff[0], @"<LSMASHWorksIndexVersion=.*>");
-          isLwi &= Regex.IsMatch(readBuff[1], @"<LibavReaderIndexFile=\d+>");
-          isLwi &= Regex.IsMatch(readBuff[2], @"<InputFilePath>.*</InputFilePath>");
-          isLwi &= Regex.IsMatch(readBuff[3], @"<LibavReaderIndex=.*>");
-          if (isLwi == false)
+          bool isValid = true;
+          isValid &= Regex.IsMatch(readBuff[0], @"<LSMASHWorksIndexVersion=.*>");
+          isValid &= Regex.IsMatch(readBuff[1], @"<LibavReaderIndexFile=\d+>");
+          isValid &= Regex.IsMatch(readBuff[2], @"<InputFilePath>.*</InputFilePath>");
+          isValid &= Regex.IsMatch(readBuff[3], @"<LibavReaderIndex=.*>");
+          if (isValid == false)
             throw new LGLException("lwi format error");
         }
         /*

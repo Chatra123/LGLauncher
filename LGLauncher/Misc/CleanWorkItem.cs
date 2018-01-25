@@ -25,11 +25,7 @@ namespace LGLauncher
       //LWorkDir
       if (PathList.Is1stPart)
       {
-        if (PathList.IsPart)
-          cleaner.OldFile(0.0, PathList.LWorkDir, "*.p?*.*");
-        else if (PathList.IsAll)
-          cleaner.OldFile(0.0, PathList.LWorkDir, "*.all.*");
-
+        cleaner.OldFile(0.0, PathList.LWorkDir, "*.p?*.*");
         cleaner.OldFile(0.0, PathList.LWorkDir, "*.frame.cat.txt");
         cleaner.OldFile(0.0, PathList.LWorkDir, "*.jls.*");
         cleaner.OldFile(0.0, PathList.LWorkDir, "*.d2v");
@@ -50,8 +46,7 @@ namespace LGLauncher
           //LWorkDir
           cleaner.OldFile(0.0, PathList.LWorkDir, "*" + PathList.TsShortName + "*");
         }
-
-      // Mode = 2,1    古いファイル削除
+      // Mode = 2, 1    古いファイル削除
       if (1 <= PathList.Mode_CleanWorkItem)
         if (PathList.IsLastPart)
         {
@@ -65,8 +60,6 @@ namespace LGLauncher
           cleaner.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.d2v");
           cleaner.OldFile(nDaysBefore, PathList.LTopWorkDir, "*.lwi");
           cleaner.EmptyDir(PathList.LTopWorkDir);
-          //Windows Temp    DGIndex
-          cleaner.OldFile(nDaysBefore, Path.GetTempPath(), "DGI_temp_*_*");
         }
     }
 
@@ -105,14 +98,14 @@ namespace LGLauncher
       var files = new FileInfo[] { };
       try
       {
-        var dirInfo = new DirectoryInfo(directory);
-        files = dirInfo.GetFiles(pattern, SearchOption.AllDirectories);//ignore case
+        var di = new DirectoryInfo(directory);
+        files = di.GetFiles(pattern, SearchOption.AllDirectories);//ignore case
       }
       catch (UnauthorizedAccessException)
       {
         /*
          * アクセス権限の無いファイルが含まれているフォルダに
-         * files = dirInfo.GetFiles();
+         * files = di.GetFiles();
          * を実行すると System.UnauthorizedAccessExceptionが発生する。
          * 
          * Java  jre-8u73-windows-i586.exeを実行してインストール用のウィンドウを表示させると、
@@ -122,17 +115,17 @@ namespace LGLauncher
         return;
       }
 
-      foreach (var finfo in files)
+      foreach (var fi in files)
       {
-        if (finfo.Exists == false) continue;
-        if (ignore != null && 0 <= finfo.Name.IndexOf(ignore)) continue;
+        if (fi.Exists == false) continue;
+        if (ignore != null && 0 <= fi.Name.IndexOf(ignore)) continue;
 
         //古いファイル？
-        bool over_creation = nDaysBefore < (DateTime.Now - finfo.CreationTime).TotalDays;
-        bool over_lastwrite = nDaysBefore < (DateTime.Now - finfo.LastWriteTime).TotalDays;
+        bool over_creation = nDaysBefore < (DateTime.Now - fi.CreationTime).TotalDays;
+        bool over_lastwrite = nDaysBefore < (DateTime.Now - fi.LastWriteTime).TotalDays;
         if (over_creation && over_lastwrite)
         {
-          try { finfo.Delete(); }
+          try { fi.Delete(); }
           catch { /*ファイル使用中*/ }
         }
       }
@@ -150,23 +143,22 @@ namespace LGLauncher
       var dirs = new DirectoryInfo[] { };
       try
       {
-        var dirInfo = new DirectoryInfo(parent_dir);
-        dirs = dirInfo.GetDirectories("*", SearchOption.AllDirectories);
+        var di = new DirectoryInfo(parent_dir);
+        dirs = di.GetDirectories("*", SearchOption.AllDirectories);
       }
       catch (UnauthorizedAccessException)
       {
         return;
       }
 
-      foreach (var dinfo in dirs)
+      foreach (var di in dirs)
       {
-        if (dinfo.Exists == false) continue;
-
+        if (di.Exists == false) continue;
         //空フォルダ？
-        var files = dinfo.GetFiles();
+        var files = di.GetFiles();
         if (files.Count() == 0)
         {
-          try { dinfo.Delete(); }
+          try { di.Delete(); }
           catch { /*フォルダ使用中*/ }
         }
       }

@@ -16,7 +16,7 @@ namespace LGLauncher.Frame.JLS
     /// <summary>
     ///  LogoFrameのresultを連結
     /// </summary>
-    public static void Concat(int[] trimFrame)
+    public static void Concat(int[] trimRange)
     {
       //logoframeによって作成されるファイル                     *.p3.jls.logoframe.txt
       string addText_Path = PathList.WorkPath + ".jls.logoframe.txt";
@@ -35,12 +35,12 @@ namespace LGLauncher.Frame.JLS
         {
           old_CatText = TextR.ReadAllLines(catText_Path);    // from  *.jls.logoframe.cat.txt
           if (old_CatText == null && addText == null)
-            throw new LGLException("not detect logoframe file");
+            throw new LGLException("logoframe file is not found");
         }
         //空白行を除去
         addText = addText ?? new List<string>();
         addText = addText.Where(line => string.IsNullOrWhiteSpace(line) == false)
-                                             .ToList();
+                         .ToList();
         old_CatText = old_CatText ?? new List<string>();
         old_CatText = old_CatText.Where(line => string.IsNullOrWhiteSpace(line) == false)
                                  .ToList();
@@ -51,10 +51,9 @@ namespace LGLauncher.Frame.JLS
       List<string> new_CatText;
       {
         new_CatText = new List<string>(old_CatText);
-
-        if (PathList.IsPart && trimFrame != null)
+        if (trimRange != null)
         {
-          int beginFrame = trimFrame[0];
+          int beginFrame = trimRange[0];
           addText = AppendOffset_logoframe(addText, beginFrame);
         }
         new_CatText.AddRange(addText);
@@ -98,8 +97,6 @@ namespace LGLauncher.Frame.JLS
        *   64 S 0 BTM     64     64
        * 2863 E 0 ALL   2837   2863
        */
-
-      //文字抽出
       Match match;
       {
         const string pattern = @"\s*(?<frame_1>\d+)\s+(?<SorE>\w+)\s+(?<fade>\d+)\s+(?<interlace>\w+)\s+(?<frame_2>\d+)\s+(?<frame_3>\d+)\s*";
@@ -107,17 +104,16 @@ namespace LGLauncher.Frame.JLS
         if (match.Success == false)
           throw new LGLException("logoframe text regex match error");
       }
-      //文字列から抽出する値
+
+      //string --> int
       int frame_1, frame_2, frame_3;
       int fade;
       string SorE, interlace;
-      //文字　→　数値
       try
       {
         frame_1 = int.Parse(match.Groups["frame_1"].Value);
         frame_2 = int.Parse(match.Groups["frame_2"].Value);
         frame_3 = int.Parse(match.Groups["frame_3"].Value);
-
         fade = int.Parse(match.Groups["fade"].Value);
         SorE = match.Groups["SorE"].Value;
         interlace = match.Groups["interlace"].Value;
@@ -131,7 +127,7 @@ namespace LGLauncher.Frame.JLS
       frame_1 += frame_offset;
       frame_2 += frame_offset;
       frame_3 += frame_offset;
-      //update line
+      //new line
       string new_line = string.Format("{0,6} {1} {2} {3} {4,6} {5,6}",
                                       frame_1,
                                       SorE, fade, interlace,
